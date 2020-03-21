@@ -23,7 +23,9 @@ daten_punkte <- daten_punkte_raw %>%
 punkte_mit_kreis <- daten_punkte %>% mutate(
   intersection_id = as.integer(st_intersects(geometry, nuts_sf)),
   kreis = case_when(is.na(intersection_id) ~ 'keine kreis zuordnung!',
-                    !is.na(intersection_id) ~ nuts_sf$NUTS_NAME[intersection_id])
+                    !is.na(intersection_id) ~ nuts_sf$NUTS_NAME[intersection_id]),
+  nuts_3 = case_when(is.na(intersection_id) ~ 'keine kreis zuordnung!',
+                     !is.na(intersection_id) ~ nuts_sf$NUTS_ID[intersection_id])
 ) %>% 
   select(-intersection_id)
 
