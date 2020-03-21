@@ -53,10 +53,10 @@ class GeoToAgs:
     result.update({"distance_in_meters": distances.min().m})
     return result
     
-stations = pd.read_csv('stations_with_googlelatlot_earliest_latest_meas.csv',index_col=0, sep=",", encoding="utf-8")
-stations['ags'] = 0
-stations["ascii"] = ""
-stations["distanceinmeters"] = ""
+#stations = pd.read_csv('stations_with_googlelatlot_earliest_latest_meas.csv',index_col=0, sep=",", encoding="utf-8")
+#stations['ags'] = 0
+#stations["ascii"] = ""
+#stations["distanceinmeters"] = ""
 GTA = GeoToAgs()
 
 for x in range(len(stations)):
