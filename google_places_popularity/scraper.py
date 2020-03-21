@@ -8,15 +8,15 @@ import os
 if "googleapis_keys" in os.environ:
     api_key = os.environ["googleapis_keys"]
 else:
-    with open("google_places_popularity/api_keys.txt") as f:
+    with open("api_keys.txt") as f:
         api_key = f.readline()
 
 date = datetime.now()
-with open("google_places_popularity/place_ids/staedte_koordinaten_ueber_50k_ids.csv") as f:
+with open("place_ids/staedte_koordinaten_ueber_50k_ids.csv") as f:
         place_ids = [id.strip() for id in f.readlines()]
 
 result = []
-for x, place_id in enumerate(place_ids[:4]):
+for x, place_id in enumerate(place_ids):
     try:
         key = api_key
         data = populartimes.get_id(key, place_id)
