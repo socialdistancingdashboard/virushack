@@ -33,4 +33,4 @@ with open('kreise_mit_center.csv', newline='',encoding='utf-8') as csvfile:
                     'airquality': response.content
                 }
                 new_record_encoded = str(new_record).encode('utf-8')
-                #client.put_record(DeliveryStreamName='sdd-kinesis-airquality', Record={'Data': base64.b64encode(new_record_encoded)})
+                client.put_record(DeliveryStreamName='sdd-kinesis-airquality', Record={'Data': base64.b64encode(new_record_encoded)})
