@@ -31,4 +31,4 @@ for x, place_id in enumerate(place_ids):
 
 client = boto3.client('s3')
 client.put_object(Body=json.dumps(result),  Bucket='sdd-s3-basebucket',
-              Key='googleplaces/{}/{}/{}/{}.json'.format(str(date.year), str(date.month).zfill(2), str(date.day), str(date.hour)))
+              Key='googleplaces/{}/{}/{}/{}.json'.format(str(date.year).zfill(4), str(date.month).zfill(2), str(date.day).zfill(2), str(date.hour).zfill(2)))
