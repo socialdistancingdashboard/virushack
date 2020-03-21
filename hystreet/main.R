@@ -26,7 +26,7 @@ for (id in unique(locations$id))
 }
 
 #saveRDS(alldata, file = "hystreet_20_01_01_u_20_03_20_hour.rds")
-alldata <- readRDS("hystreet_20_01_01_u_20_03_20_hour.rds")
+alldata <- readRDS("rds/hystreet_20_01_01_u_20_03_20_hour.rds")
 
 everything <- list()
 for (stationid in names(alldata))
@@ -46,13 +46,13 @@ for (stationid in names(alldata))
     query = list(
       from =  datestart,
       to =   dateend,
-      resolution = "hour"
+      resolution = "day"
     )
   )
   everything[[stationid]] <- data
 }
 warnings()
-#saveRDS(everything, file = "alldata_earliest_latest_per_station.rds")
+saveRDS(everything, file = "rds/alldata_earliest_latest_per_station.rds")
 everything <- readRDS(file = "rds/alldata_earliest_to_latest_per_station.rds")
 
 data_long <- data.frame(
@@ -75,6 +75,9 @@ data_long <- data_long[-1, ]
 incident_data <-data.frame(stationid=NA, id=NA,name=NA,icon=NA, description=NA,active_from=NA,active_to=NA)
 incident_data <- incident_data[-1,]
 
+stations <- read.csv("stations_with_googlelatlot_earliest_latest_meas.csv")
+
+
 for (listnames in names(everything))
 {
   listdata <- everything[[listnames]]
@@ -84,11 +87,10 @@ for (listnames in names(everything))
   incident_data_temp <-data.frame(stationid=listnames, id=incdata$id,name=incdata$name,icon=incdata$icon, description=incdata$description,active_from=incdata$active_from,active_to=incdata$active_to)
   incident_data <- rbind(incident_data, incident_data_temp)
   }
-  station_location <- as.character(unique(paste0(listdata$name,",",listdata$city)))
-  df <- as.data.frame(ggmap::geocode(station_location))
-  lon <- df[,1]
-  lat <- df[,2]
-
+  lon <- stations$lon[stations$stationid==as.numeric(listnames)]
+  lat <- stations$lat[stations$stationid==as.numeric(listnames)]
+  
+  
   rows <- nrow(listdata$measurements)
   if(!is.null(rows))
   {
@@ -130,7 +132,12 @@ library(ggmap)
 library(dplyr)
 register_google(key = readChar("googleconsolekey", 39))
 names()
-stations <- latest %>% group_by(stationid,lon,lat, ) %>% summarise()
+stations <- latest %>% group_by(name,city,stationid,lon,lat,earliest_measurement_at,latest_measurement_at ) %>% summarise()
+write.csv(stations,"stations_with_googlelatlot_earliest_latest_meas.csv", row.names = F,fileEncoding = "UTF-8")
+summary(stations)
+
+names(latest)
+
 map <- get_map("Germany", zoom = 6, maptype = "toner")
 
 ggmap(map) +  geom_point(aes(x = lon, y = lat,  colour = as.factor(stationid)), data = stations, size = 0.5)  
