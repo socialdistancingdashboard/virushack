@@ -21,90 +21,48 @@ We assume the AQI (Real-time Air Quality Index ) is a good overall index for the
 - in depth analysis of data points
 
 ### Open Questions
-- understand what AQI means, e.g. good, moderate, bad values
+- understand what AQI means, e.g. good, moderate, bad values (rule of thumb, the lower the better)
 
-### Firehose Record
+### Persisted Record
 Please not that this is just an example and data might not be consistent
 ```
 {
-    'landkreis_name': 'Südwestpfalz',
-    'datetime': '2020-03-21 18:15:09.328316',
-    'lat': 7.65775790003346,
-    'lon': 49.20807801390453,
-    'airquality': '{
-                       "status": "ok",
-                       "data": {
-                           "aqi": 147,
-                           "idx": 1437,
-                           "attributions": [
-                               {
-                                   "url": "https://china.usembassy-china.org.cn/embassy-consulates/shanghai/air-quality-monitor-stateair/",
-                                   "name": "U.S. Consulate Shanghai Air Quality Monitor"
-                               },
-                               {
-                                   "url": "https://sthj.sh.gov.cn/",
-                                   "name": "Shanghai Environment Monitoring Center(上海市环境监测中心)"
-                               },
-                               {
-                                   "url": "http://106.37.208.233:20035/emcpublish/",
-                                   "name": "China National Urban air quality real-time publishing platform (全国城市空气质量实时发布平台)"
-                               },
-                               {
-                                   "url": "https://waqi.info/",
-                                   "name": "World Air Quality Index Project"
-                               }
-                           ],
-                           "city": {
-                               "geo": [
-                                   31.2047372,
-                                   121.4489017
-                               ],
-                               "name": "Shanghai (上海)",
-                               "url": "https://aqicn.org/city/shanghai"
-                           },
-                           "dominentpol": "pm25",
-                           "iaqi": {
-                               "co": {
-                                   "v": 8.2
-                               },
-                               "h": {
-                                   "v": 93
-                               },
-                               "no2": {
-                                   "v": 23.4
-                               },
-                               "o3": {
-                                   "v": 33.3
-                               },
-                               "p": {
-                                   "v": 1007.4
-                               },
-                               "pm10": {
-                                   "v": 52
-                               },
-                               "pm25": {
-                                   "v": 147
-                               },
-                               "so2": {
-                                   "v": 2.1
-                               },
-                               "t": {
-                                   "v": 17.7
-                               },
-                               "w": {
-                                   "v": 0.2
-                               }
-                           },
-                           "time": {
-                               "s": "2020-03-21 23:00:00",
-                               "tz": "+08:00",
-                               "v": 1584831600
-                           },
-                           "debug": {
-                               "sync": "2020-03-22T01:28:00+09:00"
-                           }
-                       }
-                   }'
+  'landkreis_name': 'Südwestpfalz',
+  'datetime': '2020-03-21 18:15:09.328316',
+  'lat': '49.20807801390453',
+  'lon': '7.65775790003346',
+  'airquality': {
+    'aqi': 2,
+    'iaqi': {
+      'dew': {
+        'v': 3
+      },
+      'h': {
+        'v': 95.3
+      },
+      'no2': {
+        'v': 9.6
+      },
+      'o3': {
+        'v': 17.9
+      },
+      'p': {
+        'v': 1022.5
+      },
+      'pm10': {
+        'v': 2
+      },
+      't': {
+        'v': 3.6
+      },
+      'w': {
+        'v': 8.2
+      },
+      'wg': {
+        'v': 11.3
+      }
+    }
+  }
 }
 ```
 
@@ -118,3 +76,15 @@ export AIR_QUALITY_API_TOKEN=<your token>
 
 ### Run
 ```python airquality/airquality.py```
+
+## MISC Dev template
+### AWS and firehose
+We used ``boto3`` as client to connect to ``firehose``
+```
+client = boto3.client('firehose')
+...
+client.put_record(DeliveryStreamName='sdd-kinesis-<your data bucket>',
+                  Record={'Data': base64.b64encode(<your data string>)})
+```
+
+Check with @Tho to get your ``DeliveryStreamName``

@@ -38,6 +38,7 @@ def get_all_places(lat,long, radius):
     return page_ids
 
 def filter_popularity_available(place_ids):
+
     result = []
     #print(len(place_ids))
     for x, place_id in enumerate(tqdm(place_ids)):
@@ -57,6 +58,8 @@ def read_data_csv(file, encoding = "UTF-8", sep = ","):
     places = pd.read_csv(file, encoding = encoding, sep = sep, names = ["city", "lat", "long"], header = 0)
     print(places.head())
     print(places.shape)
+    # with open("place_ids/staedte_koordinaten_ueber_50k_ids.csv") as f:
+    #     id_list = [key.strip() for key in f.readlines()]
     id_list = []
     for index , row in tqdm(places.iterrows()):
         print(row[0])
