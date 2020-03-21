@@ -65,7 +65,7 @@ class DetectorAPI:
 class PeopleCounter:
     def __init__(self, model_path, threshold=0.7):
         self.odapi = DetectorAPI(path_to_ckpt=model_path)
-        self.threshold = 0.6
+        self.threshold = threshold
 
     def get_image(self, url):
         resp = urllib.request.urlopen(url)
@@ -111,4 +111,4 @@ if __name__ == '__main__':
         pc.get_image(cam['URL'])
         cam['Personenzahl'] = pc.count_people(verbose=False)
         cam['Stand'] = datetime.now().strftime("%Y-%m-%d %H:%M")
-        #print(cam["Name"]+" :"+str(cam["Personenzahl"]))
+        print(cam["Name"]+" :"+str(cam["Personenzahl"]))
