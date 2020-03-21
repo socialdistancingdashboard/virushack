@@ -10,7 +10,6 @@ import numpy as np
 import tensorflow.compat.v1 as tf
 import cv2
 import urllib
-import numpy as np
 from datetime import datetime
 
 # Geklaut von https://gist.github.com/madhawav/1546a4b99c8313f06c0b2d7d7b4a09e2
