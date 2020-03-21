@@ -1,0 +1,210 @@
+
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "apiVersion": "0.1",
+    "source": "geocode.xyz",
+    "matches": "118",
+    "type": "batch"
+  },
+  "features": [
+{ "type": "Feature", "id": 1, "geometry": { "type": "Point", "coordinates": [ 10.89625, 48.36907 ] }, "properties": { "location": "Annastrasse Augsburg DE 86150", "confidence": "0.3","LL": "48.36907,10.89625","Input":"251;Augsburg;Annastraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 2, "geometry": { "type": "Point", "coordinates": [ 8.21358, 53.13924 ] }, "properties": { "location": "Lange Strasse Oldenburg DE ", "confidence": "0.35","LL": "53.13924,8.21358","Input":"209;Oldenburg;Lange Straße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 3, "geometry": { "type": "Point", "coordinates": [ 9.17791, 48.77631 ] }, "properties": { "location": "Stiftstrasse Stuttgart DE 70173", "confidence": "0.3","LL": "48.77631,9.17791","Input":"151;Stuttgart;Stiftstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 4, "geometry": { "type": "Point", "coordinates": [ 6.6147, 51.83753 ] }, "properties": { "location": "Neustrasse Bocholt DE 46399", "confidence": "0.3","LL": "51.83753,6.6147","Input":"253;Bocholt;Neustraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 5, "geometry": { "type": "Point", "coordinates": [ 6.95634, 50.93818 ] }, "properties": { "location": "Hohe Strasse Köln DE 50667", "confidence": "0.3","LL": "50.93818,6.95634","Input":"168;Köln;Hohe Straße (Nord","Region":"DE"}}
+,
+{ "type": "Feature", "id": 6, "geometry": { "type": "Point", "coordinates": [ 9.9891, 53.55271 ] }, "properties": { "location": "Grosse Bleichen Hamburg DE ", "confidence": "0.35","LL": "53.55271,9.9891","Input":"93;Hamburg;Große Bleichen","Region":"DE"}}
+,
+{ "type": "Feature", "id": 7, "geometry": { "type": "Point", "coordinates": [ 9.93126, 49.79534 ] }, "properties": { "location": "Schönbornstrasse Würzburg DE 97070", "confidence": "0.3","LL": "49.79534,9.93126","Input":"135;Würzburg;Schönbornstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 8, "geometry": { "type": "Point", "coordinates": [ 9.43469, 54.78509 ] }, "properties": { "location": "Holm Flensburg DE 24937", "confidence": "0.4","LL": "54.78509,9.43469","Input":"252;Flensburg;Holm","Region":"DE"}}
+,
+{ "type": "Feature", "id": 9, "geometry": { "type": "Point", "coordinates": [ 10.52136, 52.26512 ] }, "properties": { "location": "Sack Braunschweig DE 38100", "confidence": "0.4","LL": "52.26512,10.52136","Input":"131;Braunschweig;Sack","Region":"DE"}}
+,
+{ "type": "Feature", "id": 10, "geometry": { "type": "Point", "coordinates": [ 11.05847, 49.7197 ] }, "properties": { "location": "Hauptstrasse Erlangen DE ", "confidence": "0.3","LL": "49.7197,11.05847","Input":"142;Erlangen;Hauptstraße (Süd","Region":"DE"}}
+,
+{ "type": "Feature", "id": 11, "geometry": { "type": "Point", "coordinates": [ 11.1296, 49.4741 ] }, "properties": { "location": "Nürnberg Nürnberg DE 90491", "confidence": "0.4","LL": "49.4741,11.1296","Input":"89;Nürnberg;Kaiserstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 12, "geometry": { "type": "Point", "coordinates": [ 6.95385, 50.93662 ] }, "properties": { "location": "Schildergasse Köln DE 50667", "confidence": "0.3","LL": "50.93662,6.95385","Input":"160;Köln;Schildergasse (Ost","Region":"DE"}}
+,
+{ "type": "Feature", "id": 13, "geometry": { "type": "Point", "coordinates": [ 8.0131, 52.2983 ] }, "properties": { "location": "Osnabrück Osnabrück DE 49090", "confidence": "0.35","LL": "52.2983,8.0131","Input":"109;Osnabrück;Krahnstraße (Mitte, Altstadt","Region":"DE"}}
+,
+{ "type": "Feature", "id": 14, "geometry": { "type": "Point", "coordinates": [ 11.03211, 50.97674 ] }, "properties": { "location": "Schlosserstrasse Erfurt DE ", "confidence": "0.25","LL": "50.97674,11.03211","Input":"57;Erfurt;Schlösserstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 15, "geometry": { "type": "Point", "coordinates": [ 9.98852, 48.39824 ] }, "properties": { "location": "Hirschstrasse Ulm DE 89073", "confidence": "0.25","LL": "48.39824,9.98852","Input":"146;Ulm;Hirschstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 16, "geometry": { "type": "Point", "coordinates": [ 9.21648, 49.13991 ] }, "properties": { "location": "Fleiner Strasse Heilbronn DE 74072", "confidence": "0.35","LL": "49.13991,9.21648","Input":"139;Heilbronn;Fleiner Straße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 17, "geometry": { "type": "Point", "coordinates": [ 7.84979, 47.99506 ] }, "properties": { "location": "Kaiser-Joseph-Strasse Freiburg DE ", "confidence": "0.3","LL": "47.99506,7.84979","Input":"143;Freiburg;Kaiser-Joseph-Straße (Mitte","Region":"DE"}}
+,
+{ "type": "Feature", "id": 18, "geometry": { "type": "Point", "coordinates": [ 13.33637, 52.50398 ] }, "properties": { "location": "Tauentzienstrasse Berlin DE 10789", "confidence": "0.25","LL": "52.50398,13.33637","Input":"98;Berlin;Tauentzienstraße Südseite (West","Region":"DE"}}
+,
+{ "type": "Feature", "id": 19, "geometry": { "type": "Point", "coordinates": [ 6.94938, 50.93735 ] }, "properties": { "location": "Zeppelinstrasse Köln DE 50667", "confidence": "0.25","LL": "50.93735,6.94938","Input":"167;Köln;Zeppelinstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 20, "geometry": { "type": "Point", "coordinates": [ 9.78911, 48.09931 ] }, "properties": { "location": "Bürgerturmstrasse Biberach An Der Riss DE ", "confidence": "0.4","LL": "48.09931,9.78911","Input":"250;Biberach an der Riß;Bürgerturmstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 21, "geometry": { "type": "Point", "coordinates": [ 9.73817, 52.37516 ] }, "properties": { "location": "Grosse Packhofstrasse Hannöver DE 30159", "confidence": "0.4","LL": "52.37516,9.73817","Input":"64;Hannover;Große Packhofstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 22, "geometry": { "type": "Point", "coordinates": [ 6.64558, 51.35735 ] }, "properties": { "location": "Krefeld-Uerdingen Krefeld DE ", "confidence": "0.25","LL": "51.35735,6.64558","Input":"145;Krefeld;Rheinstraße (West","Region":"DE"}}
+,
+{ "type": "Feature", "id": 23, "geometry": { "type": "Point", "coordinates": [ 8.65376, 49.872 ] }, "properties": { "location": "Ernst-Ludwig-Strasse Darmstadt DE 64283", "confidence": "0.3","LL": "49.872,8.65376","Input":"104;Darmstadt;Ernst-Ludwig-Straße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 24, "geometry": { "type": "Point", "coordinates": [ 8.53152, 52.02587 ] }, "properties": { "location": "Bahnhofstrasse Bielefeld DE ", "confidence": "0.3","LL": "52.02587,8.53152","Input":"163;Bielefeld;Bahnhofstraße (Süd","Region":"DE"}}
+,
+{ "type": "Feature", "id": 25, "geometry": { "type": "Point", "coordinates": [ 10.89685, 48.36698 ] }, "properties": { "location": "Bürgermeister-Fischer-Strasse Augsburg DE 86150", "confidence": "0.3","LL": "48.36698,10.89685","Input":"102;Augsburg;Bürgermeister-Fischer-Straße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 26, "geometry": { "type": "Point", "coordinates": [ 8.27233, 50.0001 ] }, "properties": { "location": "Schusterstrasse Mainz DE 55116", "confidence": "0.25","LL": "50.0001,8.27233","Input":"71;Mainz;Schusterstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 27, "geometry": { "type": "Point", "coordinates": [ 8.27007, 50.00096 ] }, "properties": { "location": "Stadthausstrasse Mainz DE ", "confidence": "0.25","LL": "50.00096,8.27007","Input":"72;Mainz;Stadthausstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 28, "geometry": { "type": "Point", "coordinates": [ 9.17667, 48.77714 ] }, "properties": { "location": "Königstrasse Stuttgart DE 70173", "confidence": "0.35","LL": "48.77714,9.17667","Input":"77;Stuttgart;Königstraße (Süd","Region":"DE"}}
+,
+{ "type": "Feature", "id": 29, "geometry": { "type": "Point", "coordinates": [ 7.01268, 51.45491 ] }, "properties": { "location": "Kettwiger Strasse Essen DE 45127", "confidence": "0.3","LL": "51.45491,7.01268","Input":"125;Essen;Kettwiger Straße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 30, "geometry": { "type": "Point", "coordinates": [ 6.63744, 49.7546 ] }, "properties": { "location": "Fleischstrasse Trier DE 54290", "confidence": "0.25","LL": "49.7546,6.63744","Input":"140;Trier;Fleischstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 31, "geometry": { "type": "Point", "coordinates": [ 8.04698, 52.27337 ] }, "properties": { "location": "Grosse Strasse Osnabrück DE ", "confidence": "0.35","LL": "52.27337,8.04698","Input":"153;Osnabrück;Große Straße (Süd","Region":"DE"}}
+,
+{ "type": "Feature", "id": 32, "geometry": { "type": "Point", "coordinates": [ 11.6366, 48.1408 ] }, "properties": { "location": "München München DE 81929", "confidence": "0.4","LL": "48.1408,11.6366","Input":"73;München;Neuhauser Straße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 33, "geometry": { "type": "Point", "coordinates": [ 6.77952, 51.2237 ] }, "properties": { "location": "Königsallee Düsseldorf DE 40212", "confidence": "0.35","LL": "51.2237,6.77952","Input":"56;Düsseldorf;Königsallee Ostseite (Süd","Region":"DE"}}
+,
+{ "type": "Feature", "id": 34, "geometry": { "type": "Point", "coordinates": [ 11.42603, 48.76416 ] }, "properties": { "location": "Ludwigstrasse Ingolstadt DE 85049", "confidence": "0.35","LL": "48.76416,11.42603","Input":"123;Ingolstadt;Ludwigstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 35, "geometry": { "type": "Point", "coordinates": [ 9.99105, 53.55165 ] }, "properties": { "location": "Neuer Wall Hamburg DE 20354", "confidence": "0.35","LL": "53.55165,9.99105","Input":"91;Hamburg;Neuer Wall","Region":"DE"}}
+,
+{ "type": "Feature", "id": 36, "geometry": { "type": "Point", "coordinates": [ 11.57353, 48.13742 ] }, "properties": { "location": "Kaufingerstrasse München DE 80331", "confidence": "0.25","LL": "48.13742,11.57353","Input":"165;München;Kaufingerstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 37, "geometry": { "type": "Point", "coordinates": [ 10.08503, 52.62453 ] }, "properties": { "location": "Zöllnerstrasse Celle DE 29221", "confidence": "0.25","LL": "52.62453,10.08503","Input":"254;Celle;Zöllnerstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 38, "geometry": { "type": "Point", "coordinates": [ 8.46534, 49.4881 ] }, "properties": { "location": "Planken Mannheim DE ", "confidence": "0.35","LL": "49.4881,8.46534","Input":"96;Mannheim;Planken (Ost","Region":"DE"}}
+,
+{ "type": "Feature", "id": 39, "geometry": { "type": "Point", "coordinates": [ 9.73777, 52.37232 ] }, "properties": { "location": "Karmarschstrasse Hannöver DE 30159", "confidence": "0.3","LL": "52.37232,9.73777","Input":"65;Hannover;Karmarschstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 40, "geometry": { "type": "Point", "coordinates": [ 7.09916, 50.73565 ] }, "properties": { "location": "Sternstrasse Bonn DE 53111", "confidence": "0.25","LL": "50.73565,7.09916","Input":"52;Bonn;Sternstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 41, "geometry": { "type": "Point", "coordinates": [ 8.27276, 50.00041 ] }, "properties": { "location": "Am Brand Mainz DE 55116", "confidence": "0.35","LL": "50.00041,8.27276","Input":"85;Mainz;Am Brand","Region":"DE"}}
+,
+{ "type": "Feature", "id": 42, "geometry": { "type": "Point", "coordinates": [ 13.73507, 51.04399 ] }, "properties": { "location": "Prager Strasse Dresden DE 1069", "confidence": "0.35","LL": "51.04399,13.73507","Input":"164;Dresden;Prager Straße (Nord","Region":"DE"}}
+,
+{ "type": "Feature", "id": 43, "geometry": { "type": "Point", "coordinates": [ 9.99216, 48.39911 ] }, "properties": { "location": "Münsterplatz Ulm DE 89073", "confidence": "0.25","LL": "48.39911,9.99216","Input":"78;Ulm;Münsterplatz","Region":"DE"}}
+,
+{ "type": "Feature", "id": 44, "geometry": { "type": "Point", "coordinates": [ 7.62439, 51.96054 ] }, "properties": { "location": "Rothenburg Münster DE 48143", "confidence": "0.3","LL": "51.96054,7.62439","Input":"100;Münster;Rothenburg","Region":"DE"}}
+,
+{ "type": "Feature", "id": 45, "geometry": { "type": "Point", "coordinates": [ 8.80451, 53.07773 ] }, "properties": { "location": "Obernstrasse Bremen DE ", "confidence": "0.3","LL": "53.07773,8.80451","Input":"172;Bremen;Obernstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 46, "geometry": { "type": "Point", "coordinates": [ 6.15334, 50.78118 ] }, "properties": { "location": "Stadt Aachen - Bezirksamt Eilendorf Aachen DE 52080", "confidence": "0.3","LL": "50.78118,6.15334","Input":"170;Aachen;Adalbertstraße (West","Region":"DE"}}
+,
+{ "type": "Feature", "id": 47, "geometry": { "type": "Point", "coordinates": [ 6.77374, 51.2253 ] }, "properties": { "location": "Flinger Strasse Düsseldorf DE 40213", "confidence": "0.35","LL": "51.2253,6.77374","Input":"55;Düsseldorf;Flinger Straße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 48, "geometry": { "type": "Point", "coordinates": [ 12.37448, 51.33839 ] }, "properties": { "location": "Petersstrasse Leipzig DE 4109", "confidence": "0.3","LL": "51.33839,12.37448","Input":"68;Leipzig;Petersstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 49, "geometry": { "type": "Point", "coordinates": [ 9.93526, 51.53467 ] }, "properties": { "location": "Göttingen Göttingen DE ", "confidence": "0.25","LL": "51.53467,9.93526","Input":"244;Göttingen;Weender Straße (Süd","Region":"DE"}}
+,
+{ "type": "Feature", "id": 50, "geometry": { "type": "Point", "coordinates": [ 10.52102, 52.26246 ] }, "properties": { "location": "Hutfiltern Braunschweig DE 38100", "confidence": "0.35","LL": "52.26246,10.52102","Input":"128;Braunschweig;Hutfiltern","Region":"DE"}}
+,
+{ "type": "Feature", "id": 51, "geometry": { "type": "Point", "coordinates": [ 10.52037, 52.26281 ] }, "properties": { "location": "Schuhstrasse Braunschweig DE 38100", "confidence": "0.35","LL": "52.26281,10.52037","Input":"129;Braunschweig;Schuhstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 52, "geometry": { "type": "Point", "coordinates": [ 8.05204, 52.26924 ] }, "properties": { "location": "Johannisstrasse Osnabrück DE 49074", "confidence": "0.3","LL": "52.26924,8.05204","Input":"110;Osnabrück;Johannisstraße (Nord","Region":"DE"}}
+,
+{ "type": "Feature", "id": 53, "geometry": { "type": "Point", "coordinates": [ 13.30322, 52.49955 ] }, "properties": { "location": "Kurfürstendamm Berlin DE 10709", "confidence": "0.25","LL": "52.49955,13.30322","Input":"94;Berlin;Kurfürstendamm Nordseite (Ost","Region":"DE"}}
+,
+{ "type": "Feature", "id": 54, "geometry": { "type": "Point", "coordinates": [ 8.67248, 50.58364 ] }, "properties": { "location": "Seltersweg Giessen DE 35390", "confidence": "0.3","LL": "50.58364,8.67248","Input":"122;Gießen;Seltersweg","Region":"DE"}}
+,
+{ "type": "Feature", "id": 55, "geometry": { "type": "Point", "coordinates": [ 10.51825, 52.26249 ] }, "properties": { "location": "Poststrasse Braunschweig DE 38100", "confidence": "0.35","LL": "52.26249,10.51825","Input":"127;Braunschweig;Poststraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 56, "geometry": { "type": "Point", "coordinates": [ 7.62753, 51.95757 ] }, "properties": { "location": "Ludgeristrasse Münster DE 48143", "confidence": "0.3","LL": "51.95757,7.62753","Input":"117;Münster;Ludgeristraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 57, "geometry": { "type": "Point", "coordinates": [ 6.9431, 50.93845 ] }, "properties": { "location": "Ehrenstrasse Köln DE 50672", "confidence": "0.25","LL": "50.93845,6.9431","Input":"205;Köln;Ehrenstraße (Mitte","Region":"DE"}}
+,
+{ "type": "Feature", "id": 58, "geometry": { "type": "Point", "coordinates": [ 8.04718, 52.27591 ] }, "properties": { "location": "Herrenteichsstrasse Osnabrück DE ", "confidence": "0.3","LL": "52.27591,8.04718","Input":"114;Osnabrück;Herrenteichsstraße (Ost","Region":"DE"}}
+,
+{ "type": "Feature", "id": 59, "geometry": { "type": "Point", "coordinates": [ 8.5753, 51.4 ] }, "properties": { "location": "Bahnhofstrasse Brilon DE ", "confidence": "0.25","LL": "51.4,8.5753","Input":"249;Brilon;Bahnhofstraße (Mitte","Region":"DE"}}
+,
+{ "type": "Feature", "id": 60, "geometry": { "type": "Point", "coordinates": [ 10.51855, 52.26391 ] }, "properties": { "location": "Neue Strasse Braunschweig DE ", "confidence": "0.35","LL": "52.26391,10.51855","Input":"126;Braunschweig;Neue Straße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 61, "geometry": { "type": "Point", "coordinates": [ 10.52563, 52.26416 ] }, "properties": { "location": "Langer Hof Braunschweig DE 38100", "confidence": "0.35","LL": "52.26416,10.52563","Input":"132;Braunschweig;Langer Hof","Region":"DE"}}
+,
+{ "type": "Feature", "id": 62, "geometry": { "type": "Point", "coordinates": [ 8.39828, 49.00996 ] }, "properties": { "location": "Kaiserstrasse Karlsruhe DE 76133", "confidence": "0.3","LL": "49.00996,8.39828","Input":"67;Karlsruhe;Kaiserstraße (Mitte","Region":"DE"}}
+,
+{ "type": "Feature", "id": 63, "geometry": { "type": "Point", "coordinates": [ 7.10055, 50.73406 ] }, "properties": { "location": "Remigiusstrasse Bonn DE ", "confidence": "0.25","LL": "50.73406,7.10055","Input":"51;Bonn;Remigiusstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 64, "geometry": { "type": "Point", "coordinates": [ 12.37365, 51.34208 ] }, "properties": { "location": "Hainstrasse Leipzig DE 4109", "confidence": "0.3","LL": "51.34208,12.37365","Input":"69;Leipzig;Hainstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 65, "geometry": { "type": "Point", "coordinates": [ 10.00208, 53.55192 ] }, "properties": { "location": "Spitalerstrasse Hamburg DE ", "confidence": "0.3","LL": "53.55192,10.00208","Input":"81;Hamburg;Spitalerstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 66, "geometry": { "type": "Point", "coordinates": [ 8.23766, 50.07984 ] }, "properties": { "location": "Kirchgasse Wiesbaden DE 65185", "confidence": "0.35","LL": "50.07984,8.23766","Input":"79;Wiesbaden;Kirchgasse","Region":"DE"}}
+,
+{ "type": "Feature", "id": 67, "geometry": { "type": "Point", "coordinates": [ 11.07419, 49.45119 ] }, "properties": { "location": "Karolinenstrasse Nürnberg DE ", "confidence": "0.3","LL": "49.45119,11.07419","Input":"90;Nürnberg;Karolinenstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 68, "geometry": { "type": "Point", "coordinates": [ 9.21176, 48.4924 ] }, "properties": { "location": "Wilhelmstrasse Reutlingen DE 72764", "confidence": "0.3","LL": "48.4924,9.21176","Input":"134;Reutlingen;Wilhelmstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 69, "geometry": { "type": "Point", "coordinates": [ 8.67466, 50.11401 ] }, "properties": { "location": "Goethestrasse Frankfurt DE 60313", "confidence": "0.45","LL": "50.11401,8.67466","Input":"59;Frankfurt a.M.;Goethestraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 70, "geometry": { "type": "Point", "coordinates": [ 7.84827, 47.99618 ] }, "properties": { "location": "Rathausgasse Freiburg DE ", "confidence": "0.3","LL": "47.99618,7.84827","Input":"84;Freiburg;Rathausgasse","Region":"DE"}}
+,
+{ "type": "Feature", "id": 71, "geometry": { "type": "Point", "coordinates": [ 10.68551, 53.86664 ] }, "properties": { "location": "Breite Strasse Lübeck DE ", "confidence": "0.3","LL": "53.86664,10.68551","Input":"207;Lübeck;Breite Straße (Mitte","Region":"DE"}}
+,
+{ "type": "Feature", "id": 72, "geometry": { "type": "Point", "coordinates": [ 11.56285, 48.13989 ] }, "properties": { "location": "Schützenstrasse München DE 80335", "confidence": "0.3","LL": "48.13989,11.56285","Input":"74;München;Schützenstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 73, "geometry": { "type": "Point", "coordinates": [ 7.4647, 51.51417 ] }, "properties": { "location": "Westenhellweg Dortmund DE ", "confidence": "0.3","LL": "51.51417,7.4647","Input":"246;Dortmund;Westenhellweg (Ost","Region":"DE"}}
+,
+{ "type": "Feature", "id": 74, "geometry": { "type": "Point", "coordinates": [ 8.70491, 49.41144 ] }, "properties": { "location": "Hauptstrasse Heidelberg DE 69117", "confidence": "0.35","LL": "49.41144,8.70491","Input":"141;Heidelberg;Hauptstraße (West","Region":"DE"}}
+,
+{ "type": "Feature", "id": 75, "geometry": { "type": "Point", "coordinates": [ 7.13655, 50.9643 ] }, "properties": { "location": " Bergisch-Gladbach DE ", "confidence": "0.9","LL": "50.9643,7.13655","Input":"171;Bergisch-Gladbach;Hauptstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 76, "geometry": { "type": "Point", "coordinates": [ 6.64076, 49.75301 ] }, "properties": { "location": "Brotstrasse Trier DE 54290", "confidence": "0.25","LL": "49.75301,6.64076","Input":"138;Trier;Brotstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 77, "geometry": { "type": "Point", "coordinates": [ 6.78408, 51.22691 ] }, "properties": { "location": "Schadowstrasse Düsseldorf DE 40212", "confidence": "0.35","LL": "51.22691,6.78408","Input":"54;Düsseldorf;Schadowstraße (Ost","Region":"DE"}}
+,
+{ "type": "Feature", "id": 78, "geometry": { "type": "Point", "coordinates": [ 8.65322, 49.87149 ] }, "properties": { "location": "Schuchardstrasse Darmstadt DE 64283", "confidence": "0.3","LL": "49.87149,8.65322","Input":"103;Darmstadt;Schuchardstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 79, "geometry": { "type": "Point", "coordinates": [ 8.06031, 50.38752 ] }, "properties": { "location": "Werner-Senger-Strasse Limburg DE ", "confidence": "0.3","LL": "50.38752,8.06031","Input":"148;Limburg;Werner-Senger-Straße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 80, "geometry": { "type": "Point", "coordinates": [ 9.95105, 52.15131 ] }, "properties": { "location": "Hoher Weg Hildesheim DE 31134", "confidence": "0.4","LL": "52.15131,9.95105","Input":"208;Hildesheim;Hoher Weg","Region":"DE"}}
+,
+{ "type": "Feature", "id": 81, "geometry": { "type": "Point", "coordinates": [ 9.99243, 53.553 ] }, "properties": { "location": "Jungfernstieg Hamburg DE ", "confidence": "0.3","LL": "53.553,9.99243","Input":"92;Hamburg;Jungfernstieg","Region":"DE"}}
+,
+{ "type": "Feature", "id": 82, "geometry": { "type": "Point", "coordinates": [ 8.67324, 50.11499 ] }, "properties": { "location": "Grosse Bockenheimer Strasse Frankfurt DE ", "confidence": "0.4","LL": "50.11499,8.67324","Input":"58;Frankfurt a.M.;Große Bockenheimer Straße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 83, "geometry": { "type": "Point", "coordinates": [ 12.13571, 54.08817 ] }, "properties": { "location": "Kröpeliner Strasse Rostock DE 18055", "confidence": "0.3","LL": "54.08817,12.13571","Input":"206;Rostock;Kröpeliner Straße (West","Region":"DE"}}
+,
+{ "type": "Feature", "id": 84, "geometry": { "type": "Point", "coordinates": [ 7.59151, 50.35633 ] }, "properties": { "location": "Löhrstrasse Koblenz DE ", "confidence": "0.3","LL": "50.35633,7.59151","Input":"86;Koblenz;Löhrstraße (Mitte","Region":"DE"}}
+,
+{ "type": "Feature", "id": 85, "geometry": { "type": "Point", "coordinates": [ 6.99355, 49.23607 ] }, "properties": { "location": "Bahnhofstrasse Saarbrücken DE 66111", "confidence": "0.35","LL": "49.23607,6.99355","Input":"75;Saarbrücken;Bahnhofstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 86, "geometry": { "type": "Point", "coordinates": [ 6.4172, 51.1604 ] }, "properties": { "location": "Mönchengladbach Mönchengladbach DE 41239", "confidence": "0.4","LL": "51.1604,6.4172","Input":"245;Mönchengladbach;Hindenburgstraße (Mitte","Region":"DE"}}
+,
+{ "type": "Feature", "id": 87, "geometry": { "type": "Point", "coordinates": [ 11.5837, 48.13801 ] }, "properties": { "location": "Maximilianstrasse München DE 80539", "confidence": "0.25","LL": "48.13801,11.5837","Input":"166;München;Maximilianstraße (Mitte","Region":"DE"}}
+,
+{ "type": "Feature", "id": 88, "geometry": { "type": "Point", "coordinates": [ 7.09771, 50.73322 ] }, "properties": { "location": "Poststrasse Bonn DE 53111", "confidence": "0.25","LL": "50.73322,7.09771","Input":"87;Bonn;Poststraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 89, "geometry": { "type": "Point", "coordinates": [ 8.74999, 51.71629 ] }, "properties": { "location": "Westernstrasse Paderborn DE 33098", "confidence": "0.35","LL": "51.71629,8.74999","Input":"169;Paderborn;Westernstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 90, "geometry": { "type": "Point", "coordinates": [ 13.45868, 48.57418 ] }, "properties": { "location": "Ludwigstrasse Passau DE 94032", "confidence": "0.25","LL": "48.57418,13.45868","Input":"147;Passau;Ludwigstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 91, "geometry": { "type": "Point", "coordinates": [ 8.21484, 53.14037 ] }, "properties": { "location": "Achternstrasse Oldenburg DE ", "confidence": "0.35","LL": "53.14037,8.21484","Input":"210;Oldenburg;Achternstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 92, "geometry": { "type": "Point", "coordinates": [ 8.53297, 52.02497 ] }, "properties": { "location": "Stresemannstrasse Bielefeld DE ", "confidence": "0.3","LL": "52.02497,8.53297","Input":"161;Bielefeld;Stresemannstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 93, "geometry": { "type": "Point", "coordinates": [ 6.77404, 51.22452 ] }, "properties": { "location": "Mittelstrasse Düsseldorf DE 40213", "confidence": "0.35","LL": "51.22452,6.77404","Input":"157;Düsseldorf;Mittelstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 94, "geometry": { "type": "Point", "coordinates": [ 7.14745, 51.25782 ] }, "properties": { "location": "Poststrasse Wuppertal DE 42103", "confidence": "0.35","LL": "51.25782,7.14745","Input":"154;Wuppertal;Poststraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 95, "geometry": { "type": "Point", "coordinates": [ 8.68691, 50.11409 ] }, "properties": { "location": "Zeil Frankfurt DE 60313", "confidence": "0.45","LL": "50.11409,8.68691","Input":"150;Frankfurt a.M.;Zeil (Mitte","Region":"DE"}}
+,
+{ "type": "Feature", "id": 96, "geometry": { "type": "Point", "coordinates": [ 9.7402, 52.37218 ] }, "properties": { "location": "Georgstrasse Hannöver DE 30159", "confidence": "0.3","LL": "52.37218,9.7402","Input":"63;Hannover;Georgstraße","Region":"DE"}}
+,
+{ "type": "Feature", "id": 97, "geometry": { "type": "Point", "coordinates": [ 10.88795, 49.89288 ] }, "properties": { "location": "Grüner Markt Bamberg DE 96047", "confidence": "0.35","LL": "49.89288,10.88795","Input":"118;Bamberg;Grüner Markt","Region":"DE"}}
+,
+{ "type": "Feature", "id": 98, "geometry": { "type": "Point", "coordinates": [ 10.52397, 52.26251 ] }, "properties": { "location": "Damm Braunschweig DE 38100", "confidence": "0.4","LL": "52.26251,10.52397","Input":"130;Braunschweig;Damm","Region":"DE"}}
+,
+{ "type": "Feature", "id": 99, "geometry": { "type": "Point", "coordinates": [ 6.56356, 51.33082 ] }, "properties": { "location": "Hochstrasse Krefeld DE 47798", "confidence": "0.3","LL": "51.33082,6.56356","Input":"144;Krefeld;Hochstraße (Mitte","Region":"DE"}}
+]
+}
+        
