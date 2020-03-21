@@ -11,11 +11,34 @@ airquality_token = os.environ['AIR_QUALITY_API_TOKEN']
 
 client = boto3.client('firehose')
 
-with open('kreise_mit_center.csv', newline='',encoding='utf-8') as csvfile:
+
+def to_byte_record(airquality_record):
+    new_record_encoded = str(airquality_record).encode('utf-8')
+
+    return base64.b64encode(new_record_encoded)
+
+
+def to_airquality(city_name, lat, lon, response):
+    data = response['data']
+
+    return {
+        'landkreis_name': city_name,
+        # todo time from request
+        'datetime': datetime.datetime.now(),
+        'lat': lat,
+        'lon': lon,
+        'airquality': {
+            'aqi': data['aqi'],
+            'iaqi': data['iaqi']
+        }
+    }
+
+
+with open('kreise_mit_center.csv', newline='', encoding='utf-8') as csvfile:
     fileReader = csv.reader(csvfile, delimiter=',', quotechar='|')
     header = next(fileReader)
     # Check file as empty
-    if header != None:
+    if header is not None:
         # Iterate over each row after the header in the csv
         for row in fileReader:
             city_name = row[0]
@@ -23,14 +46,8 @@ with open('kreise_mit_center.csv', newline='',encoding='utf-8') as csvfile:
             lat = row[2]
             url = f'https://api.waqi.info/feed/geo:{lat};{lon}/?token={airquality_token}'
             response = requests.get(url)
-            if response.status_code == 200:
-                new_record = {
-                    'landkreis_name': city_name,
-                    # todo time from request
-                    'datetime': datetime.datetime.now(),
-                    'lat': lat,
-                    'lon': lon,
-                    'airquality': response.content
-                }
-                new_record_encoded = str(new_record).encode('utf-8')
-                client.put_record(DeliveryStreamName='sdd-kinesis-airquality', Record={'Data': base64.b64encode(new_record_encoded)})
+            if response.status_code == 200 and response.json()['status'] == 'ok':
+                airquality_record = to_airquality(city_name, lat, lon, response.json())
+                # print(str(airquality_record).encode('utf-8'))
+                client.put_record(DeliveryStreamName='sdd-kinesis-airquality',
+                                  Record={'Data': to_byte_record(airquality_record)})
