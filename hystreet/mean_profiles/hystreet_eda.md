@@ -1,22 +1,13 @@
----
-title: "hystreet expl. data analysis"
-author: "Urs Wilke"
-date: "3/21/2020"
-output: 
-  github_document:
-    html_preview: false
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
-library(tidyverse)
-```
+hystreet expl. data analysis
+================
+Urs Wilke
+3/21/2020
 
 ## Gescrapete Daten laden
 
-Die Daten kommen von https://hystreet.com/
+Die Daten kommen von <https://hystreet.com/>
 
-```{r load}
+``` r
 load("~/R/socialdistancingdash/hystreet.RData") 
 
 df <- 
@@ -28,7 +19,22 @@ df <-
 df %>% as_tibble()
 ```
 
-Im Datensatz sind `r nrow(df)` Messwerte von `r length(unique(df$place))` Stationen.
+    ## # A tibble: 221,949 x 7
+    ##    place    timestamp           pedestrians_cou…  hour wd    date       id      
+    ##    <chr>    <dttm>                         <int> <int> <ord> <date>     <chr>   
+    ##  1 Annastr… 2020-01-01 00:00:00                0     0 Mi    2020-01-01 2020-01…
+    ##  2 Annastr… 2020-01-01 01:00:00                0     1 Mi    2020-01-01 2020-01…
+    ##  3 Annastr… 2020-01-01 02:00:00                0     2 Mi    2020-01-01 2020-01…
+    ##  4 Annastr… 2020-01-01 03:00:00                0     3 Mi    2020-01-01 2020-01…
+    ##  5 Annastr… 2020-01-01 04:00:00                0     4 Mi    2020-01-01 2020-01…
+    ##  6 Annastr… 2020-01-01 05:00:00                0     5 Mi    2020-01-01 2020-01…
+    ##  7 Annastr… 2020-01-01 06:00:00                0     6 Mi    2020-01-01 2020-01…
+    ##  8 Annastr… 2020-01-01 07:00:00                0     7 Mi    2020-01-01 2020-01…
+    ##  9 Annastr… 2020-01-01 08:00:00                0     8 Mi    2020-01-01 2020-01…
+    ## 10 Annastr… 2020-01-01 09:00:00                0     9 Mi    2020-01-01 2020-01…
+    ## # … with 221,939 more rows
+
+Im Datensatz sind 221949 Messwerte von 117 Stationen.
 
 ## EDA
 
@@ -36,7 +42,7 @@ Im Datensatz sind `r nrow(df)` Messwerte von `r length(unique(df$place))` Statio
 
 Wahrschenlich waren an diesen Tagen die Sensoren nicht funktionstüchtig.
 
-```{r time_dep}
+``` r
 df %>% 
   group_by(hour) %>% 
   summarise(eq0 = sum(pedestrians_count == 0),
@@ -50,9 +56,9 @@ df %>%
   scale_y_continuous(labels = scales::percent_format(accuracy = 1))
 ```
 
+![](hystreet_eda_files/figure-gfm/time_dep-1.png)<!-- -->
 
-
-```{r eda}
+``` r
 df %>% 
   ggplot(aes(hour, pedestrians_count, color = wd, group = id)) +
   geom_line(alpha = 0.01) +
@@ -64,11 +70,13 @@ df %>%
        y = "Fußgängerzahl")
 ```
 
+![](hystreet_eda_files/figure-gfm/eda-1.png)<!-- -->
+
 Die Messwerte sind an manchen Tagen durchgehend 0.
 
 ### Daten an den die jeweiligen Stationen nicht gemessen haben
 
-```{r non_measure_days}
+``` r
 df_ausfall <- 
   df %>% 
   group_by(place, date) %>% 
@@ -82,13 +90,16 @@ df_ausfall %>%
        y = "Ausfalltage")
 ```
 
+![](hystreet_eda_files/figure-gfm/non_measure_days-1.png)<!-- -->
 
 ### Mittelwerte der Fußgängerzahlen
 
-  * Ausfalltage filtern
-  * Nur Tage vor dem 1. März
+  - Ausfalltage filtern
+  - Nur Tage vor dem 1. März
 
-```{r filter}
+<!-- end list -->
+
+``` r
 df_mean <- 
   df %>% 
   # Ausfalltage filtern:
@@ -97,7 +108,11 @@ df_mean <-
   filter(date < "2020-03-01") %>% 
   group_by(place, wd, hour) %>% 
   summarise(mean_count = mean(pedestrians_count))
+```
 
+    ## Joining, by = c("place", "date")
+
+``` r
 df_mean %>% 
   ggplot(aes(hour, mean_count, group = place)) + 
   geom_line(alpha = 0.1) +
@@ -107,11 +122,10 @@ df_mean %>%
        y = "Mittlerer count")
 ```
 
-Die Mittelwerte schreibe ich in die Datei "mean_count.csv"
+![](hystreet_eda_files/figure-gfm/filter-1.png)<!-- -->
 
+Die Mittelwerte schreibe ich in die Datei “mean\_count.csv”
 
-```{r save_data}
+``` r
 write_csv(df_mean, "mean_count.csv")
 ```
-
-
