@@ -103,7 +103,19 @@ if __name__ == '__main__':
                {'URL':'https://cdn01.koeln.de/uploads/webcam/live.jpg', 'Lat':'50.941278',"Lon":'6.958281','Name':'Köln Domplatte', 'Personenzahl':None, 'Stand':None },
                {'URL':'http://www.adlerauge1.de/subs/www/current.jpg', 'Lat':'51.513989',"Lon":'7.466483','Name':'Dortmund Markt', 'Personenzahl':None, 'Stand':None },
                {'URL':'https://www.hal-oever.de/webcam/schlastshut.jpg', 'Lat':'53.078206',"Lon":'8.799147','Name':'Bremen Schlachten', 'Personenzahl':None, 'Stand':None },
-               {'URL':'https://www.call-mail-call.de/webcam/000M.jpg', 'Lat':'52.376701',"Lon":'9.728407','Name':'Hannover Laube', 'Personenzahl':None, 'Stand':None }]
+               {'URL':'https://www.call-mail-call.de/webcam/000M.jpg', 'Lat':'52.376701',"Lon":'9.728407','Name':'Hannover Laube', 'Personenzahl':None, 'Stand':None },
+               {'URL':'http://80.151.116.140:19812/record/current.jpg', 'Lat':'50.043667',"Lon":'10.2330092','Name':'Schweinfurt Spitalstraße', 'Personenzahl':None, 'Stand':None },
+               {'URL':'http://109.90.6.242/cgi-bin/faststream.jpg', 'Lat':'52.028423',"Lon":'8.901522','Name':'Lemgo Mittelstraße', 'Personenzahl':None, 'Stand':None },
+               {'URL':'https://webcam.bitel.info/webcamgt01/', 'Lat':'51.9064407',"Lon":'8.3782269','Name':'Gütersloh Berliner Platz', 'Personenzahl':None, 'Stand':None },
+               {'URL':'https://www.fiwa-forum.de/webcam/fiwa-forum-cam.jpg', 'Lat':'51.630403',"Lon":'13.708284','Name':'Finsterwalde Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'URL':'https://rathaus-hildesheim.de/webcam/webcam.jpg', 'Lat':'52.1527203',"Lon":'9.9515704','Name':'Hildesheim Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'URL':'https://www.blick.ms/cam-muenster.php','Lat':'51.962064',"Lon":'7.628089', 'Name':'Münster Prinzipalmarkt','Personenzahl':None, 'Stand':None},
+               {'URL':'https://www.siegen.de/fileadmin/cms/bilder/Webcam/WebCam_Siegen.jpg', 'Lat':'50.8335211',"Lon":'7.9867985','Name':'Siegen Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'URL':'https://lamp01.dortmund.de/webcams/friedensplatz/current.jpg', 'Lat':'51.511543',"Lon":'7.466345','Name':'Dortmund Friedensplatz', 'Personenzahl':None, 'Stand':None },
+               {'URL':'https://lamp01.dortmund.de/webcams/altermarkt_hik/current_TIMING.jpg', 'Lat':'51.513989',"Lon":'7.466483','Name':'Dortmund Alter Markt', 'Personenzahl':None, 'Stand':None },
+               {'URL':'https://www.osnabrueck.de/marktplatzwebcam/axis-cgi/mjpg/video.cgi', 'Lat':'52.113777',"Lon":'8.205642','Name':'Osnabrück Marktplatz', 'Personenzahl':None, 'Stand':None }]
+
+
 
     pc = PeopleCounter(model_path)
     for cam in webcams:
