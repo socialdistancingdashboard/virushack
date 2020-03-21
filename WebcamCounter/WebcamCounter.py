@@ -11,6 +11,8 @@ import tensorflow.compat.v1 as tf
 import cv2
 import urllib
 from datetime import datetime
+import boto3
+import json
 
 # Geklaut von https://gist.github.com/madhawav/1546a4b99c8313f06c0b2d7d7b4a09e2
 class DetectorAPI:
@@ -88,38 +90,50 @@ class PeopleCounter:
 
 if __name__ == '__main__':
     model_path = './faster_rcnn_inception_v2_coco_2018_01_28/frozen_inference_graph.pb'
-    webcams = [{'URL':'http://217.24.53.18/record/current.jpg', 'Lat':'50.258318',"Lon":'10.964798','Name':'Coburg Marktplatz', 'Personenzahl':None, 'Stand':None },
-               {'URL':'http://www2.annaberg-buchholz.de/webcam/markt.jpg', 'Lat':'50.580062',"Lon":'13.002370','Name':'Annaberg-Buchholz Markt', 'Personenzahl':None, 'Stand':None },
-               {'URL':'https://www.konzil-konstanz.de/webcam/hafen.jpg', 'Lat':'47.660951',"Lon":'9.178256','Name':'Hafen Konstanz', 'Personenzahl':None, 'Stand':None },
-               {'URL':'https://www.erfurt.de/webcam/fischmarkt.jpg', 'Lat':'50.978031',"Lon":'11.028691','Name':'Erfurt Fischmarkt', 'Personenzahl':None, 'Stand':None },
-               {'URL':'https://www.juwelier-roller.de/media/webcam/chemnitz_markt.jpg', 'Lat':'50.832587',"Lon":'12.919738','Name':'Chemnitz Markt', 'Personenzahl':None, 'Stand':None },
-               {'URL':'https://www.celle-tourismus.de/webcam/image-640x480.jpg', 'Lat':'52.623973',"Lon":'10.080568','Name':'Celle Stechbahn', 'Personenzahl':None, 'Stand':None },
-               {'URL':'https://webcam.heilbronn.de/current.jpg', 'Lat':'49.142365',"Lon":'9.219044','Name':'Heilbronn Marktplatz', 'Personenzahl':None, 'Stand':None },
-               {'URL':'https://www.verkehrsinfos.ulm.de/webcam/einstein/current.jpg', 'Lat':'48.401848',"Lon":'9.992416','Name':'Ulm Olgastrasse', 'Personenzahl':None, 'Stand':None },
-               {'URL':'https://achern.de/tools/webcam/webcam/achern-rathaus1.jpg', 'Lat':'48.625454',"Lon":'8.082615','Name':'Achern Rathaus', 'Personenzahl':None, 'Stand':None },
-               {'URL':'http://www.marktplatzcam.mybiberach.de/MarktplatzCam000M.jpg', 'Lat':'48.097822',"Lon":'9.787595','Name':'Biberach Marktplatz', 'Personenzahl':None, 'Stand':None },
-               {'URL':'https://www.radolfzell.de/docs/webcam/radolfzell_640.jpg', 'Lat':' 47.745237',"Lon":'8.966910','Name':'Radolfzell Marktplatz', 'Personenzahl':None, 'Stand':None },
-               {'URL':'http://ftp.kaufhaus.ludwigbeck.de/webcam/webcam.jpg', 'Lat':'48.137079',"Lon":'11.576006','Name':'München Marienplatz', 'Personenzahl':None, 'Stand':None },
-               {'URL':'https://cdn01.koeln.de/uploads/webcam/live.jpg', 'Lat':'50.941278',"Lon":'6.958281','Name':'Köln Domplatte', 'Personenzahl':None, 'Stand':None },
-               {'URL':'http://www.adlerauge1.de/subs/www/current.jpg', 'Lat':'51.513989',"Lon":'7.466483','Name':'Dortmund Markt', 'Personenzahl':None, 'Stand':None },
-               {'URL':'https://www.hal-oever.de/webcam/schlastshut.jpg', 'Lat':'53.078206',"Lon":'8.799147','Name':'Bremen Schlachten', 'Personenzahl':None, 'Stand':None },
-               {'URL':'https://www.call-mail-call.de/webcam/000M.jpg', 'Lat':'52.376701',"Lon":'9.728407','Name':'Hannover Laube', 'Personenzahl':None, 'Stand':None },
-               {'URL':'http://80.151.116.140:19812/record/current.jpg', 'Lat':'50.043667',"Lon":'10.2330092','Name':'Schweinfurt Spitalstraße', 'Personenzahl':None, 'Stand':None },
-               {'URL':'http://109.90.6.242/cgi-bin/faststream.jpg', 'Lat':'52.028423',"Lon":'8.901522','Name':'Lemgo Mittelstraße', 'Personenzahl':None, 'Stand':None },
-               {'URL':'https://webcam.bitel.info/webcamgt01/', 'Lat':'51.9064407',"Lon":'8.3782269','Name':'Gütersloh Berliner Platz', 'Personenzahl':None, 'Stand':None },
-               {'URL':'https://www.fiwa-forum.de/webcam/fiwa-forum-cam.jpg', 'Lat':'51.630403',"Lon":'13.708284','Name':'Finsterwalde Marktplatz', 'Personenzahl':None, 'Stand':None },
-               {'URL':'https://rathaus-hildesheim.de/webcam/webcam.jpg', 'Lat':'52.1527203',"Lon":'9.9515704','Name':'Hildesheim Marktplatz', 'Personenzahl':None, 'Stand':None },
-               {'URL':'https://www.blick.ms/cam-muenster.php','Lat':'51.962064',"Lon":'7.628089', 'Name':'Münster Prinzipalmarkt','Personenzahl':None, 'Stand':None},
-               {'URL':'https://www.siegen.de/fileadmin/cms/bilder/Webcam/WebCam_Siegen.jpg', 'Lat':'50.8335211',"Lon":'7.9867985','Name':'Siegen Marktplatz', 'Personenzahl':None, 'Stand':None },
-               {'URL':'https://lamp01.dortmund.de/webcams/friedensplatz/current.jpg', 'Lat':'51.511543',"Lon":'7.466345','Name':'Dortmund Friedensplatz', 'Personenzahl':None, 'Stand':None },
-               {'URL':'https://lamp01.dortmund.de/webcams/altermarkt_hik/current_TIMING.jpg', 'Lat':'51.513989',"Lon":'7.466483','Name':'Dortmund Alter Markt', 'Personenzahl':None, 'Stand':None },
-               {'URL':'https://www.osnabrueck.de/marktplatzwebcam/axis-cgi/mjpg/video.cgi', 'Lat':'52.113777',"Lon":'8.205642','Name':'Osnabrück Marktplatz', 'Personenzahl':None, 'Stand':None }]
-
-
+    webcams = [{'ID':1,'URL':'http://217.24.53.18/record/current.jpg', 'Lat':'50.258318',"Lon":'10.964798','Name':'Coburg Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':2,'URL':'http://www2.annaberg-buchholz.de/webcam/markt.jpg', 'Lat':'50.580062',"Lon":'13.002370','Name':'Annaberg-Buchholz Markt', 'Personenzahl':None, 'Stand':None },
+               {'ID':3,'URL':'https://www.konzil-konstanz.de/webcam/hafen.jpg', 'Lat':'47.660951',"Lon":'9.178256','Name':'Hafen Konstanz', 'Personenzahl':None, 'Stand':None },
+               {'ID':4,'URL':'https://www.erfurt.de/webcam/fischmarkt.jpg', 'Lat':'50.978031',"Lon":'11.028691','Name':'Erfurt Fischmarkt', 'Personenzahl':None, 'Stand':None },
+               {'ID':5,'URL':'https://www.juwelier-roller.de/media/webcam/chemnitz_markt.jpg', 'Lat':'50.832587',"Lon":'12.919738','Name':'Chemnitz Markt', 'Personenzahl':None, 'Stand':None },
+               {'ID':6,'URL':'https://www.celle-tourismus.de/webcam/image-640x480.jpg', 'Lat':'52.623973',"Lon":'10.080568','Name':'Celle Stechbahn', 'Personenzahl':None, 'Stand':None },
+               {'ID':7,'URL':'https://webcam.heilbronn.de/current.jpg', 'Lat':'49.142365',"Lon":'9.219044','Name':'Heilbronn Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':8,'URL':'https://www.verkehrsinfos.ulm.de/webcam/einstein/current.jpg', 'Lat':'48.401848',"Lon":'9.992416','Name':'Ulm Olgastrasse', 'Personenzahl':None, 'Stand':None },
+               {'ID':9,'URL':'https://achern.de/tools/webcam/webcam/achern-rathaus1.jpg', 'Lat':'48.625454',"Lon":'8.082615','Name':'Achern Rathaus', 'Personenzahl':None, 'Stand':None },
+               {'ID':10,'URL':'http://www.marktplatzcam.mybiberach.de/MarktplatzCam000M.jpg', 'Lat':'48.097822',"Lon":'9.787595','Name':'Biberach Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':11,'URL':'https://www.radolfzell.de/docs/webcam/radolfzell_640.jpg', 'Lat':' 47.745237',"Lon":'8.966910','Name':'Radolfzell Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':12,'URL':'http://ftp.kaufhaus.ludwigbeck.de/webcam/webcam.jpg', 'Lat':'48.137079',"Lon":'11.576006','Name':'München Marienplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':13,'URL':'https://cdn01.koeln.de/uploads/webcam/live.jpg', 'Lat':'50.941278',"Lon":'6.958281','Name':'Köln Domplatte', 'Personenzahl':None, 'Stand':None },
+               {'ID':14,'URL':'http://www.adlerauge1.de/subs/www/current.jpg', 'Lat':'51.513989',"Lon":'7.466483','Name':'Dortmund Markt', 'Personenzahl':None, 'Stand':None },
+               {'ID':15,'URL':'https://www.hal-oever.de/webcam/schlastshut.jpg', 'Lat':'53.078206',"Lon":'8.799147','Name':'Bremen Schlachten', 'Personenzahl':None, 'Stand':None },
+               {'ID':16,'URL':'https://www.call-mail-call.de/webcam/000M.jpg', 'Lat':'52.376701',"Lon":'9.728407','Name':'Hannover Laube', 'Personenzahl':None, 'Stand':None },
+               {'ID':17,'URL':'http://80.151.116.140:19812/record/current.jpg', 'Lat':'50.043667',"Lon":'10.2330092','Name':'Schweinfurt Spitalstraße', 'Personenzahl':None, 'Stand':None },
+               {'ID':18,'URL':'http://www.lemgo.de/fileadmin/image/webcam/aktuell.jpg', 'Lat':'52.028423',"Lon":'8.901522','Name':'Lemgo Mittelstraße', 'Personenzahl':None, 'Stand':None },
+               {'ID':19,'URL':'https://www.fiwa-forum.de/webcam/fiwa-forum-cam.jpg', 'Lat':'51.630403',"Lon":'13.708284','Name':'Finsterwalde Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':20,'URL':'https://rathaus-hildesheim.de/webcam/webcam.jpg', 'Lat':'52.1527203',"Lon":'9.9515704','Name':'Hildesheim Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':21,'URL':'https://www.siegen.de/fileadmin/cms/bilder/Webcam/WebCam_Siegen.jpg', 'Lat':'50.8335211',"Lon":'7.9867985','Name':'Siegen Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':22,'URL':'https://lamp01.dortmund.de/webcams/friedensplatz/current.jpg', 'Lat':'51.511543',"Lon":'7.466345','Name':'Dortmund Friedensplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':23,'URL':'https://lamp01.dortmund.de/webcams/altermarkt_hik/current_TIMING.jpg', 'Lat':'51.513989',"Lon":'7.466483','Name':'Dortmund Alter Markt', 'Personenzahl':None, 'Stand':None },
+               {'ID':24,'URL':'https://service.ka-news.de/tools/webcams/?cam=27', 'Lat':'49.009220',"Lon":'8.403912','Name':'Karlsruhe Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':25,'URL':'https://service.ka-news.de/tools/webcams/?cam=39', 'Lat':'49.0099302',"Lon":'8.3920208','Name':'Karlsruhe Europaplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':26,'URL':'https://www.augsburg.de/fileadmin/user_upload/header/webcam/webcamdachspitz/B_Rathausplatz_Dachspitz_00.jpg', 'Lat':'48.368963',"Lon":'10.898227','Name':'Augsburg Rathausplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':27,'URL':'https://www2.braunschweig.de/webcam/schloss.jpg', 'Lat':'52.263363',"Lon":'10.527763','Name':'Braunschweig Schloss', 'Personenzahl':None, 'Stand':None },
+               {'ID':28,'URL':'http://webcambild-rathaus.aachen.de/webcam_rathaus.jpg', 'Lat':'50.776103',"Lon":'6.083780','Name':'Aachen Rathaus', 'Personenzahl':None, 'Stand':None },
+               {'ID':29,'URL':'http://www.brillen-krille.de/Webcam/foto.jpg', 'Lat':'54.087890',"Lon":'12.134464','Name':'Rostock Universitätsplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':30,'URL':'https://www.mvv.de/fileadmin/user_upload/Systemdateien/Webcam/current.jpg', 'Lat':'49.4840612',"Lon":'8.4733678','Name':'Mannheim Wasserturm', 'Personenzahl':None, 'Stand':None },
+               {'ID':31,'URL':'https://www.theater-schwedt.de/ubs/cam/130/', 'Lat':'53.0617394',"Lon":'14.2838004','Name':'Schwedt Lindenallee', 'Personenzahl':None, 'Stand':None }]
 
     pc = PeopleCounter(model_path)
+
     for cam in webcams:
         pc.get_image(cam['URL'])
         cam['Personenzahl'] = pc.count_people(verbose=False)
         cam['Stand'] = datetime.now().strftime("%Y-%m-%d %H:%M")
         print(cam["Name"]+" :"+str(cam["Personenzahl"]))
+
+    client_s3 = boto3.client("s3" )
+
+    response = client_s3.put_object(
+        Bucket="sdd-s3-basebucket",
+        Body=json.dumps(webcams),
+        Key="webcamdaten/" + "/" + datetime.now().strftime("%Y%m%d%H") + "/webcamdaten.json"
+      )
