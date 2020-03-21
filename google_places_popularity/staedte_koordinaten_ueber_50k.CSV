@@ -1,0 +1,192 @@
+Stadt;Lat;Long
+Berlin;52.516;13.387
+Hamburg;53.567;10.033
+München;48.133;11.567
+Köln;50.95;6.95
+Frankfurt am Main;50.117;8.683
+Stuttgart;48.783;9.183
+Düsseldorf;51.233;6.783
+Leipzig;51.339;12.377
+Dortmund;51.517;7.467
+Essen;51.467;7.017
+Bremen;53.083;8.817
+Dresden;51.05;13.739
+Hannover;52.383;9.733
+Nürnberg;49.45;11.083
+Duisburg;51.433;6.767
+Bochum;51.483;7.217
+Wuppertal;51.267;7.2
+Bielefeld;52.017;8.533
+Bonn;50.733;7.1
+Münster;49.933;8.867
+Karlsruhe;49.017;8.4
+Mannheim;49.483;8.467
+Augsburg;48.367;10.9
+Wiesbaden;50.1;8.233
+Mönchengladbach;51.2;6.433
+Gelsenkirchen;51.55;7.1
+Braunschweig;52.267;10.533
+Kiel;54.333;10.133
+Aachen;50.783;6.083
+Chemnitz;50.83;12.917
+Halle (Saale);51.479;11.978
+Magdeburg;52.122;11.619
+Freiburg im Breisgau;48;7.85
+Krefeld;51.333;6.567
+Lübeck;53.867;10.683
+Mainz;50;8.267
+Erfurt;50.986;11.022
+Oberhausen;47.783;11.133
+Rostock;54.089;12.125
+Kassel;51.317;9.5
+Hagen;51.367;7.467
+Saarbrücken;49.233;7
+Hamm;49.733;8.433
+Potsdam;52.401;13.049
+Ludwigshafen am Rhein;49.467;8.45
+Mülheim an der Ruhr;51.433;6.883
+Oldenburg;53.15;8.217
+Osnabrück;52.283;8.05
+Leverkusen;51.033;7
+Heidelberg;49.4;8.683
+Solingen;51.167;7.083
+Darmstadt;49.867;8.65
+Herne;51.55;7.217
+Neuss;51.2;6.683
+Regensburg;49.017;12.1
+Paderborn;51.717;8.75
+Ingolstadt;48.767;11.433
+Offenbach am Main;50.0921;8.712
+Würzburg;49.8;9.933
+Fürth;49.483;10.983
+Ulm;48.4;9.983
+Heilbronn;49.15;9.217
+Pforzheim;48.883;8.7
+Wolfsburg;52.417;10.783
+Göttingen;51.533;9.933
+Bottrop;51.533;6.933
+Reutlingen;48.5;9.217
+Koblenz;50.35;7.6
+Bremerhaven;53.55;8.583
+Recklinghausen;51.617;7.2
+Bergisch Gladbach;50.983;7.133
+Erlangen;49.6;11
+Jena;50.933;11.591
+Remscheid;51.183;7.183
+Trier;49.75;6.65
+Salzgitter;52.117;10.417
+Moers;51.45;6.633
+Siegen;50.883;8.033
+Hildesheim;52.15;9.95
+Cottbus;51.766;14.335
+Gütersloh;51.9;8.383
+Kaiserslautern;49.45;7.767
+Witten;51.433;7.333
+Hanau;50.117;8.917
+Schwerin;53.628;11.412
+Gera;50.878;12.076
+Esslingen am Neckar;48.75;9.3
+Ludwigsburg;48.9;9.2
+Iserlohn;51.383;7.7
+Düren;50.8;6.483
+Tübingen;48.517;9.067
+Zwickau;50.72;12.5
+Flensburg;54.783;9.433
+Gießen;50.58;8.589
+Ratingen;51.3;6.85
+Lünen;51.617;7.533
+Villingen-Schwenningen;48.067;8.45
+Konstanz;47.667;9.183
+Marl;51.667;7.1
+Worms;49.633;8.367
+Velbert;51.333;7.05
+Minden;52.3;8.917
+Dessau-Roßlau;51.852;12.09
+Neumünster;54.067;9.983
+Norderstedt;53.7;10.017
+Delmenhorst;53.05;8.633
+Bamberg;49.9;10.883
+Viersen;51.25;6.4
+Marburg;50.817;8.767
+Wilhelmshaven;53.517;8.117
+Rheine;52.283;7.45
+Gladbeck;51.583;6.983
+Lüneburg;53.25;10.417
+Troisdorf;50.817;7.15
+Dorsten;51.667;6.967
+Bayreuth;49.95;11.583
+Detmold;51.933;8.883
+Arnsberg;51.4;8.067
+Castrop-Rauxel;51.55;7.317
+Lüdenscheid;51.217;7.633
+Landshut;48.533;12.15
+Brandenburg an der Havel;52.426;12.403
+Bocholt;51.833;6.617
+Aschaffenburg;49.967;9.15
+Celle;52.633;10.083
+Kempten (Allgäu);47.733;10.317
+Fulda;50.55;9.683
+Aalen;48.833;10.1
+Lippstadt;51.667;8.35
+Dinslaken;51.567;6.733
+Herford;52.117;8.683
+Kerpen;50.867;6.7
+Rüsselsheim am Main;49.9819821;8.382
+Weimar;50.767;8.733
+Plauen;50.489;12.13
+Sindelfingen;48.717;9
+Neuwied;50.433;7.467
+Dormagen;51.1;6.833
+Neubrandenburg;53.555;13.262
+Grevenbroich;51.1;6.583
+Rosenheim;47.85;12.133
+Herten;51.6;7.133
+Bergheim;48.767;11.267
+Schwäbisch Gmünd;48.8;9.8
+Friedrichshafen;47.65;9.483
+Garbsen;52.417;9.583
+Wesel;51.667;6.617
+Hürth;50.867;6.867
+Offenburg;48.467;7.95
+Stralsund;54.312;13.09
+Greifswald;54.089;13.383
+Langenfeld (Rheinland);51.1;6.95
+Neu-Ulm;48.4;10.017
+Unna;51.533;7.683
+Euskirchen;50.667;6.783
+Frankfurt (Oder);52.3255138;14.4281
+Göppingen;48.7;9.65
+Hameln;52.1;9.35
+Stolberg (Rheinland);50.767;6.233
+Eschweiler;50.817;6.267
+Görlitz;51.156;14.993
+Meerbusch;51.267;6.683
+Sankt Augustin;50.767;7.183
+Hilden;51.167;6.933
+Waiblingen;48.833;9.317
+Baden-Baden;48.767;8.233
+Hattingen;51.4;7.183
+Lingen (Ems);52.517;7.317
+Bad Homburg vor der Höhe;50.233;8.617
+Langenhagen;52.433;9.733
+Bad Salzuflen;52.083;8.75
+Pulheim;51;6.8
+Schweinfurt;50.05;10.233
+Nordhorn;52.433;7.067
+Neustadt an der Weinstraße;49.3484324;8.089
+Wetzlar;50.55;8.5
+Menden (Sauerland);51.433;7.8
+Ahlen;51.767;7.883
+Frechen;50.917;6.817
+Passau;48.567;13.467
+Wolfenbüttel;52.167;10.533
+Ibbenbüren;52.283;7.717
+Kleve;51.783;6.133
+Bad Kreuznach;49.833;7.867
+Goslar;51.9;10.433
+Gummersbach;51.033;7.567
+Ravensburg;47.783;9.617
+Willich;51.267;6.55
+Speyer;49.317;8.433
+Emden;53.367;7.2
+Böblingen;48.683;9.017

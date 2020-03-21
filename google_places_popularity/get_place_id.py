@@ -60,8 +60,9 @@ def read_data_csv(file, encoding = "UTF-8", sep = ","):
     id_list = []
     for index , row in tqdm(places.iterrows()):
         print(row[0])
-        id_list = id_list + filter_popularity_available(get_all_places(row[1],row[2], 3000))
-    pd.DataFrame(id_list).to_csv("place_ids/" + str(file.split(".")[0]) + "_ids.csv", index=False, header=False)
+        id_list = id_list + filter_popularity_available(get_all_places(row[1],row[2], 2000))
+        print(len(id_list))
+        pd.DataFrame(id_list).to_csv("place_ids/" + str(file.split(".")[0]) + "_ids.csv", index=False, header=False)
 
 
-read_data_csv("cities_filterd_1mio.CSV")
+read_data_csv("staedte_koordinaten_ueber_50k.csv", sep = ";")
