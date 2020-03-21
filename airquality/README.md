@@ -12,6 +12,7 @@ You can find their API docs here: https://aqicn.org/json-api/doc/#api-Geolocaliz
 
 We assume the AQI (Real-time Air Quality Index ) is a good overall index for the purpose of this hackathon
 
+An example for Berlin: https://aqicn.org/city/germany/berlin/
 ### In scope
 - fetching data for all "Landkreise", see kreise_mit_center.csv for more info
 

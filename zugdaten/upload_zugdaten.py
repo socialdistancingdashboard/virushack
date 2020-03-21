@@ -17,16 +17,16 @@ db = DatabaseWrapper("localhost", "hafasdb2", "hafas", "123")
 path = "/media/bemootzer/SICHERUNG/stewardless/data"
 re_sql = re.compile(r"arrival.*.sql")
 
-_, blacklist, _ = next(os.walk(os.path.join("summaries","data")))
+# _, blacklist, _ = next(os.walk(os.path.join("summaries","data")))
 
 for file in os.listdir(path):
   if re_sql.match(file):
     # LOAD BACKUP
     #file = "arrivals-2020-03-01.sql"
     date_string = file.replace("arrivals-", "").replace(".sql", "")
-    if date_string in blacklist:
-      print("skip %s" % file)
-      continue #skip because this file was already uploaded.
+    # if date_string in blacklist:
+    #   print("skip %s" % file)
+    #   continue #skip because this file was already uploaded.
 
     try:
       print("current file", file)
@@ -103,7 +103,7 @@ for file in os.listdir(path):
       df.drop("customIndex", axis=1, inplace=True)
 
       # WRITE A SHORT DAILY SUMMARY TO DISC
-      summary_path = os.path.join(os.getcwd(), "summaries", "data", date_string)
+      summary_path = os.path.join(os.getcwd(), "zugdaten", "summaries", "data", date_string)
       Path(summary_path).mkdir(parents=True, exist_ok=True)
       tmp = json.loads(df.groupby(["lineProduct"]).sum()[["planned_stops", "cancelled_stops"]].to_json())
       summary = {
@@ -117,14 +117,13 @@ for file in os.listdir(path):
       # UPLOAD JSON TO AMAZON
       j = json.loads(df.to_json(orient="records"))
       
-      client_s3 = boto3.client("s3"
-        #region_name="eu-central-1"
+      client_s3 = boto3.client("s3"#region_name="eu-central-1"
       )
 
       response = client_s3.put_object(
         Bucket="sdd-s3-basebucket",
         Body=json.dumps(j),     
-        Key="zugdaten/2020/03/21/zugdaten.json"
+        Key="zugdaten/" + "/".join(date_string.split("-")) + "/zugdaten.json"
       )
 
       print("upload successfull", file)

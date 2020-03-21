@@ -1,0 +1,17 @@
+{
+  "date": "2020-03-17",
+  "planned_stops": {
+    "bus": 567,
+    "national": 3307,
+    "nationalExpress": 4521,
+    "regional": 162283,
+    "suburban": 203084
+  },
+  "cancelled_stops": {
+    "bus": 202.0,
+    "national": 434.0,
+    "nationalExpress": 319.0,
+    "regional": 4390.0,
+    "suburban": 4872.0
+  }
+}
