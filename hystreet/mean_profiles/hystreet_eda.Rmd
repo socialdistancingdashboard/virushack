@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 library(tidyverse)
 ```
 
@@ -23,8 +23,10 @@ df <-
          wd = lubridate::wday(timestamp, label = TRUE),
          date = lubridate::date(timestamp),
          id = paste0(date, place)) 
-
+df %>% as_tibble()
 ```
+
+Im Datensatz sind `r nrow(df)` Messwerte von `r length(unique(df$place))` Stationen.
 
 ## EDA
 
