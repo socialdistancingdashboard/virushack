@@ -113,9 +113,12 @@ if __name__ == '__main__':
                {'URL':'https://www.siegen.de/fileadmin/cms/bilder/Webcam/WebCam_Siegen.jpg', 'Lat':'50.8335211',"Lon":'7.9867985','Name':'Siegen Marktplatz', 'Personenzahl':None, 'Stand':None },
                {'URL':'https://lamp01.dortmund.de/webcams/friedensplatz/current.jpg', 'Lat':'51.511543',"Lon":'7.466345','Name':'Dortmund Friedensplatz', 'Personenzahl':None, 'Stand':None },
                {'URL':'https://lamp01.dortmund.de/webcams/altermarkt_hik/current_TIMING.jpg', 'Lat':'51.513989',"Lon":'7.466483','Name':'Dortmund Alter Markt', 'Personenzahl':None, 'Stand':None },
-               {'URL':'https://www.osnabrueck.de/marktplatzwebcam/axis-cgi/mjpg/video.cgi', 'Lat':'52.113777',"Lon":'8.205642','Name':'Osnabrück Marktplatz', 'Personenzahl':None, 'Stand':None }]
-
-
+               {'URL':'https://www.osnabrueck.de/marktplatzwebcam/axis-cgi/mjpg/video.cgi', 'Lat':'52.113777',"Lon":'8.205642','Name':'Osnabrück Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':24,'URL':'https://service.ka-news.de/tools/webcams/?cam=27', 'Lat':'49.009220',"Lon":'8.403912','Name':'Karlsruhe Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':25,'URL':'https://www.augsburg.de/fileadmin/user_upload/header/webcam/webcamdachspitz/B_Rathausplatz_Dachspitz_00.jpg', 'Lat':'48.368963',"Lon":'10.898227','Name':'Augsburg Rathausplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':26,'URL':'https://www2.braunschweig.de/webcam/schloss.jpg', 'Lat':'52.263363',"Lon":'10.527763','Name':'Braunschweig Schloss', 'Personenzahl':None, 'Stand':None },
+               {'ID':27,'URL':'http://webcambild-rathaus.aachen.de/webcam_rathaus.jpg', 'Lat':'50.776103',"Lon":'6.083780','Name':'Aachen Rathaus', 'Personenzahl':None, 'Stand':None },
+               {'ID':28,'URL':'http://www.brillen-krille.de/Webcam/foto.jpg', 'Lat':'54.087890',"Lon":'12.134464','Name':'Rostock Universitätsplatz', 'Personenzahl':None, 'Stand':None }]
 
     pc = PeopleCounter(model_path)
     for cam in webcams:
@@ -123,3 +126,11 @@ if __name__ == '__main__':
         cam['Personenzahl'] = pc.count_people(verbose=False)
         cam['Stand'] = datetime.now().strftime("%Y-%m-%d %H:%M")
         print(cam["Name"]+" :"+str(cam["Personenzahl"]))
+
+    client_s3 = boto3.client("s3" )
+
+      response = client_s3.put_object(
+        Bucket="sdd-s3-basebucket",
+        Body=json.dumps(webcams),
+        Key="webcamdaten/" + "/".datetime.now().strftime("%Y%m%d%H") + "/webcamdaten.json"
+      )
