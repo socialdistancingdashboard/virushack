@@ -19,7 +19,7 @@ daten_punkte_raw <- tibble(
 daten_punkte <- daten_punkte_raw %>% 
   st_as_sf(coords = c("lat", "long"), crs = st_crs(nuts_sf))
 
-#
+#punkte dem entsprechenden kreis anhand des shape files zuordnen
 punkte_mit_kreis <- daten_punkte %>% mutate(
   intersection_id = as.integer(st_intersects(geometry, nuts_sf)),
   kreis = case_when(is.na(intersection_id) ~ 'keine kreis zuordnung!',
