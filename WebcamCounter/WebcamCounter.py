@@ -135,5 +135,5 @@ if __name__ == '__main__':
     response = client_s3.put_object(
         Bucket="sdd-s3-basebucket",
         Body=json.dumps(webcams),
-        Key="webcamdaten/" + "/".datetime.now().strftime("%Y%m%d%H") + "/webcamdaten.json"
+        Key="webcamdaten/" + "/" + datetime.now().strftime("%Y%m%d%H") + "/webcamdaten.json"
       )
