@@ -1,0 +1,113 @@
+---
+title: "hystreet expl. data analysis"
+author: "Urs Wilke"
+date: "3/21/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Gescrapete Daten laden
+
+Die Daten kommen von https://hystreet.com/
+
+```{r load}
+load("~/R/socialdistancingdash/hystreet.RData") 
+
+df <- 
+  df %>% 
+  mutate(hour = lubridate::hour(timestamp),
+         wd = lubridate::wday(timestamp, label = TRUE),
+         date = lubridate::date(timestamp),
+         id = paste0(date, place)) 
+
+```
+
+## EDA
+
+### Anteil der Messwerte die 0 sind
+
+Wahrschenlich waren an diesen Tagen die Sensoren nicht funktionstüchtig.
+
+```{r time_dep}
+df %>% 
+  group_by(hour) %>% 
+  summarise(eq0 = sum(pedestrians_count == 0),
+            n = n(),
+            eq0_share = eq0 / n) %>% 
+  ggplot(aes(hour, eq0_share)) +
+  geom_col() +
+  labs(title = "Anteil Messwerte gleich 0 in Abh. der Uhrzeit",
+       x = "Uhrzeit",
+       y = "Anteil Messwerte gleich 0") +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1))
+```
+
+
+
+```{r eda}
+df %>% 
+  ggplot(aes(hour, pedestrians_count, color = wd, group = id)) +
+  geom_line(alpha = 0.01) +
+  facet_wrap(~wd) +
+  theme(legend.position = "none") +
+  labs(title = "Fußgängerzahlen in Abh. der Uhrzeit & des Wochentages",
+       subtitle = "Verlauf aller Mess-Stationen",
+       x = "Uhrzeit",
+       y = "Fußgängerzahl")
+```
+
+Die Messwerte sind an manchen Tagen durchgehend 0.
+
+### Daten an den die jeweiligen Stationen nicht gemessen haben
+
+```{r non_measure_days}
+df_ausfall <- 
+  df %>% 
+  group_by(place, date) %>% 
+  summarise(ausfall = all(pedestrians_count == 0)) %>% 
+  filter(ausfall) 
+df_ausfall %>% 
+  ggplot(aes(date, place)) +
+  geom_point() +
+  labs(title = "Stationen mit Ausfalltagen",
+       x = "Datum",
+       y = "Ausfalltage")
+```
+
+
+### Mittelwerte der Fußgängerzahlen
+
+  * Ausfalltage filtern
+  * Nur Tage vor dem 1. März
+
+```{r filter}
+df_mean <- 
+  df %>% 
+  # Ausfalltage filtern:
+  anti_join(df_ausfall) %>% 
+  # Nur Tage vor dem 1. März:
+  filter(date < "2020-03-01") %>% 
+  group_by(place, wd, hour) %>% 
+  summarise(mean_count = mean(pedestrians_count))
+
+df_mean %>% 
+  ggplot(aes(hour, mean_count, group = place)) + 
+  geom_line(alpha = 0.1) +
+  facet_wrap(~wd) +
+  labs(title = "Mittlere Fußgängerprofile",
+       x = "Datum",
+       y = "Mittlerer count")
+```
+
+Die Mittelwerte schreibe ich in die Datei "mean_count.csv"
+
+
+```{r save_data}
+write_csv(df_mean, "mean_count.csv")
+```
+
+
