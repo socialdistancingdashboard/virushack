@@ -2,6 +2,9 @@ library(tidyverse)
 library(eurostat)
 library(sf)
 
+#Schlüssel von NUTS zu AGS
+schluessel_nuts_ags <- read_csv2("schluessel_nuts_ags_kreise.csv") %>% 
+  select(-bez_nuts)
 
 #shape file von eurostat
 nuts_sf <- get_eurostat_geospatial(nuts_level="all", year = "2016") %>% 
@@ -24,8 +27,9 @@ punkte_mit_kreis <- daten_punkte %>% mutate(
   intersection_id = as.integer(st_intersects(geometry, nuts_sf)),
   kreis = case_when(is.na(intersection_id) ~ 'keine kreis zuordnung!',
                     !is.na(intersection_id) ~ nuts_sf$NUTS_NAME[intersection_id]),
-  nuts_3 = case_when(is.na(intersection_id) ~ 'keine kreis zuordnung!',
+  nuts = case_when(is.na(intersection_id) ~ 'keine kreis zuordnung!',
                      !is.na(intersection_id) ~ nuts_sf$NUTS_ID[intersection_id])
 ) %>% 
-  select(-intersection_id)
+  select(-intersection_id) %>% 
+  left_join(y = schluessel_nuts_ags, by = ("nuts"))
 
