@@ -118,8 +118,7 @@ else:
 df_mock_scores["date"] = pd.to_datetime(df_mock_scores["date"])
 
 germany_average = np.mean(df_mock_scores["average_score"])
-st.write("Zum Vergleich - die durchschnittliche Soziale Distanz heute in Deutschland:")
-st.write(germany_average)
+st.write("Zum Vergleich - die durchschnittliche Soziale Distanz heute in Deutschland: {0:.2f}".format(germany_average))
 
 
 
