@@ -1,30 +1,34 @@
-# Zugdaten summary
+# how does public transportation react to corona?
 
-Dieser Ordner enthält das Script für den Zugdaten-Upload. Außerdem gibt es im Ordner summaries Zusammenfassungen (jsons) für jeden Tag. 
+We assume that social distancing is related to public transportation. Therefore we look for correlation between the number of available trains (measured in scheduled train stops per district) and social distancing measurements. We collect the number of *scheduled* and *actual* number of stops per district. Differences in these numbers show the **reaction of the train operators** to the corona-crisis. 
 
-## Zeitraum
-* Anfang des Uploads: 27.01.2020
-* Ende des Uploads: (immer bis gestern)
+The origin of this data is not particulary clear...
 
-##Missing values
-* 2020-01-29 (da unvollständig)
-* 2020-02-01 (fehlt)
-* 2020-03-08 (fehlt)
-* 2020-03-09 (fehlt)
-* 2020-03-10 (fehlt)
+Hava a look in /summaries for daily summary files (json).
 
-##Daten liegen getrennt nach Zugtypen vor
+## time perios
+* upload started at 27.01.2020
+* upload ended at (currently running, data is uploaded at the end of the day)
+
+## Missing values
+* 2020-01-29 (skipped because uncomplete data)
+* 2020-02-01 (missing)
+* 2020-03-08 (missing)
+* 2020-03-09 (missing)
+* 2020-03-10 (missing)
+
+## scheduled / actual stops per train type:
 * national
 * nationalExpress
 * regional
 * suburban
 * bus
 
-##Welche Daten liegen vor
-* Wie viele Zughalte hätte es je nach Kategorie geben SOLLEN
-* Wie viele Zughalte hat es je nach Kategorie tatsächlich gegeben?
+## what data
+* How many stops were scheduled per district (to be exact: geo coordinates of station)
+* How many stops actually happened
 
-##Json Format
+## Json Format
 ```json
 {
   'date': '2020-03-01',
@@ -45,10 +49,15 @@ Dieser Ordner enthält das Script für den Zugdaten-Upload. Außerdem gibt es im
 }
 ```
 
-## Visualisierung der Daten bis 2020-03-20
-![Zeigt die Entwicklung der geplanten und ausgefallenen Stops in Deutschland nach Zugtyp](data_viz.png "Visualisierung")
+## data preview 2020-01-27 to 2020-03-20
+![data preview](data_viz.png "Visualization")
    
-### Interpretation
+### Interpretation (german below)
+* One does notice the weekends as drops in scheduled stops
+* One does notice a significant peak in cancelled stops on 2020-02-08/09 due to hurricane Sabrina
+* Busses were reduced from mid of february. Reason unclear.
+* One does notice a rise in cancelled trains with the beginning of corona
+
 * Man erkennt die Wochenenden als (planmäßige) Reduktion der geplanten Zughalte.
 * Man erkennt einen starken Peak am 2020-02-08/09. Hier hat das Sturmtief Sabrina zugeschlagen
 * Busse sind ab mitte Februar massiv eingeschränt worden (warum?)
