@@ -154,7 +154,7 @@ df_mean %>%
   geom_line(alpha = 0.1) +
   facet_wrap(~wd) +
   labs(title = "Mittlere Fußgängerprofile",
-       x = "Datum",
+       x = "Uhrzeit",
        y = "Mittlerer count")
 ```
 
