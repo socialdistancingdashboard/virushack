@@ -40,38 +40,20 @@ def load_data(nrows):
     data[DATE_TIME] = pd.to_datetime(data[DATE_TIME])
     return data
 
-@st.cache(persist=True)
+@st.cache()
 def load_mock_data():
-    county_names = []
-    county_ids = []
-    mock_scores = []
-    gmaps_scores = []
-    hystreet_scores = []
-    cycle_scores = []
-    url_topojson = 'https://raw.githubusercontent.com/AliceWi/TopoJSON-Germany/master/germany.json'
-    r = requests.get(url_topojson)
-    jsondump = r.json()
-    for county in jsondump["objects"]["counties"]["geometries"]:
-        county_names.append(county["properties"]["name"])
-        county_ids.append(county["id"])
-        mock_scores.append(random.randint(0, 100) / 100)
-        gmaps_scores.append(random.randint(0, 100) / 100)
-        hystreet_scores.append(random.randint(0, 100) / 100)
-        cycle_scores.append(random.randint(0, 100) / 100)
-    return county_names, county_ids, mock_scores, gmaps_scores, hystreet_scores, cycle_scores
+    df = pd.read_csv("/Users/Sebastian/Desktop/scores.csv", index_col=0)
+    return df
 
 
-url_topojson = 'https://raw.githubusercontent.com/AliceWi/TopoJSON-Germany/master/germany.json'
+#data = load_data(10)
+df_mock_scores2 = load_mock_data()
+df_mock_scores = df_mock_scores2.copy()
+county_names = list(set(df_mock_scores["name"].values))
 
-data = load_data(1000)
-
-county_names, county_ids, mock_scores, gmaps_scores, hystreet_scores, cycle_scores = load_mock_data()
-df_mock_scores = pd.DataFrame({"id": county_ids, "name": county_names, "score": mock_scores,"gmap_score": gmaps_scores, "hystreet_score": hystreet_scores, "cycle_score": cycle_scores})
-places = st.sidebar.multiselect('Welche Orte?',county_names, ["Bielefeld","Calw"])
-date = st.sidebar.date_input('Datum', datetime.date(2011,1,1))
-
-
-
+places = st.sidebar.multiselect('Welche Orte?',list(set(county_names)), ["Bielefeld","Calw"])
+start_date = st.sidebar.date_input('Datum', datetime.date(2020,3,12))
+start_date = st.sidebar.date_input('Datum', datetime.date(2020,3,22))
 data_sources = st.sidebar.multiselect('Welche Daten?',['gmap_score', 'hystreet_score', "cycle_score"],"gmap_score")
 
 #calculate average score based on selected data_sources
@@ -81,33 +63,42 @@ else:
     df_mock_scores["average_score"] = [0] * len(df_mock_scores)
 
 #filter scores based on selected places
-df_mock_scores["filtered_score"] = np.where(df_mock_scores["name"].isin(places),df_mock_scores["average_score"],[0] * len(df_mock_scores))
+if len(places) > 0:
+    df_mock_scores["filtered_score"] = np.where(df_mock_scores["name"].isin(places), df_mock_scores["average_score"],[0] * len(df_mock_scores))
+else:
+    df_mock_scores["filtered_score"] = df_mock_scores["average_score"]
+
 
 
 
 st.subheader('Social Distancing Map')
 
+url_topojson = 'https://raw.githubusercontent.com/AliceWi/TopoJSON-Germany/master/germany.json'
 data_topojson_remote = alt.topo_feature(url=url_topojson, feature='counties')
-c = alt.Chart(data_topojson_remote).mark_geoshape(
+st.altair_chart(alt.Chart(data_topojson_remote).mark_geoshape(
     stroke='white'
 ).encode(
-    color=alt.Color('filtered_score:Q', scale=alt.Scale(scheme='greens')),
+    color=alt.Color('filtered_score:Q', title="Soziale Distanz", scale=alt.Scale(scheme='greens')),
     tooltip=[alt.Tooltip("properties.name:N", title="Landkreis"),alt.Tooltip("filtered_score:N", title="Score")]
 ).transform_lookup(
     lookup='id',
     from_=alt.LookupData(df_mock_scores, 'id', ['filtered_score'])
-).properties(width=750,height = 1000)
-st.altair_chart(c)
+).properties(width=750,height = 1000))
 
 
 
-st.subheader("Vergleich Soziale Distanz")
+if len(places) > 0:
+    st.subheader("Vergleich Soziale Distanz")
+    st.altair_chart(alt.Chart(df_mock_scores[df_mock_scores["name"].isin(places)][["name","date", "filtered_score"]]).mark_line().encode(
+        x= alt.X('date:T',title="Tag"),
+        y= alt.Y('filtered_score:Q',title="Soziale Distanz"),
+        color=alt.Color('name',title ="Landkreis")
+    ).properties(
+        width=750,
+        height = 400
+    ))
 
-st.altair_chart(alt.Chart(df_mock_scores[df_mock_scores["name"].isin(places)][["name","filtered_score"]]).mark_bar(size = 20).encode(
-    x='name:N',
-    y='filtered_score:Q',
-    color=alt.Color('filtered_score:Q', scale=alt.Scale(scheme='greens'))
-).properties(width=750,height=400))
+
 
 if st.checkbox("Show raw data", False):
     st.subheader("Ort gefiltert")
