@@ -11,10 +11,11 @@ import csv
 s3_client = boto3.client('s3')
 date = date.today()
 data = pd.DataFrame()
+clientFirehose = boto3.client('firehose')
 
 for x in range(9,19):
     try:
-        response = s3_client.get_object(Bucket='sdd-s3-basebucket', Key='googleplaces/{}/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2), str(date.day-1).zfill(2), str(x).zfill(2)))
+        response = s3_client.get_object(Bucket='sdd-s3-basebucket', Key='googleplaces/{}/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2), str(date.day).zfill(2), str(x).zfill(2)))
         result = pd.DataFrame(json.loads(response["Body"].read()))
         result["date"] = date
         result["hour"] = x
@@ -27,7 +28,7 @@ def normal_popularity(row):
 
 
 def getPlzDictionary ():
-    with open('zuordnung_plz_ort_landkreis.csv', newline='', encoding='utf-8') as csvfile:
+    with open('google_places_popularity/zuordnung_plz_ort_landkreis.csv', newline='', encoding='utf-8') as csvfile:
         plz_dictionary = {}
         fileReader = csv.reader(csvfile, delimiter=',', quotechar='|')
         header = next(fileReader)
@@ -37,42 +38,67 @@ def getPlzDictionary ():
             for row in fileReader:
                 plz=row[3]
                 landkreis=row[2]
+                #print("row:"+plz+" landkreis:"+landkreis)
                 plz_dictionary[plz]=landkreis
 
     return plz_dictionary
+
+def extract_ags_from_plz(row):
+    #print(row["address"])
+    plz_dictionary = getPlzDictionary()
+
+    plz = row["address"].split(",")[-2].split(" ")
+    for ele in plz:
+        try:
+            ags = plz_dictionary[ele]
+            #print("found ags")
+            return ags
+        except:
+            #print("error: cant find ags")
+            return None
+
+def to_data(landkreis, date, relative_popularity, airquality_score,hystreet_score,cycle_score):
+
+    #['id', 'name', 'date', 'gmap_score', 'hystreet_score', 'cycle_score']
+     return {
+        'name': landkreis,
+        # todo time from request
+        'date': date,
+         'gmap_score' : relative_popularity
+         #"airquality_score" : airquality_score
+         #'hystreet_score' : hystreet_score
+         # 'cycle_score' : cycle_score
+    }
+
 
 
 data["normal_popularity"] = data.apply(normal_popularity, axis = 1, result_type = "reduce")
 data["relative_popularity"] = data["current_popularity"] / data["normal_popularity"]
 data["coordinates"] = data["coordinates"].astype(str)
-result = pd.DataFrame(data.groupby(["id", "address", "coordinates"])["relative_popularity"].mean())
+data["ags"] = data.apply(extract_ags_from_plz,axis = 1, result_type = "reduce" )
+data2 = data.loc[data["ags"].notna()]
+
+
+result = pd.DataFrame(data2.groupby("ags")["relative_popularity"].mean())
 result = result.reset_index()
-def extract_plz(row):
-    #print(row["address"])
-    plz = row["address"].split(",")[-2].split(" ")[1]
-    #print(plz)
-    return plz
-result["plz"] = result.apply(extract_plz, axis = 1, result_type = "reduce")
-result = result.drop(columns=["address"])
 
-plz_dictionary = getPlzDictionary()
-
-##Create a MongoDB client, open a connection to Amazon DocumentDB as a replica set and specify the read preference as secondary preferred
-client = pymongo.MongoClient('mongodb://sddmongodb1:sdd123456@sdd-amazon-docdb.cluster-chjfvfcgw69a.eu-central-1.docdb.amazonaws.com:27017/?ssl=true&ssl_ca_certs=rds-combined-ca-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false')
-##Specify the database to be used
-db = client.sddGooglePlacesDB
-##Specify the collection to be used
-col = db.sddGooglePlacesColl
 
 for index, row in result.iterrows():
-    landkreis = plz_dictionary[row['plz']]
+    landkreis = row['ags']
     relative_popularity = row['relative_popularity']
-    input = {'date':date.isoformat(), 'landkreis':landkreis,'relative_popularity':relative_popularity}
+    data_index = json.dumps({
+        'name': landkreis,
+        # todo time from request
+        'date': str(date),
+         'gmap_score' : relative_popularity
+         #"airquality_score" : airquality_score
+         #'hystreet_score' : hystreet_score
+         # 'cycle_score' : cycle_score
+    })
+
+    print (data_index)
+    clientFirehose.put_record(DeliveryStreamName='sdd-kinese-aggregator',  Record={'Data':data_index })
+
+
     print(input)
-#col.update()
-#print(plz_dictionary)
 
-
-
-##Insert a single document
-#col.insert_one()
