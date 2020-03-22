@@ -3,7 +3,7 @@ import pandas as pd
 import json
 import datetime
 
-df = pd.read_csv('data.csv')
+df = pd.read_csv('data.temp.csv')
 
 for name, group in df.groupby('timestamp'):
     print(group.to_json(orient='records'))

@@ -6,7 +6,7 @@
 
 **/.vscode
 **/.venv
-**/hystreet_to_s3/*.csv
+**/hystreet_to_s3/*.temp.csv
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
