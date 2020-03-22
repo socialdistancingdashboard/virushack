@@ -40,7 +40,7 @@ lats <- c(45, 57)
 
 
 df_coord <- 
-  readr::read_csv("~/R/virushack/hystreet/data/stations_with_ags.csv") %>% 
+  readr::read_csv("~/R/virushack/hystreet/data/stations_with_ags.csv", col_names = TRUE) %>% 
   sf::st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% 
   {bind_cols(sf::st_drop_geometry(.), sf::st_coordinates(.) %>% as_tibble() )}
 
