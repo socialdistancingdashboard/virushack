@@ -56,7 +56,8 @@ places = st.sidebar.multiselect('Welche Orte?',list(set(county_names)), standard
 # start_date = st.sidebar.date_input('Datum', datetime.date(2020,3,22))
 start_date = st.sidebar.date_input('Datum', datetime.date(2020,3,22))
 
-data_sources = st.sidebar.multiselect('Welche Daten?',['gmap_score', 'hystreet_score', "cycle_score"],"gmap_score")
+# data_sources = st.sidebar.multiselect('Welche Daten?',['gmap_score', 'hystreet_score', "cycle_score"],"gmap_score")
+data_sources = st.sidebar.multiselect('Welche Daten?',['gmap_score'],"gmap_score")
 
 #calculate average score based on selected data_sources
 if len(data_sources) > 0:
@@ -111,28 +112,28 @@ initial_view_state=pdk.ViewState(
       ],
   ))
 
-data_topojson_remote = alt.topo_feature(url=url_topojson, feature='counties')
-c = alt.Chart(data_topojson_remote).mark_geoshape(
-    stroke='white'
-).encode(
-    color=alt.Color('filtered_score:Q', scale=alt.Scale(scheme='greens')),
-    tooltip=[alt.Tooltip("properties.name:N", title="City"),alt.Tooltip("filtered_score:N", title="Score")]
-).transform_lookup(
-    lookup='id',
-    from_=alt.LookupData(df_mock_scores, 'id', ['filtered_score'])
-).properties(width=750,height = 1000)
-st.altair_chart(c)
-
-if len(places) > 0:
-    st.subheader("Vergleich Soziale Distanz")
-    st.altair_chart(alt.Chart(df_mock_scores[df_mock_scores["name"].isin(places)][["name", "date", "filtered_score"]]).mark_line().encode(
-        x= alt.X('date:T',axis = alt.Axis(title = 'Tag', format = ("%d %b"))),
-        y= alt.Y('filtered_score:Q',title="Soziale Distanz"),
-        color=alt.Color('name',title ="Landkreis")
-    ).properties(
-        width=750,
-        height = 400
-    ))
+# data_topojson_remote = alt.topo_feature(url=url_topojson, feature='counties')
+# c = alt.Chart(data_topojson_remote).mark_geoshape(
+#     stroke='white'
+# ).encode(
+#     color=alt.Color('filtered_score:Q', scale=alt.Scale(scheme='greens')),
+#     tooltip=[alt.Tooltip("properties.name:N", title="City"),alt.Tooltip("filtered_score:N", title="Score")]
+# ).transform_lookup(
+#     lookup='id',
+#     from_=alt.LookupData(df_mock_scores, 'id', ['filtered_score'])
+# ).properties(width=750,height = 1000)
+# st.altair_chart(c)
+#
+# if len(places) > 0:
+#     st.subheader("Vergleich Soziale Distanz")
+#     st.altair_chart(alt.Chart(df_mock_scores[df_mock_scores["name"].isin(places)][["name", "date", "filtered_score"]]).mark_line().encode(
+#         x= alt.X('date:T',axis = alt.Axis(title = 'Tag', format = ("%d %b"))),
+#         y= alt.Y('filtered_score:Q',title="Soziale Distanz"),
+#         color=alt.Color('name',title ="Landkreis")
+#     ).properties(
+#         width=750,
+#         height = 400
+#     ))
 
 st.subheader("Vergleich Soziale Distanz")
 
