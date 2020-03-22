@@ -21,15 +21,12 @@ import numpy as np
 import altair as alt
 import datetime
 import requests
-<<<<<<< Updated upstream
 import random
-=======
 from PIL import Image
 from io import BytesIO
 import boto3
 import json
 import datetime
->>>>>>> Stashed changes
 
 import pandas as pd
 
@@ -53,7 +50,6 @@ date = datetime.datetime.now()
 
 @st.cache(persist=True)
 def load_mock_data():
-<<<<<<< Updated upstream
     county_names = []
     county_ids = []
     mock_scores = []
@@ -83,8 +79,6 @@ places = st.sidebar.multiselect('Welche Orte?',county_names, ["Bielefeld","Calw"
 date = st.sidebar.date_input('Datum', datetime.date(2011,1,1))
 
 
-
-=======
     df = pd.read_csv("scores.csv", index_col = 0, dtype = {"id": str, 'name': str,'date': str,
                                                       'gmap_score': float,'hystreet_score': float, 'cycle_score': float,})
     return df
@@ -116,7 +110,7 @@ st.sidebar.image(img, use_column_width=True)
 places = st.sidebar.multiselect('Welche Orte?',list(set(county_names)), ["Bielefeld","Calw"])
 start_date = st.sidebar.date_input('Datum', datetime.date(2020,3,12))
 start_date = st.sidebar.date_input('Datum', datetime.date(2020,3,22))
->>>>>>> Stashed changes
+
 data_sources = st.sidebar.multiselect('Welche Daten?',['gmap_score', 'hystreet_score', "cycle_score"],"gmap_score")
 
 #calculate average score based on selected data_sources
@@ -144,9 +138,6 @@ c = alt.Chart(data_topojson_remote).mark_geoshape(
 ).properties(width=750,height = 1000)
 st.altair_chart(c)
 
-
-<<<<<<< Updated upstream
-=======
 if len(places) > 0:
     st.subheader("Vergleich Soziale Distanz")
     st.altair_chart(alt.Chart(df_mock_scores[df_mock_scores["name"].isin(places)][["name", "date", "filtered_score"]]).mark_line().encode(
@@ -157,7 +148,6 @@ if len(places) > 0:
         width=750,
         height = 400
     ))
->>>>>>> Stashed changes
 
 st.subheader("Vergleich Soziale Distanz")
 
