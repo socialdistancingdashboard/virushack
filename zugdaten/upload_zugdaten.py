@@ -14,7 +14,7 @@ from pathlib import Path
 
 db = DatabaseWrapper("localhost", "hafasdb2", "hafas", "123")
 
-path = "/media/bemootzer/SICHERUNG/stewardless/data"
+path = "/home/bemootzer/Documents/SoftwareProjekte/stewardless/stewardless-crawler/dbbackup"
 re_sql = re.compile(r"arrival.*.sql")
 
 _, blacklist, _ = next(os.walk(os.path.join("summaries","data")))

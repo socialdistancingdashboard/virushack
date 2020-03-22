@@ -50,7 +50,7 @@ Hava a look in /summaries for daily summary files (json).
 ```
 
 ## data preview 2020-01-27 to 2020-03-20
-![data preview](data_viz.png "Visualization")
+![data preview](summaries/data_viz.png "Visualization")
    
 ### Interpretation (german below)
 * One does notice the weekends as drops in scheduled stops
