@@ -185,11 +185,12 @@ Wird read only angeboten. Ist noch WIP.
 
 
 ## Unterstützer
-Kineo.ai -> Server
-Google -> Google Maps API Credits
-[Hystreet](http://hystreet.com) -> API
-Fraunhofer IOSB-INA -> Daten von Lemgo Digital, Datenaufbereitung, Video
-Eco Compteur -> Zugriff auf Fahrradzählstationen
+
+* Kineo.ai -> Server
+* Google -> Google Maps API Credits
+* [Hystreet](http://hystreet.com) -> API
+* Fraunhofer IOSB-INA -> Daten von Lemgo Digital, Datenaufbereitung, Video
+* Eco Compteur -> Zugriff auf Fahrradzählstationen
 
 ## Publicity
 
