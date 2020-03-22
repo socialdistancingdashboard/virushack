@@ -36,6 +36,87 @@ df %>% as_tibble()
 
 Im Datensatz sind 221949 Messwerte von 117 Stationen.
 
+### Karte der Stationen
+
+``` r
+lons <- c(3, 18)
+lats <- c(45, 57)
+
+
+df_coord <- 
+  readr::read_csv("~/R/virushack/hystreet/data/stations_with_ags.csv") %>% 
+  sf::st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% 
+  {bind_cols(sf::st_drop_geometry(.), sf::st_coordinates(.) %>% as_tibble() )}
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   name = col_character(),
+    ##   city = col_character(),
+    ##   stationid = col_double(),
+    ##   lon = col_double(),
+    ##   lat = col_double(),
+    ##   earliest_measurement_at = col_datetime(format = ""),
+    ##   latest_measurement_at = col_datetime(format = ""),
+    ##   ags = col_double(),
+    ##   ascii = col_character(),
+    ##   distanceinmeters = col_double()
+    ## )
+
+``` r
+countries_sf <-
+  rnaturalearth::ne_countries(scale = "medium", returnclass = "sf") %>% 
+  filter(continent == "Europe")
+
+ggplot() + 
+  geom_sf(data = countries_sf, alpha = 0) +
+  geom_sf(data = countries_sf %>% 
+            filter(name == "Germany"), 
+          fill = "#376597FF") +
+  geom_point(data = df_coord,
+                aes(x = X, 
+                    y = Y)) +
+  ggrepel::geom_label_repel(data = df_coord,
+                aes(x = X, 
+                    y = Y, 
+                    label = name),
+                size = 2,
+                alpha = 0.7,
+                segment.color = "#CCAF69FF") +
+  coord_sf(xlim = lons, ylim = lats) +
+  theme(
+    panel.border = element_rect(fill = NA, linetype = "solid", color = "black"),
+    panel.background = element_rect(fill = NA),
+    axis.title.x=element_blank(),
+    axis.title.y=element_blank()
+  ) +
+  labs(title = "Straßennamen aller Messstationen")
+```
+
+![](hystreet_eda_files/figure-gfm/map-1.png)<!-- -->
+
+### Time series
+
+Die Daten sind time series von Fußgängerzahlen. Die ersten 6 Stationen
+ab 1. Januar 2020 sind hier dargestellt:
+
+``` r
+df %>% 
+  filter(place %in% unique(df$place)[1:6]) %>% 
+  ggplot(aes(x = timestamp, y = pedestrians_count, colour = weekdays(timestamp))) +
+  geom_path(group = 1) +
+  labs(x = "Date",
+       y = "Pedestrians",
+       colour = "Day") +
+  facet_wrap(~place)
+```
+
+![](hystreet_eda_files/figure-gfm/ts-1.png)<!-- -->
+
+``` r
+ggsave("hystreet.png", height = 10, width =  14)
+```
+
 ## EDA
 
 ### Anteil der Messwerte die 0 sind
