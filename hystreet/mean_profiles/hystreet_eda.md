@@ -39,7 +39,7 @@ Im Datensatz sind 221949 Messwerte von 117 Stationen.
 ### Karte der Stationen
 
 ``` r
-lons <- c(3, 18)
+lons <- c(1, 20)
 lats <- c(45, 57)
 
 
@@ -69,7 +69,9 @@ countries_sf <-
   filter(continent == "Europe")
 
 ggplot() + 
-  geom_sf(data = countries_sf, alpha = 0) +
+  geom_sf(data = countries_sf, 
+          aes(fill = name),
+          alpha = 0.1) +
   geom_sf(data = countries_sf %>% 
             filter(name == "Germany"), 
           fill = "#376597FF") +
@@ -79,12 +81,13 @@ ggplot() +
   ggrepel::geom_label_repel(data = df_coord,
                 aes(x = X, 
                     y = Y, 
-                    label = name),
-                size = 2,
+                    label = paste0(name, "\n", city)),
+                size = 1.5,
                 alpha = 0.7,
                 segment.color = "#CCAF69FF") +
   coord_sf(xlim = lons, ylim = lats) +
   theme(
+    legend.position = "none",
     panel.border = element_rect(fill = NA, linetype = "solid", color = "black"),
     panel.background = element_rect(fill = NA),
     axis.title.x=element_blank(),
@@ -112,10 +115,6 @@ df %>%
 ```
 
 ![](hystreet_eda_files/figure-gfm/ts-1.png)<!-- -->
-
-``` r
-ggsave("hystreet.png", height = 10, width =  14)
-```
 
 ## EDA
 
