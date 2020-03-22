@@ -1,0 +1,5 @@
+boto3
+tqdm
+requests
+pandas
+-e git://github.com/m-wrzr/populartimes.git#egg=populartimes

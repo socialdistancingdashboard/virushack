@@ -1,12 +1,12 @@
 import boto3
 import json
 import time
-from datetime import datetime
+from datetime import date
 import pandas as pd
 
 
 s3_client = boto3.client('s3')
-date = datetime.now()
+date = date.today()
 data = pd.DataFrame()
 
 for x in range(9,19):
@@ -22,10 +22,17 @@ for x in range(9,19):
 def normal_popularity(row):
     return row["populartimes"][row["date"].weekday()]["data"][row["hour"]]
 
+#print(data)
 data["normal_popularity"] = data.apply(normal_popularity, axis = 1, result_type = "reduce")
 data["relative_popularity"] = data["current_popularity"] / data["normal_popularity"]
 data["coordinates"] = data["coordinates"].astype(str)
-print(data)
-result = data.groupby(["id", "address", "coordinates"])["relative_popularity"].mean()
-print(result)
+result = pd.DataFrame(data.groupby(["id", "address", "coordinates"])["relative_popularity"].mean())
+result = result.reset_index()
+def extract_plz(row):
+    #print(row["address"])
+    plz = row["address"].split(",")[-2].split(" ")[1]
+    #print(plz)
+    return plz
+result["plz"] = result.apply(extract_plz, axis = 1, result_type = "reduce")
+result = result.drop(columns=["address"])
 result.to_csv("test.csv")
