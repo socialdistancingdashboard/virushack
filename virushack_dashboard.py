@@ -21,7 +21,8 @@ import numpy as np
 import altair as alt
 import datetime
 import requests
-import random
+from PIL import Image
+from io import BytesIO
 
 
 DATE_TIME = "date/time"
@@ -42,7 +43,8 @@ def load_data(nrows):
 
 @st.cache()
 def load_mock_data():
-    df = pd.read_csv("/Users/Sebastian/Desktop/scores.csv", index_col=0)
+    df = pd.read_csv("/Users/Sebastian/Desktop/scores.csv", index_col = 0, dtype = {"id": str, 'name': str,'date': str,
+                                                      'gmap_score': float,'hystreet_score': float, 'cycle_score': float,})
     return df
 
 
@@ -51,6 +53,9 @@ df_mock_scores2 = load_mock_data()
 df_mock_scores = df_mock_scores2.copy()
 county_names = list(set(df_mock_scores["name"].values))
 
+response = requests.get('https://github.com/socialdistancingdashboard/virushack/raw/master/logo/logo_with_medium_text.png')
+img = Image.open(BytesIO(response.content))
+st.sidebar.image(img, use_column_width=True)
 places = st.sidebar.multiselect('Welche Orte?',list(set(county_names)), ["Bielefeld","Calw"])
 start_date = st.sidebar.date_input('Datum', datetime.date(2020,3,12))
 start_date = st.sidebar.date_input('Datum', datetime.date(2020,3,22))
@@ -78,19 +83,21 @@ data_topojson_remote = alt.topo_feature(url=url_topojson, feature='counties')
 st.altair_chart(alt.Chart(data_topojson_remote).mark_geoshape(
     stroke='white'
 ).encode(
-    color=alt.Color('filtered_score:Q', title="Soziale Distanz", scale=alt.Scale(scheme='greens')),
+    color=alt.Color('filtered_score:Q', title="Soziale Distanz", scale=alt.Scale(scheme='redyellowgreen')),
     tooltip=[alt.Tooltip("properties.name:N", title="Landkreis"),alt.Tooltip("filtered_score:N", title="Score")]
 ).transform_lookup(
     lookup='id',
-    from_=alt.LookupData(df_mock_scores, 'id', ['filtered_score'])
+    from_= alt.LookupData(df_mock_scores, 'id', ['filtered_score'])
 ).properties(width=750,height = 1000))
+
+
 
 
 
 if len(places) > 0:
     st.subheader("Vergleich Soziale Distanz")
     st.altair_chart(alt.Chart(df_mock_scores[df_mock_scores["name"].isin(places)][["name","date", "filtered_score"]]).mark_line().encode(
-        x= alt.X('date:T',title="Tag"),
+        x= alt.X('date:T',axis = alt.Axis(title = 'Tag', format = ("%d %b"))),
         y= alt.Y('filtered_score:Q',title="Soziale Distanz"),
         color=alt.Color('name',title ="Landkreis")
     ).properties(
