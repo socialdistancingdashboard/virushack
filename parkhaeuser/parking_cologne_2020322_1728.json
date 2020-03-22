@@ -1,0 +1,69 @@
+{
+    "date": "2020-3-22",
+    "time": "17:28",
+    "list": {
+        "Am Dom": {
+            "adress": "Kurt-Hackenberg-Platz 2,50667 K\u00f6ln",
+            "total": 610,
+            "empty": 0,
+            "occupation": 1.0
+        },
+        "Am G\u00fcrzenich": {
+            "adress": "Quatermarkt 5,50667 K\u00f6ln",
+            "total": 315,
+            "empty": 200,
+            "occupation": 0.36507936507936506
+        },
+        "An Farina": {
+            "adress": "Laurenzplatz 4,50667 K\u00f6ln",
+            "total": 305,
+            "empty": 190,
+            "occupation": 0.3770491803278688
+        },
+        "Galeria Kaufhof": {
+            "adress": "C\u00e4cilienstra\u00dfe/Hohe Stra\u00dfe 41-53,50667 K\u00f6ln",
+            "total": 1260,
+            "empty": 860,
+            "occupation": 0.31746031746031744
+        },
+        "Gro\u00df Sankt Martin": {
+            "adress": "Gro\u00dfe Neugasse 4,50667 K\u00f6ln",
+            "total": 145,
+            "empty": 156,
+            "occupation": -0.07586206896551724
+        },
+        "Hauptbahnhof": {
+            "adress": "Breslauer Platz 1,50668 K\u00f6ln",
+            "total": 500,
+            "empty": 384,
+            "occupation": 0.232
+        },
+        "Heumarkt": {
+            "adress": "Markmannsgasse ,50667 K\u00f6ln",
+            "total": 460,
+            "empty": 296,
+            "occupation": 0.3565217391304348
+        },
+        "Hohe Stra\u00dfe": {
+            "adress": "Marspfortengasse 10,50667 K\u00f6ln",
+            "total": 280,
+            "empty": 163,
+            "occupation": 0.41785714285714287
+        },
+        "Maritim": {
+            "adress": "Heumarkt 20,50667 K\u00f6ln",
+            "total": 600,
+            "empty": 0,
+            "occupation": 1.0
+        },
+        "Philharmonie": {
+            "adress": "Bischofsgartenstra\u00dfe 1,50667 K\u00f6ln",
+            "total": 390,
+            "empty": 30,
+            "occupation": 0.9230769230769231
+        }
+    },
+    "total": 4865,
+    "empty": 2279,
+    "occupation": 0.531551901336074
+}

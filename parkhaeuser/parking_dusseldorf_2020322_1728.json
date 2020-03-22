@@ -1,0 +1,34 @@
+{
+    "date": "2020-3-22",
+    "time": "17:28",
+    "list": {
+        "Altstadt": {
+            "total": 2404,
+            "empty": 2241,
+            "occupation": 0.06780366056572379
+        },
+        "Friedrichstadt": {
+            "total": 1035,
+            "empty": 865,
+            "occupation": 0.1642512077294686
+        },
+        "Hauptbahnhof": {
+            "total": 2372,
+            "empty": 2304,
+            "occupation": 0.02866779089376054
+        },
+        "K\u00f6": {
+            "total": 3790,
+            "empty": 3530,
+            "occupation": 0.06860158311345646
+        },
+        "Schadowstra\u00dfe": {
+            "total": 1313,
+            "empty": 988,
+            "occupation": 0.24752475247524752
+        }
+    },
+    "total": 10914,
+    "empty": 9928,
+    "occupation": 0.09034267912772585
+}
