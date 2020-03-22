@@ -120,7 +120,9 @@ if __name__ == '__main__':
                {'ID':28,'URL':'http://webcambild-rathaus.aachen.de/webcam_rathaus.jpg', 'Lat':'50.776103',"Lon":'6.083780','Name':'Aachen Rathaus', 'Personenzahl':None, 'Stand':None },
                {'ID':29,'URL':'http://www.brillen-krille.de/Webcam/foto.jpg', 'Lat':'54.087890',"Lon":'12.134464','Name':'Rostock Universitätsplatz', 'Personenzahl':None, 'Stand':None },
                {'ID':30,'URL':'https://www.mvv.de/fileadmin/user_upload/Systemdateien/Webcam/current.jpg', 'Lat':'49.4840612',"Lon":'8.4733678','Name':'Mannheim Wasserturm', 'Personenzahl':None, 'Stand':None },
-               {'ID':31,'URL':'https://www.theater-schwedt.de/ubs/cam/130/', 'Lat':'53.0617394',"Lon":'14.2838004','Name':'Schwedt Lindenallee', 'Personenzahl':None, 'Stand':None }]
+               {'ID':31,'URL':'https://www.theater-schwedt.de/ubs/cam/130/', 'Lat':'53.0617394',"Lon":'14.2838004','Name':'Schwedt Lindenallee', 'Personenzahl':None, 'Stand':None },
+               {'ID':32,'URL':'https://webcam.stuttgart.de/wcam007/current.jpg', 'Lat':'48.7754909',"Lon":'9.1763283','Name':'Stuttgart Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':33,'URL':'http://webcam.wilhelma.de/webcam02/webcam02.jpg', 'Lat':'48.8041551',"Lon":'9.2058097','Name':'Stuttgart Wilhelma', 'Personenzahl':None, 'Stand':None }]
 
     pc = PeopleCounter(model_path)
 
