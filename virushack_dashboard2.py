@@ -11,6 +11,7 @@ import boto3
 import json
 import datetime
 
+import pydeck as pdk
 import pandas as pd
 
 
@@ -71,12 +72,44 @@ df_mock_scores["filtered_score"] = np.where(df_mock_scores["name"].isin(places),
 
 st.subheader('Social Distancing Map')
 
+# response = requests.get('https://3u54czgyw4.execute-api.eu-central-1.amazonaws.com/default/sdd-lambda-request').text.replace("}{", "},{")
+# ast.eval(response)
+# json.loads(response)
 
 st.altair_chart(alt.Chart(df_mock_scores[df_mock_scores["name"].isin(places)][["name","filtered_score"]]).mark_bar(size = 20).encode(
     x='name:N',
     y='filtered_score:Q',
     color=alt.Color('filtered_score:Q', scale=alt.Scale(scheme='greens'))
 ).properties(width=750,height=400))
+
+st.pydeck_chart(pdk.Deck(
+map_style='mapbox://styles/mapbox/light-v9',
+initial_view_state=pdk.ViewState(
+  latitude=50.32,
+  longitude=9.41,
+  zoom=5,
+  pitch=50,
+      ),
+      layers=[
+          pdk.Layer(
+             'HexagonLayer',
+             data=df_mock_scores,
+             get_position='[lon, lat]',
+             radius=20000,
+             elevation_scale=100,
+             elevation_range=[0, 1000],
+             pickable=True,
+             extruded=True,
+          ),
+          pdk.Layer(
+              'ScatterplotLayer',
+              data=df_mock_scores,
+              get_position='[lon, lat]',
+              get_color='[200, 30, 0, 160]',
+              get_radius=200,
+          ),
+      ],
+  ))
 
 data_topojson_remote = alt.topo_feature(url=url_topojson, feature='counties')
 c = alt.Chart(data_topojson_remote).mark_geoshape(
