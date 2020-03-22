@@ -39,36 +39,30 @@ class BikePrediction:
 
   def train(
     self,
-    path_to_training_data="fahrrad_zaehler.json", 
+    path_to_training_data="whole_json.json", 
     out_path="prediction_parameters"):
     
     """ This trains and saves a model for all stations found in 
     path.json file. Output folder defaults to /prediction_parameters."""
 
-    data = json.load(open("fahrrad_zaehler.json", "r"))
-
-    for d in data:
-      print("start training for station %s", d)
+    data_json = json.load(open(path_to_training_data, "r"))
+    data = pd.DataFrame(data_json)
+  
+    # take care of dtypes
+    data.date = data.date.apply(lambda x: datetime.strptime(x, '%Y-%m-%d'))
+    data.bike_count = pd.to_numeric(data.bike_count)
+    data.lon = pd.to_numeric(data.lon)
+    data.lat = pd.to_numeric(data.lat)
+  
+    stations = data.name.unique()
+  
+    for station in stations:
+      print("start training for station %s", station)
       # load data and skip last row. Last row contains the overall sum.
-      df = pd.DataFrame(np.array(
-        data[d][:-1]), columns=["date", "bike_count"])
-
-      # transform "YYYY/MM/DD" to datetime object
-      df.date = df.date.apply(
-        lambda x: datetime(
-          int(x.split("/")[2]),
-          int(x.split("/")[0]),
-          int(x.split("/")[1])
-        )
-      )
+      df = data[data.name == station]
 
       # define new columns for regression (happens inplace)
       df = self.enrich_df(df)
-
-      # these are not used at the moment
-      # df["workingday"] = df["weekday"].apply(lambda x: 1 if x < 5 else 0)
-      # df["saturday"] = df["weekday_5"]
-      # df["sunday"] = df["weekday_6"]
 
       # Perform regression but use data only until 2020-01-01
       result = sm.ols(formula="""
@@ -95,7 +89,7 @@ class BikePrediction:
         weekday_6 
       """, data=df[(df.date < datetime(2020, 1, 1))]).fit()
 
-      result.save(os.path.join(out_path, d + ".model"))
+      result.save(os.path.join(out_path, station + ".model"))
 
       # visualize
       df["bike_count_prediction"] = result.predict(df)
@@ -107,10 +101,10 @@ class BikePrediction:
         title="""
           trained with data until 2020-01-01 \n
           displayed data from 2019 onwards \n
-          Station %s""" % d)
+          Station %s""" % station)
       plt.ylabel("bike count")
       plt.tight_layout()
-      plt.savefig(os.path.join(out_path, "prediction_%s.png" % d))
+      plt.savefig(os.path.join(out_path, "prediction_%s.png" % station))
       plt.close()
       print("model and visualization saved to '%s'" % out_path)
 
@@ -156,7 +150,7 @@ if __name__ == "__main__":
 
   # make a single prediction
   prediction = BP.predict_single(
-    station_string="('9.92926', '51.53692')",
+    station_string="Karlsruhe (DE)",
     day=datetime(2020,1,1)
   )
 
