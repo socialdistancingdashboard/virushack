@@ -29,4 +29,4 @@ for location in locations:
         measurement['date'] = date.strftime("%Y-%m-%d")
         df = df.append(measurement, ignore_index=True)
     print(json.dumps(measurements[0], indent=4))
-df.to_csv('data.csv', index=False)
+df.to_csv('data.temp.csv', index=False)
