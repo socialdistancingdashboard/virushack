@@ -1,10 +1,7 @@
-import base64
 import datetime
 import os
-
 import boto3
 import requests
-
 import csv
 import json
 
