@@ -28,8 +28,13 @@ class BikePrediction:
     if "bike_count" in df:
       # only for training
       df["bike_count"] = df.bike_count.astype("float16")
+
     df = df.join(pd.get_dummies(df.weekday, prefix="weekday"))
     df = df.join(pd.get_dummies(df.month, prefix="month"))
+
+    # for d in self.dummies:
+    #   df[d] = df[d.split("_")[0]].apply(lambda x: 1 if x == d.split("_")[1] else 0)
+
     return df
 
   def train(
@@ -147,7 +152,7 @@ if __name__ == "__main__":
   BP = BikePrediction()
   
   # run training on all classes
-  # BP.train()
+  BP.train()
 
   # make a single prediction
   prediction = BP.predict_single(
