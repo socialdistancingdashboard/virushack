@@ -1,4 +1,5 @@
-ChIJ62hndh9OqEcRydXjBjh91ps,"Dircksenstr. 2, 10179 Berlin, Germany","{'lat': 52.52155630000001, 'lng': 13.4111577}",0.1320754716981132
-ChIJcy1JA8NRqEcRBNy2MNzQTmw,"Georgenstraße 14/17, 10117 Berlin, Germany","{'lat': 52.5202894, 'lng': 13.3869776}",0.06896551724137931
-ChIJe-ff-71RqEcRqvy8lRR4PHo,"Hauptbahnhof, Europaplatz 1, 10557 Berlin, Germany","{'lat': 52.5250839, 'lng': 13.369402}",0.05555555555555555
-ChIJhwfvW8lRqEcRud4JRZ-d6vQ,"Potsdamer Platz, 10785 Berlin, Germany","{'lat': 52.5087397, 'lng': 13.3761764}",0.1111111111111111
+,id,coordinates,relative_popularity,plz
+0,ChIJ62hndh9OqEcRydXjBjh91ps,"{'lat': 52.52155630000001, 'lng': 13.4111577}",0.1320754716981132,10179
+1,ChIJcy1JA8NRqEcRBNy2MNzQTmw,"{'lat': 52.5202894, 'lng': 13.3869776}",0.06896551724137931,10117
+2,ChIJe-ff-71RqEcRqvy8lRR4PHo,"{'lat': 52.5250839, 'lng': 13.369402}",0.05555555555555555,10557
+3,ChIJhwfvW8lRqEcRud4JRZ-d6vQ,"{'lat': 52.5087397, 'lng': 13.3761764}",0.1111111111111111,10785
