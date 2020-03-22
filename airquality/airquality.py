@@ -13,9 +13,9 @@ client = boto3.client('firehose')
 
 
 def to_byte_record(airquality_record):
-    new_record_encoded = str(airquality_record).encode('utf-8')
+    # new_record_encoded = str(airquality_record).encode('utf-8')
 
-    return base64.b64encode(new_record_encoded)
+    return base64.b64encode(airquality_record)
 
 
 def to_airquality(city_name, lat, lon, response):
