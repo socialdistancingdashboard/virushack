@@ -6,6 +6,7 @@ import boto3
 import requests
 
 import csv
+import json
 
 airquality_token = os.environ['AIR_QUALITY_API_TOKEN']
 
@@ -15,7 +16,7 @@ client = boto3.client('firehose')
 def to_byte_record(airquality_record):
     # new_record_encoded = str(airquality_record).encode('utf-8')
 
-    return base64.b64encode(airquality_record)
+    return json.dumps(airquality_record)
 
 
 def to_airquality(city_name, lat, lon, response):

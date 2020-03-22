@@ -61,3 +61,33 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': json.dumps(response_data)
     }
+
+
+import json
+import boto3
+import datetime
+import pandas as pd
+
+def lambda_handler(event, context):
+    print(event)
+
+
+    # event["date_min"], event["date_max"]
+    # min_date = datetime.datetime.now().date() - datetime.timedelta(days=1)
+    # max_date = datetime.datetime.now().date()
+
+    # pd.date_range(min_date, max_date)
+    # datetime.timedelta(days=1)
+
+
+    s3 = boto3.resource('s3')
+    #    obj = s3.Object('sdd-s3-basebucket', 'AggregatedData/2020/03/22/sdd-kinese-aggregator-2-2020-03-22-15-28-20-0bb7c782-48b8-4478-8f95-989db4f51834')
+    for date in pd.date_range(event["date_min"], event["date_max"]):
+        obj = s3.Object('sdd-s3-basebucket',
+                        'aggdata/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2),
+                                                                  str(date.day).zfill(2)))
+
+    return {
+        'statusCode': 200,
+        'body': obj.get()['Body'].read()
+    }
