@@ -14,19 +14,20 @@ from pathlib import Path
 
 db = DatabaseWrapper("localhost", "hafasdb2", "hafas", "123")
 
-path = "/media/bemootzer/SICHERUNG/stewardless/data"
+path = "/home/bemootzer/Documents/SoftwareProjekte/stewardless/stewardless-crawler/dbbackup"
 re_sql = re.compile(r"arrival.*.sql")
 
-# _, blacklist, _ = next(os.walk(os.path.join("summaries","data")))
+_, blacklist, _ = next(os.walk(os.path.join("summaries","data")))
+blacklist.append("2020-02-01") # data not complete
 
 for file in os.listdir(path):
   if re_sql.match(file):
     # LOAD BACKUP
     #file = "arrivals-2020-03-01.sql"
     date_string = file.replace("arrivals-", "").replace(".sql", "")
-    # if date_string in blacklist:
-    #   print("skip %s" % file)
-    #   continue #skip because this file was already uploaded.
+    if date_string in blacklist:
+      print("skip %s" % file)
+      continue #skip because this file was already uploaded.
 
     try:
       print("current file", file)
@@ -103,7 +104,7 @@ for file in os.listdir(path):
       df.drop("customIndex", axis=1, inplace=True)
 
       # WRITE A SHORT DAILY SUMMARY TO DISC
-      summary_path = os.path.join(os.getcwd(), "zugdaten", "summaries", "data", date_string)
+      summary_path = os.path.join(os.getcwd(), "summaries", "data", date_string)
       Path(summary_path).mkdir(parents=True, exist_ok=True)
       tmp = json.loads(df.groupby(["lineProduct"]).sum()[["planned_stops", "cancelled_stops"]].to_json())
       summary = {

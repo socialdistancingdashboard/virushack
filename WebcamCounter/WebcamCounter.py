@@ -11,6 +11,8 @@ import tensorflow.compat.v1 as tf
 import cv2
 import urllib
 from datetime import datetime
+import boto3
+import json
 
 # Geklaut von https://gist.github.com/madhawav/1546a4b99c8313f06c0b2d7d7b4a09e2
 class DetectorAPI:
@@ -112,10 +114,13 @@ if __name__ == '__main__':
                {'ID':22,'URL':'https://lamp01.dortmund.de/webcams/friedensplatz/current.jpg', 'Lat':'51.511543',"Lon":'7.466345','Name':'Dortmund Friedensplatz', 'Personenzahl':None, 'Stand':None },
                {'ID':23,'URL':'https://lamp01.dortmund.de/webcams/altermarkt_hik/current_TIMING.jpg', 'Lat':'51.513989',"Lon":'7.466483','Name':'Dortmund Alter Markt', 'Personenzahl':None, 'Stand':None },
                {'ID':24,'URL':'https://service.ka-news.de/tools/webcams/?cam=27', 'Lat':'49.009220',"Lon":'8.403912','Name':'Karlsruhe Marktplatz', 'Personenzahl':None, 'Stand':None },
-               {'ID':25,'URL':'https://www.augsburg.de/fileadmin/user_upload/header/webcam/webcamdachspitz/B_Rathausplatz_Dachspitz_00.jpg', 'Lat':'48.368963',"Lon":'10.898227','Name':'Augsburg Rathausplatz', 'Personenzahl':None, 'Stand':None },
-               {'ID':26,'URL':'https://www2.braunschweig.de/webcam/schloss.jpg', 'Lat':'52.263363',"Lon":'10.527763','Name':'Braunschweig Schloss', 'Personenzahl':None, 'Stand':None },
-               {'ID':27,'URL':'http://webcambild-rathaus.aachen.de/webcam_rathaus.jpg', 'Lat':'50.776103',"Lon":'6.083780','Name':'Aachen Rathaus', 'Personenzahl':None, 'Stand':None },
-               {'ID':28,'URL':'http://www.brillen-krille.de/Webcam/foto.jpg', 'Lat':'54.087890',"Lon":'12.134464','Name':'Rostock Universitätsplatz', 'Personenzahl':None, 'Stand':None }]
+               {'ID':25,'URL':'https://service.ka-news.de/tools/webcams/?cam=39', 'Lat':'49.0099302',"Lon":'8.3920208','Name':'Karlsruhe Europaplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':26,'URL':'https://www.augsburg.de/fileadmin/user_upload/header/webcam/webcamdachspitz/B_Rathausplatz_Dachspitz_00.jpg', 'Lat':'48.368963',"Lon":'10.898227','Name':'Augsburg Rathausplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':27,'URL':'https://www2.braunschweig.de/webcam/schloss.jpg', 'Lat':'52.263363',"Lon":'10.527763','Name':'Braunschweig Schloss', 'Personenzahl':None, 'Stand':None },
+               {'ID':28,'URL':'http://webcambild-rathaus.aachen.de/webcam_rathaus.jpg', 'Lat':'50.776103',"Lon":'6.083780','Name':'Aachen Rathaus', 'Personenzahl':None, 'Stand':None },
+               {'ID':29,'URL':'http://www.brillen-krille.de/Webcam/foto.jpg', 'Lat':'54.087890',"Lon":'12.134464','Name':'Rostock Universitätsplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':30,'URL':'https://www.mvv.de/fileadmin/user_upload/Systemdateien/Webcam/current.jpg', 'Lat':'49.4840612',"Lon":'8.4733678','Name':'Mannheim Wasserturm', 'Personenzahl':None, 'Stand':None },
+               {'ID':31,'URL':'https://www.theater-schwedt.de/ubs/cam/130/', 'Lat':'53.0617394',"Lon":'14.2838004','Name':'Schwedt Lindenallee', 'Personenzahl':None, 'Stand':None }]
 
     pc = PeopleCounter(model_path)
 
@@ -130,5 +135,5 @@ if __name__ == '__main__':
     response = client_s3.put_object(
         Bucket="sdd-s3-basebucket",
         Body=json.dumps(webcams),
-        Key="webcamdaten/" + "/".datetime.now().strftime("%Y%m%d%H") + "/webcamdaten.json"
+        Key=f"webcamdaten/{datetime.now().strftime('%Y/%m/%d/%H')}webcamdaten.json"
       )
