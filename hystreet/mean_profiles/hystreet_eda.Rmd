@@ -34,7 +34,7 @@ Im Datensatz sind `r nrow(df)` Messwerte von `r length(unique(df$place))` Statio
 
 
 
-```{r map, echo=FALSE}
+```{r map, echo=FALSE, message=FALSE}
 lons <- c(1, 20)
 lats <- c(45, 57)
 
