@@ -53,11 +53,13 @@ Hava a look in /summaries for daily summary files (json).
 ![data preview](summaries/data_viz.png "Visualization")
    
 ### Interpretation (german below)
+(english)
 * One does notice the weekends as drops in scheduled stops
 * One does notice a significant peak in cancelled stops on 2020-02-08/09 due to hurricane Sabrina
 * Busses were reduced from mid of february. Reason unclear.
 * One does notice a rise in cancelled trains with the beginning of corona
 
+(deutsch)
 * Man erkennt die Wochenenden als (planmäßige) Reduktion der geplanten Zughalte.
 * Man erkennt einen starken Peak am 2020-02-08/09. Hier hat das Sturmtief Sabrina zugeschlagen
 * Busse sind ab mitte Februar massiv eingeschränt worden (warum?)
