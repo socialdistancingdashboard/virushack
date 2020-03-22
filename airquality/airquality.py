@@ -22,7 +22,7 @@ def to_airquality(city_name, lat, lon, response):
     return {
         'landkreis_name': city_name,
         # todo time from request
-        'datetime': datetime.datetime.now(),
+        'datetime': datetime.datetime.now().isoformat(),
         'lat': lat,
         'lon': lon,
         'airquality': {
