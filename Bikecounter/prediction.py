@@ -16,6 +16,10 @@ except:
 
 
 class BikePrediction:
+  def __init__(self):
+    self.dummies = ["month_" + str(i+1) for i in range(12)]
+    self.dummies.extend(["weekday_" + str(i) for i in range(7)])
+
   def enrich_df(self, df):
     """ Adds dummy variables to dataframe """
     df["year"] = df.date.apply(lambda x: x.year)
@@ -105,33 +109,53 @@ class BikePrediction:
       plt.close()
       print("model and visualization saved to '%s'" % out_path)
 
-  def predict_single(self, station_string, day, path_to_models="prediction_parameters"):
+  def predict_single(self, station_string, day, path_to_models="prediction_parameters" ):
+    """ Makes a prediction for a station_string and a given day """
     if not type(day) == datetime:
       raise "Please pass a proper datetime object."
 
-    dummies = []
-    dummies.extend(["month_" + str(i+1) for i in range(12)])
-    dummies.extend(["weekday_" + str(i) for i in range(7)])
+
     df = pd.DataFrame([day], columns=["date"])
     self.enrich_df(df)
-    for d in dummies:
+    for d in self.dummies:
       if not d in df:
         df[d] = 0
     df["month_" + str(df.iloc[0].month)] = 1
     df["weekday_" + str(df.iloc[0].weekday)] = 1
 
+    # load model and predict
     model = load_pickle(os.path.join(path_to_models, station_string + ".model"))
-    prediction = model.predict(df)
-    return prediction.iloc[0]
+    df["prediction"] = model.predict(df)
+    # return prediction as plain number
+    return df.iloc[0]["prediction"]
+
+  def predict_series(self, station_string, days, path_to_models="prediction_parameters" ):
+    """ Predict all given days. Returns a dataframe with date and prediction """
+    if not type(days) == pd.core.series.Series:
+      assert "Please pass days as a pandas Series. E.g. days = df['date']"
+
+    df = pd.DataFrame()
+    df["date"] = days    
+    df = self.enrich_df(df)
+    model = load_pickle(os.path.join(path_to_models, station_string + ".model"))
+    df["prediction"] = model.predict(df)
+    return df[["date", "prediction"]]
 
 
 if __name__ == "__main__":
   # instance of class
   BP = BikePrediction()
+  
   # run training on all classes
-  BP.train()
+  # BP.train()
+
   # make a single prediction
   prediction = BP.predict_single(
     station_string="('9.92926', '51.53692')",
     day=datetime(2020,1,1)
+  )
+
+  BP.predict_series(
+    station_string="('9.92926', '51.53692')",
+    days=df.date
   )
