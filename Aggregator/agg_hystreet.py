@@ -51,7 +51,7 @@ def aggregate():
 
     for index, row in grouped.iterrows():
         data_dict = {
-            'name': row['city'],
+            #'name': row['city'],
             'hystreet_score': row['relative_pedestrians_count'],
             'landkreis': row['landkreis']
             #'lat': row['lat'],
