@@ -18,7 +18,7 @@ hystreet_list = pd.DataFrame(agg_hystreet())
 hystreet_list = hystreet_list.set_index('landkreis')
 list_result = list_result.join(hystreet_list, how = "outer")
 
-list_result["date"] = date
+list_result["date"] = str(date)
 list_result.to_csv("test.csv")
 
 dict = list_result.T.to_dict()
