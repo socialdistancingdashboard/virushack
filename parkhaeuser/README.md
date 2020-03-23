@@ -1,22 +1,53 @@
-Scrapet die freien Plätze in Parkhäusern von den Seiten der jeweiligen Städte, berechnet die Belegung und schreibt diese in eine JSON-Datei. Das ganze funktioniert durch regex-Suche im Quelltext der jeweiligen Seiten.
+Scrapet die Auslastung der Parkhäuser in Landkreisen von verschiedenen Seiten. Danach wird eine JSON-Datei im folgenden Format auf den S3 Bucket geladen.
 
 JSON-Schema:
 
+    [
     {
-        "date": "2020-3-22",    
-        "time": "17:28",    
-        "list": {    
-            "Altstadt": {            
-                "total": 2404,            
-                "empty": 2241,
-                "occupation": 0.06780366056572379
+        "Landkreis": "K\u00f6ln",
+        "Gesamt": 3655,
+        "Frei": 2278,
+        "Auslastung": 0.3767441860465116,
+        "Details": [
+            {
+                "Location": "Am G\u00fcrzenich",
+                "Gesamt": 315,
+                "Frei": 200,
+                "Auslastung": 0.36507936507936506
             },
-        ...(weitere Viertel)...
-        },
-        "total": 10914,
-        "empty": 9928,
-        "occupation": 0.09034267912772585
-        }
+            (...)
+        ]
+    },
+    {
+        "Landkreis": "D\u00fcsseldorf",
+        "Gesamt": 7171,
+        "Frei": 6471,
+        "Auslastung": 0.09761539534235114,
+        "Details": [
+            (...)
+        ]
+    },
+    {
+        "Landkreis": "Frankfurt",
+        "Auslastung": 0.12
+    },
+    {
+        "Landkreis": "Wiesbaden",
+        "Auslastung": 0.09999999999999998
+    },
+    {
+        "Landkreis": "Mannheim",
+        "Auslastung": 0.32999999999999996
+    },
+    {
+        "Landkreis": "Kassel",
+        "Auslastung": 0.42000000000000004
+    },
+    {
+        "Landkreis": "Bad Homburg",
+        "Auslastung": 0.030000000000000027
+    }
+]
 
 TODO:    
 -Kapazitäten der Parkhäuser in Köln vervollständigen  
