@@ -5,17 +5,6 @@ import requests
 import csv
 import json
 
-airquality_token = os.environ['AIR_QUALITY_API_TOKEN']
-
-client = boto3.client('firehose')
-
-
-def to_byte_record(airquality_record):
-    # new_record_encoded = str(airquality_record).encode('utf-8')
-
-    return json.dumps(airquality_record)
-
-
 def to_airquality(city_name, lat, lon, response):
     data = response['data']
 
@@ -30,9 +19,11 @@ def to_airquality(city_name, lat, lon, response):
             'iaqi': data['iaqi']
         }
     }
-
+airquality_token = os.environ['AIR_QUALITY_API_TOKEN']
+bucket=[]
 
 with open('kreise_mit_center.csv', newline='', encoding='utf-8') as csvfile:
+
     fileReader = csv.reader(csvfile, delimiter=',', quotechar='|')
     header = next(fileReader)
     # Check file as empty
@@ -47,5 +38,8 @@ with open('kreise_mit_center.csv', newline='', encoding='utf-8') as csvfile:
             if response.status_code == 200 and response.json()['status'] == 'ok':
                 airquality_record = to_airquality(city_name, lat, lon, response.json())
                 # print(str(airquality_record).encode('utf-8'))
-                client.put_record(DeliveryStreamName='sdd-kinesis-airquality',
-                                  Record={'Data': to_byte_record(airquality_record)})
+                bucket.append(airquality_record)
+
+client = boto3.client('firehose')
+if len(bucket) > 0 :
+    client.put_record(DeliveryStreamName='sdd-kinesis-airquality',Record={'Data': bucket})
