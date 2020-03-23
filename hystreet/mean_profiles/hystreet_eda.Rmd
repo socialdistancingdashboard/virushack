@@ -34,13 +34,13 @@ Im Datensatz sind `r nrow(df)` Messwerte von `r length(unique(df$place))` Statio
 
 
 
-```{r map, echo=FALSE}
+```{r map, echo=FALSE, message=FALSE}
 lons <- c(1, 20)
 lats <- c(45, 57)
 
 
 df_coord <- 
-  readr::read_csv("~/R/virushack/hystreet/data/stations_with_ags.csv") %>% 
+  readr::read_csv("~/R/virushack/hystreet/data/stations_with_ags.csv", col_names = TRUE) %>% 
   sf::st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% 
   {bind_cols(sf::st_drop_geometry(.), sf::st_coordinates(.) %>% as_tibble() )}
 
@@ -167,7 +167,7 @@ df_mean %>%
   geom_line(alpha = 0.1) +
   facet_wrap(~wd) +
   labs(title = "Mittlere Fußgängerprofile",
-       x = "Datum",
+       x = "Uhrzeit",
        y = "Mittlerer count")
 ```
 

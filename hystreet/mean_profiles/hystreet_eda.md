@@ -38,20 +38,6 @@ Im Datensatz sind 221949 Messwerte von 117 Stationen.
 
 ### Karte der Stationen
 
-    ## Parsed with column specification:
-    ## cols(
-    ##   name = col_character(),
-    ##   city = col_character(),
-    ##   stationid = col_double(),
-    ##   lon = col_double(),
-    ##   lat = col_double(),
-    ##   earliest_measurement_at = col_datetime(format = ""),
-    ##   latest_measurement_at = col_datetime(format = ""),
-    ##   ags = col_double(),
-    ##   ascii = col_character(),
-    ##   distanceinmeters = col_double()
-    ## )
-
 ![](hystreet_eda_files/figure-gfm/map-1.png)<!-- -->
 
 ### Time series
@@ -154,7 +140,7 @@ df_mean %>%
   geom_line(alpha = 0.1) +
   facet_wrap(~wd) +
   labs(title = "Mittlere Fußgängerprofile",
-       x = "Datum",
+       x = "Uhrzeit",
        y = "Mittlerer count")
 ```
 
