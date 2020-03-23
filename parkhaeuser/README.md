@@ -18,23 +18,7 @@ JSON-Schema:
         "occupation": 0.09034267912772585
         }
 
-Requirements:
-
--Für Düsseldorf:
-
-from bs4 import BeautifulSoup
-
-from selenium import webdriver
-                 
-und dazu geckodriver (kann auch zu Chrome geändert werden, falls das besser ist)
-
-TODO:
--parkhaeuser.py vereinfachen, momentan gibt es noch einigen Code mehrfach
-
--Kapazitäten der Parkhäuser in Köln vervollständigen, nach Stadtvierteln sortieren
-
--Skript zum Upload der Daten zum AWS server schreiben
-
--weitere Städte hinzufügen
-
+TODO:    
+-Kapazitäten der Parkhäuser in Köln vervollständigen  
+-weitere Städte hinzufügen  
 -evtl alte Daten (vor Corona) finden

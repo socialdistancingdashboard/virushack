@@ -1,0 +1,110 @@
+[
+    {
+        "Landkreis": "K\u00f6ln",
+        "Gesamt": 3655,
+        "Frei": 2278,
+        "Auslastung": 0.3767441860465116,
+        "Details": [
+            {
+                "Location": "Am G\u00fcrzenich",
+                "Gesamt": 315,
+                "Frei": 200,
+                "Auslastung": 0.36507936507936506
+            },
+            {
+                "Location": "An Farina",
+                "Gesamt": 305,
+                "Frei": 185,
+                "Auslastung": 0.39344262295081966
+            },
+            {
+                "Location": "Galeria Kaufhof",
+                "Gesamt": 1260,
+                "Frei": 860,
+                "Auslastung": 0.31746031746031744
+            },
+            {
+                "Location": "Gro\u00df Sankt Martin",
+                "Gesamt": 145,
+                "Frei": 155,
+                "Auslastung": -0.06896551724137931
+            },
+            {
+                "Location": "Hauptbahnhof",
+                "Gesamt": 500,
+                "Frei": 389,
+                "Auslastung": 0.222
+            },
+            {
+                "Location": "Heumarkt",
+                "Gesamt": 460,
+                "Frei": 300,
+                "Auslastung": 0.34782608695652173
+            },
+            {
+                "Location": "Hohe Stra\u00dfe",
+                "Gesamt": 280,
+                "Frei": 159,
+                "Auslastung": 0.43214285714285716
+            },
+            {
+                "Location": "Philharmonie",
+                "Gesamt": 390,
+                "Frei": 30,
+                "Auslastung": 0.9230769230769231
+            }
+        ]
+    },
+    {
+        "Landkreis": "D\u00fcsseldorf",
+        "Gesamt": 7171,
+        "Frei": 6471,
+        "Auslastung": 0.09761539534235114,
+        "Details": [
+            {
+                "Location": "Altstadt",
+                "Gesamt": 2409,
+                "Frei": 2286,
+                "Auslastung": 0.05105853051058531
+            },
+            {
+                "Location": "Friedrichstadt",
+                "Gesamt": 1075,
+                "Frei": 885,
+                "Auslastung": 0.17674418604651163
+            },
+            {
+                "Location": "Hauptbahnhof",
+                "Gesamt": 2372,
+                "Frei": 2272,
+                "Auslastung": 0.04215851602023609
+            },
+            {
+                "Location": "Schadowstra\u00dfe",
+                "Gesamt": 1315,
+                "Frei": 1028,
+                "Auslastung": 0.21825095057034222
+            }
+        ]
+    },
+    {
+        "Landkreis": "Frankfurt",
+        "Auslastung": 0.12
+    },
+    {
+        "Landkreis": "Wiesbaden",
+        "Auslastung": 0.09999999999999998
+    },
+    {
+        "Landkreis": "Mannheim",
+        "Auslastung": 0.32999999999999996
+    },
+    {
+        "Landkreis": "Kassel",
+        "Auslastung": 0.42000000000000004
+    },
+    {
+        "Landkreis": "Bad Homburg",
+        "Auslastung": 0.030000000000000027
+    }
+]
