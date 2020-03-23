@@ -74,7 +74,7 @@ def aggregate():
             lon = None#
             continue
         data_index = {
-            'name': landkreis,
+            "landkreis": landkreis,
             # todo time from request
             #'date': str(date),
             'gmap_score' : relative_popularity
@@ -83,7 +83,7 @@ def aggregate():
              # 'cycle_score' : cycle_score
         }
         data_index2 = {
-            'name': landkreis,
+            'landkreis': landkreis,
             "lon" : lon,
             "lat" : lat,
             # todo time from request

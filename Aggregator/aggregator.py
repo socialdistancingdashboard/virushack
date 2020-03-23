@@ -7,15 +7,15 @@ import json
 
 date = date.today()
 
-list_result = pd.DataFrame(columns = ['name'])
-list_result =list_result.set_index("name")
+list_result = pd.DataFrame(columns = ['landkreis'])
+list_result =list_result.set_index("landkreis")
 
 gmapscore_list = pd.DataFrame(agg_gmapscore())
-gmapscore_list = gmapscore_list.set_index('name')
+gmapscore_list = gmapscore_list.set_index('landkreis')
 list_result = list_result.join(gmapscore_list, how = "outer")
 
 hystreet_list = pd.DataFrame(agg_hystreet())
-hystreet_list = hystreet_list.set_index('name')
+hystreet_list = hystreet_list.set_index('landkreis')
 list_result = list_result.join(hystreet_list, how = "outer")
 
 list_result["date"] = date
