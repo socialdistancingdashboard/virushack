@@ -1,5 +1,5 @@
 from webbrowser import get
-
+from coords_to_kreis import coords_convert
 import boto3
 import json
 import time
@@ -28,36 +28,6 @@ def aggregate():
     def normal_popularity(row):
         return row["populartimes"][row["date"].weekday()]["data"][row["hour"]]
 
-
-    def getPlzDictionary ():
-        with open('zuordnung_plz_ort_landkreis.csv', newline='', encoding='utf-8') as csvfile:
-            plz_dictionary = {}
-            fileReader = csv.reader(csvfile, delimiter=',', quotechar='|')
-            header = next(fileReader)
-            # Check file as empty
-            if header is not None:
-                # Iterate over each row after the header in the csv
-                for row in fileReader:
-                    plz=row[3]
-                    landkreis=row[2]
-                    #print("row:"+plz+" landkreis:"+landkreis)
-                    plz_dictionary[plz]=landkreis
-
-        return plz_dictionary
-
-    def extract_ags_from_plz(row):
-        #print(row["address"])
-        plz_dictionary = getPlzDictionary()
-        plz = row["address"].split(",")[-2].split(" ")
-        for ele in plz:
-            try:
-                ags = plz_dictionary[ele]
-                #print("found ags")
-                return ags
-            except:
-                #print("error: cant find ags")
-                return plz[0]
-
     def to_data(landkreis, date, relative_popularity, airquality_score,hystreet_score,cycle_score):
 
         #['id', 'name', 'date', 'gmap_score', 'hystreet_score', 'cycle_score']
@@ -84,7 +54,8 @@ def aggregate():
 
     data["lat"] = lat
     data["lon"] = lon
-    data["ags"] = data.apply(extract_ags_from_plz,axis = 1, result_type = "reduce" )
+    print(data)
+    data["ags"] = coords_convert(data)
     data2 = data.loc[data["ags"].notna()]
 
 
@@ -129,3 +100,5 @@ def aggregate():
 
         print(input)
     return list_results
+
+#aggregate()
