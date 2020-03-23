@@ -4,6 +4,7 @@ import boto3
 import requests
 import csv
 import json
+from datetime import datetime
 
 def to_airquality(city_name, lat, lon, response):
     data = response['data']
@@ -11,7 +12,7 @@ def to_airquality(city_name, lat, lon, response):
     return {
         'landkreis_name': city_name,
         # todo time from request
-        'datetime': datetime.datetime.now().isoformat(),
+        'datetime': datetime.now().isoformat(),
         'lat': lat,
         'lon': lon,
         'airquality': {
@@ -40,6 +41,11 @@ with open('kreise_mit_center.csv', newline='', encoding='utf-8') as csvfile:
                 # print(str(airquality_record).encode('utf-8'))
                 bucket.append(airquality_record)
 
-client = boto3.client('firehose')
+s3_client = boto3.client('s3')
+date = datetime.now()
+
 if len(bucket) > 0 :
-    client.put_record(DeliveryStreamName='sdd-kinesis-airquality',Record={'Data': bucket})
+    response = s3_client.put_object(Body=json.dumps(bucket), Bucket='sdd-s3-basebucket',
+                         Key='airquality/{}/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2),
+                                                               str(date.day).zfill(2), str(date.hour).zfill(2)))
+    print('Response: '+response)
