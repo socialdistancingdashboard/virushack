@@ -5,7 +5,8 @@ countries = geopandas.GeoDataFrame.from_file(
   "https://raw.githubusercontent.com/AliceWi/TopoJSON-Germany/master/germany.json",
   layer=1,
   driver="TopoJSON")
-countries = countries[["name", "geometry"]]
+countries
+countries = countries[["id", "geometry"]]
 countries.columns = ["landkreis_daten", "geometry"]
 
 # map coord to points for geo mapping
