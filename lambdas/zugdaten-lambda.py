@@ -55,17 +55,17 @@ for date_string in folders:
     df_filtered_by_region = df[df.name==r]
 
     # calculate scores
-    scores = {"zug_score": tmp.cancelled_stops.mean() / tmp.planned_stops.mean()}
+    scores = {"zug_score": df_filtered_by_region.cancelled_stops.mean() / df_filtered_by_region.planned_stops.mean()}
     for product in lineProducts:
-      df_filtered_by_region_and_product = tmp[tmp.lineProduct==product]
+      df_filtered_by_region_and_product = df_filtered_by_region[df_filtered_by_region.lineProduct==product]
       scores.update({product + "_score": (
         df_filtered_by_region_and_product.cancelled_stops.mean() / df_filtered_by_region_and_product.planned_stops.mean())})
 
     scores.update({
-      "lon": tmp.lon.iloc[0],
-      "lat": tmp.lat.iloc[0],
+      "lon": df_filtered_by_region.lon.iloc[0],
+      "lat": df_filtered_by_region.lat.iloc[0],
       "date": date_string,
-      "name": tmp.name.iloc[0]
+      "name": df_filtered_by_region.name.iloc[0]
     })
     result.append(scores)
   result
