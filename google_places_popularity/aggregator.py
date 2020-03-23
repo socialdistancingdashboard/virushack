@@ -21,51 +21,22 @@ def getAirquality():
 
     if 'Contents' not in s3_objects:
         return []
-    file_list = []
+
     print("Found " + str(len(s3_objects['Contents'])) + " elements")
     for key in s3_objects['Contents']:
         airqualityObject = s3_client.get_object(Bucket='sdd-s3-basebucket', Key=key['Key'])
         object_body = str(airqualityObject["Body"].read(), 'utf-8')
-
-        print(object_body)
         airquality_json = pd.json_normalize(json.loads(object_body))
-        # except:
-        #  pass
 
-        # result.append(pd.json_normalize(airquality_json))
-        # x=pd.DataFrame(airquality_json)
-        # result.append(x)
         list.append(pd.DataFrame(airquality_json))
 
     merged = pd.concat(list)
-    # merged = merged.to_frame()
-    print(merged)
 
-    # merged=data.apply(aqi, axis=1, result_type="reduce")
-    print(merged)
-    # result = pd.DataFrame(data2.groupby("ags")[["relative_popularity", "lat", "lon"]].mean())
-    result = pd.DataFrame(merged.groupby("landkreis_name")[["lat", "lon"]].mean())
-
-    print(result)
-    x = result[result.landkreis_name.eq('Berlin')]
-    print(result[result['landkreis_name'] == "Berlin"].shape)
-    print(result[result.Letters == 'Berlin'].Letters.item)
-    print(result)
-    # p=pd.concat(result)
-    print(p)
+    result = pd.DataFrame(merged.groupby("landkreis_name")[["airquality.aqi"]].mean())
 
     result = result.reset_index()
 
     return result
-    # result = pd.DataFrame(json.loads(obj))
-
-    # objects = s3_client.list_objects(Bucket='sdd-s3-basebucket/airquality/{}/{}/{}/'.format(str(date.year).zfill(4), str(date.month).zfill(2), str(date.day).zfill(2)))
-    # data = s3_client.get_object(Bucket='sdd-s3-basebucket', Key='airquality/{}/{}/{}/'.format(str(date.year).zfill(4), str(date.month).zfill(2), str(date.day).zfill(2) ))
-
-    # result = pd.DataFrame(json.loads(response["Body"].read()))
-    # except:
-    #   pass
-
 
 def normal_popularity(row):
     return row["populartimes"][row["date"].weekday()]["data"][row["hour"]]
