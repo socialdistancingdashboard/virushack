@@ -48,4 +48,4 @@ if len(bucket) > 0 :
     response = s3_client.put_object(Body=json.dumps(bucket), Bucket='sdd-s3-basebucket',
                          Key='airquality/{}/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2),
                                                                str(date.day).zfill(2), str(date.hour).zfill(2)))
-    print('Response: '+response)
+    print("Response: " + str(response))
