@@ -8,8 +8,11 @@ from agg_zugdaten import aggregate as agg_zugdaten
 from agg_fahrrad import aggregate as agg_fahrrad
 import json
 
-for x in range(0,10):
-    date = date.today() - timedelta(days = 1)
+
+s3_client = boto3.client('s3')
+for x in range(10,30):
+    print(x)
+    date = date.today() - timedelta(days = x)
     list_result = pd.DataFrame(columns = ['landkreis'])
     list_result = list_result.set_index("landkreis")
 
@@ -53,6 +56,7 @@ for x in range(0,10):
 
     dict = list_result.T.to_dict()
 
-    s3_client = boto3.client('s3')
+
     #s3_client.put_object(Bucket='sdd-s3-basebucket', Key="aggdata/live", Body=json.dumps(dict))
-    s3_client.put_object(Bucket='sdd-s3-basebucket', Key='aggdata/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2), str(date.day).zfill(2)), Body=json.dumps(dict))
+    response = s3_client.put_object(Bucket='sdd-s3-basebucket', Key='aggdata/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2), str(date.day).zfill(2)), Body=json.dumps(dict))
+    print(response)

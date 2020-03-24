@@ -64,7 +64,7 @@ def load_real_data(county_names, county_ids,history_length=5):
     hystreet_scores_prod = []
     zug_scores_prod = []
 
-    data_dict = json.loads(dict(response.json())["body"])
+    data_dict = response.json()["body"]
 
     for (date, row) in list(data_dict.items()):
         print(date)

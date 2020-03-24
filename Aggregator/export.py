@@ -5,13 +5,14 @@ import json
 import numpy as np
 
 #Specify Timeframe
-min_date = datetime.datetime.now().date() - datetime.timedelta(days=6)
-max_date = datetime.datetime.now().date()
-params = {"min_date": str(min_date), "max_date": str(max_date), "data_sources":"0,1,2"}
-response = requests.get('https://f3fp7p5z00.execute-api.eu-central-1.amazonaws.com/dev/sdd-lambda-request',params = params)
+min_date = datetime.datetime.now().date() - datetime.timedelta(days=3)
+max_date = datetime.datetime.now().date() - datetime.timedelta(days=1)
+params = {"min_date": str(min_date), "max_date": str(max_date)}
+params
+response = requests.get('https://0he6m5aakd.execute-api.eu-central-1.amazonaws.com/prod',params = params)
+response.json()["body"]
 
-data = pd.DataFrame()
-for day, data_day in json.loads(response.json()["body"]).items():
+for day, data_day in response.json()["body"].items():
     if day == "2020-03-23":
         continue
     daily_data = pd.DataFrame.from_dict(data_day, orient='index')
