@@ -56,32 +56,30 @@ def load_real_data(county_names, county_ids):
         days=5)
     max_date = datetime.datetime.now().date()
     params = {"min_date": str(min_date), "max_date": str(max_date), "data_sources":"0,1,2"}
-    #headers = {"x-api-key":"pbPTujVEPm3uLp9tdJRFe3KAizreTpVc3UOPKBIv"}
     response = requests.get('https://f3fp7p5z00.execute-api.eu-central-1.amazonaws.com/dev/sdd-lambda-request',params = params)
-    #urllib.parse.unquote(response.url)
 
     county_names_prod = []
     county_ids_prod = []
     dates_prod = []
     gmaps_scores_prod = []
     hystreet_scores_prod = []
-
+    zug_scores_prod = []
 
     data_dict = json.loads(dict(response.json())["body"])
 
-    for (date, row) in list(data_dict.items())[:1]:
-        #print(date)
+    for (date, row) in list(data_dict.items())[2:3]:
+        print(date)
         for cid, scores in row.items():
-            print(id_to_name[cid])
             county_names_prod.append(id_to_name[cid])
             county_ids_prod.append(cid)
             dates_prod.append(date)
-            print(scores["gmap_score"])
             gmaps_scores_prod.append(scores["gmap_score"])
             hystreet_scores_prod.append(scores["hystreet_score"])
+            zug_scores_prod.append(scores["zug_score"])
+
 
     df_mock_scores = pd.DataFrame(
-        {"id": county_ids_prod, "name": county_names_prod, "date": dates_prod, "gmap_score": gmaps_scores_prod, "hystreet_score": hystreet_scores_prod})
+        {"id": county_ids_prod, "name": county_names_prod, "date": dates_prod, "gmap_score": gmaps_scores_prod, "hystreet_score": hystreet_scores_prod, "zug_score": zug_scores_prod})
 
     return df_mock_scores
 
@@ -90,21 +88,15 @@ id_to_name = {cid:county_names[idx] for idx,cid in enumerate(county_ids)}
 df_mock_scores2 = load_real_data(county_names, county_ids)
 df_mock_scores = df_mock_scores2.copy()
 
-
-#df_mock_scores2 = load_mock_data()
-#df_mock_scores = df_mock_scores2.copy()
-county_names = list(set(df_mock_scores["name"].values))
-
 response = requests.get('https://github.com/socialdistancingdashboard/virushack/raw/master/logo/logo_with_medium_text.png')
 img = Image.open(BytesIO(response.content))
 st.sidebar.image(img, use_column_width=True)
 st.sidebar.markdown("<br>", unsafe_allow_html=True)
 
-
 st.sidebar.subheader("Datenfilter")
 available_countys = [value for value in county_names if value in df_mock_scores["name"]]
 countys = st.sidebar.multiselect('Vergleiche folgende Kreise',options = list(set(county_names)))
-data_sources_names = {'gmap_score':"Google Popularitätsdaten","hystreet_score":"Hystreet Daten"}
+data_sources_names = {'gmap_score':"Google Popularitätsdaten","hystreet_score":"Hystreet Daten", "zug_score":"Zug Daten"}
 available_data_sources = [value for value in df_mock_scores.columns if value in data_sources_names.keys()]
 data_sources = st.sidebar.selectbox('mit folgenden Daten',available_data_sources, format_func=lambda x: data_sources_names[x])
 print(data_sources)
@@ -151,7 +143,7 @@ basemap = alt.Chart(data_topojson_remote).mark_geoshape(
 layer = alt.Chart(data_topojson_remote).mark_geoshape(
     stroke='white'
 ).encode(
-    color=alt.Color('filtered_score:Q', title="Soziale Distanz", scale=alt.Scale(domain=(0, 1),scheme='redyellowgreen')),
+    color=alt.Color('filtered_score:Q', title="Soziale Distanz", scale=alt.Scale(domain=(2, 0),scheme='redyellowgreen')),
     tooltip=[alt.Tooltip("properties.name:N", title="Landkreis"),alt.Tooltip("filtered_score:N", title="Soziale Distanz")]
 ).transform_lookup(
     lookup='id',
