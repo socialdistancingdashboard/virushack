@@ -4,8 +4,8 @@ import json
 from datetime import datetime, timedelta, date
 from coords_to_kreis import coords_convert
 
-date = date.today()  # - timedelta(days=10)  # only for test purposes
-def aggregate():
+  # - timedelta(days=10)  # only for test purposes
+def aggregate(date):
     s3_client = boto3.client('s3')
     data = pd.DataFrame()
     clientFirehose = boto3.client('firehose')
@@ -51,7 +51,7 @@ def aggregate():
 
     for index, row in grouped.iterrows():
         data_dict = {
-            'name': row['city'],
+            #'name': row['city'],
             'hystreet_score': row['relative_pedestrians_count'],
             'landkreis': row['landkreis']
             #'lat': row['lat'],
