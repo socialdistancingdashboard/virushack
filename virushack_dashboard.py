@@ -102,7 +102,7 @@ st.sidebar.markdown("<br>", unsafe_allow_html=True)
 
 st.sidebar.subheader("Datenfilter")
 available_countys = [value for value in county_names if value in df_mock_scores["name"]]
-countys = st.sidebar.multiselect('Vergleiche folgende Kreise',options = list(set(county_names)))
+countys = st.sidebar.multiselect('Vergleiche folgende Kreise',options = list(sorted(set(county_names))))
 data_sources_names = {'gmap_score':"Google Popularitätsdaten","hystreet_score":"Hystreet Daten", "zug_score":"Zug Daten"}
 available_data_sources = [value for value in df_mock_scores.columns if value in data_sources_names.keys()]
 data_sources = st.sidebar.selectbox('mit folgenden Daten',available_data_sources, format_func=lambda x: data_sources_names[x])
