@@ -113,9 +113,12 @@ print(data_sources)
 st.sidebar.markdown("<br><br><br><br><br><br>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 st.sidebar.subheader("weitere Infos")
-st.sidebar.markdown("<a href='https://twitter.com/distancingdash/'>https://twitter.com/distancingdash/</a>", unsafe_allow_html=True)
-st.sidebar.markdown("<a href='https://www.youtube.com/watch?v=pDgcbE-c31c&feature=youtu.be'>https://www.youtube.com/watch?v=pDgcbE-c31c&feature=youtu.be</a>", unsafe_allow_html=True)
-st.sidebar.markdown("<a href='https://devpost.com/software/12-social-distancing-dashboard'>https://devpost.com/software/12-social-distancing-dashboard</a>", unsafe_allow_html=True)
+st.sidebar.markdown('''
+- [@DistancingDash](https://twitter.com/distancingdash/)
+- [Youtube](https://www.youtube.com/watch?v=pDgcbE-c31c&feature=youtu.be)
+- [Devpost](https://devpost.com/software/12-social-distancing-dashboard)
+''')
+
 
 
 #calculate average score based on selected data_sources
