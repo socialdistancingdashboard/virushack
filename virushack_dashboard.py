@@ -20,14 +20,14 @@ import pandas as pd
 import numpy as np
 import altair as alt
 import datetime
+import urllib
 import json
 import requests
 from PIL import Image
 from io import BytesIO
 
 
-st.title("EveryoneCounts")
-st.write("Das Social Distancing Dashboard")
+st.title("#EveryoneCounts - Das Social Distancing Dashboard")
 
 @st.cache(persist=True)
 def load_mock_data():
@@ -51,67 +51,83 @@ def load_topojson():
 
 @st.cache(persist=True)
 def load_real_data(county_names, county_ids):
-    response = requests.get('https://3u54czgyw4.execute-api.eu-central-1.amazonaws.com/default/sdd-lambda-request')
-    decoded = bytes.decode(response.content, 'utf-8')
-    string_fixed = '{"data" : ['+decoded+'] }'
-    while True:
-        try:
-            data_dict = json.loads(string_fixed)
-            break;
-        except json.decoder.JSONDecodeError as e:
-            if not e.args[0].startswith("Expecting ',' delimiter:"):
-                raise
-            string_fixed = ','.join((string_fixed[:e.pos], string_fixed[e.pos:]))
 
+    min_date = datetime.datetime.now().date() - datetime.timedelta(
+        days=5)
+    max_date = datetime.datetime.now().date()
+    params = {"min_date": str(min_date), "max_date": str(max_date), "data_sources":"0,1,2"}
+    #headers = {"x-api-key":"pbPTujVEPm3uLp9tdJRFe3KAizreTpVc3UOPKBIv"}
+    response = requests.get('https://f3fp7p5z00.execute-api.eu-central-1.amazonaws.com/dev/sdd-lambda-request',params = params)
+    #urllib.parse.unquote(response.url)
 
-    county_names_to_id = {name: county_ids[i] for i, name in enumerate(county_names)}
     county_names_prod = []
     county_ids_prod = []
     dates_prod = []
     gmaps_scores_prod = []
+    hystreet_scores_prod = []
 
-    for row in data_dict["data"]:
-        if row["name"] in county_names:
-            county_names_prod.append(row["name"])
-            county_ids_prod.append(county_names_to_id[row["name"]])
-            dates_prod.append(row["date"])
-            gmaps_scores_prod.append(row["gmap_score"])
+
+    data_dict = json.loads(dict(response.json())["body"])
+
+    for (date, row) in list(data_dict.items())[:1]:
+        #print(date)
+        for cid, scores in row.items():
+            print(id_to_name[cid])
+            county_names_prod.append(id_to_name[cid])
+            county_ids_prod.append(cid)
+            dates_prod.append(date)
+            print(scores["gmap_score"])
+            gmaps_scores_prod.append(scores["gmap_score"])
+            hystreet_scores_prod.append(scores["hystreet_score"])
 
     df_mock_scores = pd.DataFrame(
-        {"id": county_ids_prod, "name": county_names_prod, "date": dates_prod, "gmap_score": gmaps_scores_prod})
+        {"id": county_ids_prod, "name": county_names_prod, "date": dates_prod, "gmap_score": gmaps_scores_prod, "hystreet_score": hystreet_scores_prod})
 
     return df_mock_scores
 
-
 county_names, county_ids = load_topojson()
+id_to_name = {cid:county_names[idx] for idx,cid in enumerate(county_ids)}
 df_mock_scores2 = load_real_data(county_names, county_ids)
 df_mock_scores = df_mock_scores2.copy()
 
 
 #df_mock_scores2 = load_mock_data()
 #df_mock_scores = df_mock_scores2.copy()
-#county_names = list(set(df_mock_scores["name"].values))
+county_names = list(set(df_mock_scores["name"].values))
 
 response = requests.get('https://github.com/socialdistancingdashboard/virushack/raw/master/logo/logo_with_medium_text.png')
 img = Image.open(BytesIO(response.content))
 st.sidebar.image(img, use_column_width=True)
-st.sidebar.markdown("")
-places = st.sidebar.multiselect('Vergleiche folgende Kreise',options = list(set(county_names)))
-#data_sources_dict = {'gmap_score':"Google Popularitätsdaten", "hystreet_score":"Hystreet Daten","cycle_score":"Fahrradzähler Daten"}
-data_sources_dict = {'gmap_score':"Google Popularitätsdaten"}
-data_sources = st.sidebar.multiselect('mit folgenden Daten',list(data_sources_dict.keys()), format_func=lambda x: data_sources_dict[x], default = ["gmap_score"])
-start_date = st.sidebar.date_input('für den Zeitraum vom', datetime.date(2020,3,12))
-end_date = st.sidebar.date_input('bis', datetime.date(2020,3,22))
+st.sidebar.markdown("<br>", unsafe_allow_html=True)
+
+
+st.sidebar.subheader("Datenfilter")
+available_countys = [value for value in county_names if value in df_mock_scores["name"]]
+countys = st.sidebar.multiselect('Vergleiche folgende Kreise',options = list(set(county_names)))
+data_sources_names = {'gmap_score':"Google Popularitätsdaten","hystreet_score":"Hystreet Daten"}
+available_data_sources = [value for value in df_mock_scores.columns if value in data_sources_names.keys()]
+data_sources = st.sidebar.selectbox('mit folgenden Daten',available_data_sources, format_func=lambda x: data_sources_names[x])
+print(data_sources)
+#start_date = st.sidebar.date_input('für den Zeitraum vom', datetime.date(2020,3,12))
+#end_date = st.sidebar.date_input('bis', datetime.date(2020,3,22))
+
+st.sidebar.markdown("<br><br><br><br><br><br>", unsafe_allow_html=True)
+st.sidebar.markdown("---")
+st.sidebar.subheader("weitere Infos")
+st.sidebar.markdown("<a href='https://twitter.com/distancingdash/'>https://twitter.com/distancingdash/</a>", unsafe_allow_html=True)
+st.sidebar.markdown("<a href='https://www.youtube.com/watch?v=pDgcbE-c31c&feature=youtu.be'>https://www.youtube.com/watch?v=pDgcbE-c31c&feature=youtu.be</a>", unsafe_allow_html=True)
+st.sidebar.markdown("<a href='https://devpost.com/software/12-social-distancing-dashboard'>https://devpost.com/software/12-social-distancing-dashboard</a>", unsafe_allow_html=True)
+
 
 #calculate average score based on selected data_sources
 if len(data_sources) > 0:
-    df_mock_scores["average_score"] = df_mock_scores[data_sources].mean(axis=1)
+    df_mock_scores["average_score"] = df_mock_scores[[data_sources]].mean(axis = 1)
 else:
     df_mock_scores["average_score"] = [0] * len(df_mock_scores)
 
 #filter scores based on selected places
-if len(places) > 0:
-    df_mock_scores["filtered_score"] = np.where(df_mock_scores["name"].isin(places), df_mock_scores["average_score"],[0] * len(df_mock_scores))
+if len(countys) > 0:
+    df_mock_scores["filtered_score"] = np.where(df_mock_scores["name"].isin(countys), df_mock_scores["average_score"],[0] * len(df_mock_scores))
 else:
     df_mock_scores["filtered_score"] = df_mock_scores["average_score"]
 
@@ -142,31 +158,19 @@ layer = alt.Chart(data_topojson_remote).mark_geoshape(
     from_= alt.LookupData(df_mock_scores[df_mock_scores["filtered_score"] > 0], 'id', ['filtered_score'])
 ).properties(width=750,height = 1000)
 
-c = alt.layer(basemap, layer)
+c = alt.layer(basemap, layer).configure_view(
+    strokeOpacity=0
+)
 st.altair_chart(c)
 
 
-if len(places) > 0:
-    st.subheader("Vergleich Soziale Distanz")
-    st.altair_chart(alt.Chart(df_mock_scores[df_mock_scores["name"].isin(places)][["name", "filtered_score"]]).mark_bar(
-        size=20).encode(
-        x='name:N',
-        y='filtered_score:Q',
-        color=alt.Color('filtered_score:Q', title="Soziale Distanz", scale=alt.Scale(domain=(0, 1),scheme='redyellowgreen'))
-    ).properties(width=750, height=400))
+if len(countys) > 0:
+
+    st.altair_chart(alt.Chart(df_mock_scores[df_mock_scores["name"].isin(countys)][["name","average_score"]]).mark_bar(size = 20).encode(
+        x = alt.X('name:N', title="Landkreis / Kreisfreie Stadt"),
+        y = alt.Y('average_score:Q', title="Soziale Distanz"),
+        color=alt.Color('average_score:Q', title="Soziale Distanz", scale=alt.Scale(domain=(0, 1),scheme='redyellowgreen')),
+    ).properties(width=750,height=400))
 
 
 
-
-
-response = requests.get('https://github.com/socialdistancingdashboard/virushack/raw/master/logo/Datenquellen.PNG')
-img_data_sources = Image.open(BytesIO(response.content))
-st.image(img_data_sources, use_column_width=True)
-
-st.markdown("""
-    <style type='text/css'>
-        details {
-            display: none;
-        }
-    </style>
-""", unsafe_allow_html=True)
