@@ -38,5 +38,5 @@ for name, group in df.groupby('timestamp'):
     date_str = name.split('+')[0]
     date = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S.%f')
     print(date.strftime("%Y-%m-%d"))
-    client.put_object(Body=group.to_json(orient='records'), Bucket='sdd-s3-basebucket2',
+    client.put_object(Body=group.to_json(orient='records'), Bucket='sdd-s3-basebucket',
                       Key='hystreet/'+str(date.year).zfill(4)+'/'+str(date.month).zfill(2)+'/'+str(date.day).zfill(2))
