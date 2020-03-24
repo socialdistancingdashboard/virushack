@@ -51,39 +51,26 @@ def scrape_du():
     return response
 
 """Köln:"""
-"""Noch nicht alle locations für Köln. Kapazität der Parkhäuser muss noch vervollständigt werden.
-Die Daten gibt es hier: https://www.koeln.de/apps/parken/. Vermutlich reicht eine Aufschlüsselung nach den dort
-angegebenen Vierteln und nicht für jedes einzelne Parkhaus. 
-Unklar ist außerdem der Unterschied zwischen den Gesamt Plätzen/Kurzparker Plätzen.
-""" 
-
-locations_co = {'Am Dom': 610,
-           'Am Gürzenich': 315,
-           'An Farina': 305,
-           'Galeria Kaufhof': 1260,
-           'Groß Sankt Martin': 145,
-           'Hauptbahnhof': 500,
-           'Heumarkt': 460 ,
-           'Hohe Straße': 280,
-           'Maritim': 600,
-           'Philharmonie': 390
-           }
-#fehlende locations: ['REWE', 'Rhein Triadem', 'Rheinauhafen', 'Am Neumarkt', 'Bazaar de Cologne', 'Brückenstraße', 'Cäcilienstraße', 'DuMont-Carré', 'Galeria Karstadt', 'Kreissparkasse', 'Lungengasse', 'Opernpassagen', 'Schildergasse', 'Theater-Parkhaus', 'Wolfsstraße', 'Alte Wallgasse', 'Im Klapperhof', 'Kaiser-Wilhelm-Ring', 'Maastrichter Straße', 'Mediapark', 'Ring Karree', 'Rudolfplatz', 'Sparkasse KölnBonn', 'Köln Arcaden', 'LANXESS arena 1', 'LANXESS arena 2', 'LANXESS arena 4', 'Stadion P2 (P+R)', 'Stadion P1', 'Stadion P3', 'Stadion P4', 'Stadion P6', 'Stadion P7', 'Stadion P8 Bus', 'Stadion P8 Pkw', 'Zoo/Flora', 'Marsdorf/Haus Vorst']
 url = 'https://www.stadt-koeln.de/leben-in-koeln/verkehr/parken/parkhaeuser/'
 response = scrape('Köln', url)
-r = re.compile(r'Freie Plätze">(.*?)<strong><br />(\d*).*?Adresse">', re.DOTALL)
+r = re.compile(r'Freie Plätze">(.*?)<strong><br\s/>(\d*).*?Stellplätze:\s(\d*)', re.DOTALL)
 liste_co = r.findall(response)
 
 details = []
 total_co = 0 
 empty_co = 0
-for location, empty in liste_co: 
+for location, empty, total in liste_co: 
     try:
-        total = locations_co[location]
+        #Sonderfall: für Theather Parkhaus wird total nicht durch die regex abgegriffen
+        if location == 'Theater-Parkhaus':
+            total = 470
+        else:
+            total = int(total)
         empty = int(empty)
-        #Falls keine freien Plätze verfügbar sind, wird das Parkhaus ausgelassen. Keine freien Plätze weist auf eine
-        #Sperrung hin.
-        if not empty:
+
+        #Falls weniger Gesamtplätze als freie Plätze verfügbar sind, liegt offenbar ein Fehler vor (vermutlich ist das Parkhaus geschlossen).
+        #Ebenso falls gar keine Parkplätze frei sind (z.B. zu sehen an den Parkplätzen am Stadion).
+        if empty > total or total == 0 or not empty:
             continue
         occupation = (total - empty) / total
         total_co += total
