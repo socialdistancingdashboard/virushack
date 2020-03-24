@@ -1,15 +1,14 @@
 #!/bin/bash
-sudo apt update
-sudo apt upgrade
-sudo apt -y install python3-pip
-
+sudo yum -y -q update
+sudo yum install -y python3
 sudo pip3 install pandas
 sudo pip3 install streamlit
-pip3 install pandas
-pip3 install streamlit
-
-sudo reboot
-
-cd /home/ubuntu/
-wget https://raw.githubusercontent.com/socialdistancingdashboard/virushack/master/virushack_dashboard.py
-
+cd /home/ec2-user
+curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virushack/master/virushack_dashboard.py
+cd /usr/bin
+sudo curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virushack/master/streamlit-beanstalk/rundashboard.sh
+cd /etc/systemd/system
+sudo curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virushack/master/streamlit-beanstalk/rundashboard.service
+sudo chmod 644 /etc/systemd/system/rundashboard.service
+sudo systemctl enable rundashboard.service
+sudo systemctl start rundashboard.service
