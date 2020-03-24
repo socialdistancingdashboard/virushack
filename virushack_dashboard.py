@@ -161,7 +161,8 @@ if len(countys) > 0:
     st.altair_chart(alt.Chart(df_mock_scores[df_mock_scores["name"].isin(countys)][["name","average_score"]]).mark_bar(size = 20).encode(
         x = alt.X('name:N', title="Landkreis / Kreisfreie Stadt"),
         y = alt.Y('average_score:Q', title="Soziale Distanz"),
-        color=alt.Color('average_score:Q', title="Soziale Distanz", scale=alt.Scale(domain=(0, 1),scheme='redyellowgreen')),
+        color=alt.Color('average_score:Q', title="Soziale Distanz",
+                        scale=alt.Scale(domain=(2, 0), scheme='redyellowgreen')),
     ).properties(width=750,height=400))
 
 
