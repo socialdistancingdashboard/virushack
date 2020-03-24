@@ -3,7 +3,7 @@ Worldwide data from bicycle counters in cities: http://www.eco-public.com/ParcPu
 
 # Example for station Munich (DE)
 
-  ![Zeigt die Fahrradzahlen](prediction_Munich(DE).png "Visualisierung")
+  ![Zeigt die Fahrradzahlen](prediction_Munich (DE).png "Visualisierung")
   
 **explanation**
 The blue line represents actual data, the orange line is the prediction. Orange values are used as a reference for a non-corona scenario.
