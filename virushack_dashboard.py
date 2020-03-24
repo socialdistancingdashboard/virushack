@@ -50,10 +50,9 @@ def load_topojson():
     return county_names, county_ids
 
 @st.cache(persist=True)
-def load_real_data(county_names, county_ids):
+def load_real_data(county_names, county_ids,history_length=5):
 
-    min_date = datetime.datetime.now().date() - datetime.timedelta(
-        days=5)
+    min_date = datetime.datetime.now().date() - datetime.timedelta(days=history_length)
     max_date = datetime.datetime.now().date()
     params = {"min_date": str(min_date), "max_date": str(max_date), "data_sources":"0,1,2"}
     response = requests.get('https://f3fp7p5z00.execute-api.eu-central-1.amazonaws.com/dev/sdd-lambda-request',params = params)
@@ -67,13 +66,16 @@ def load_real_data(county_names, county_ids):
 
     data_dict = json.loads(dict(response.json())["body"])
 
-    for (date, row) in list(data_dict.items())[2:3]:
+    for (date, row) in list(data_dict.items()):
         print(date)
         for cid, scores in row.items():
             county_names_prod.append(id_to_name[cid])
             county_ids_prod.append(cid)
             dates_prod.append(date)
-            gmaps_scores_prod.append(scores["gmap_score"])
+            if "gmap_score" in scores:
+                gmaps_scores_prod.append(scores["gmap_score"])
+            else:
+                gmaps_scores_prod.append(np.nan)
             hystreet_scores_prod.append(scores["hystreet_score"])
             zug_scores_prod.append(scores["zug_score"])
 
@@ -85,8 +87,13 @@ def load_real_data(county_names, county_ids):
 
 county_names, county_ids = load_topojson()
 id_to_name = {cid:county_names[idx] for idx,cid in enumerate(county_ids)}
-df_mock_scores2 = load_real_data(county_names, county_ids)
-df_mock_scores = df_mock_scores2.copy()
+df_mock_scores_full = load_real_data(county_names, county_ids)
+df_mock_scores = df_mock_scores_full.copy()
+
+# filter for yesterday's entries, so that only on day's worth of data is in df_mock_scores:
+# I guess this is relevant for the averaging
+date_yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+df_mock_scores = df_mock_scores[df_mock_scores["date"] == date_yesterday]
 
 response = requests.get('https://github.com/socialdistancingdashboard/virushack/raw/master/logo/logo_with_medium_text.png')
 img = Image.open(BytesIO(response.content))
@@ -166,4 +173,28 @@ if len(countys) > 0:
     ).properties(width=750,height=400))
 
 
+#-------------
 
+if len(countys) > 0:
+    st.subheader('Zeitliche Entwicklung')
+    df_history_scores = df_mock_scores_full.copy()
+    df_history_scores["date"] = pd.to_datetime(df_history_scores["date"])
+    df_history_scores = df_history_scores[df_history_scores["name"].isin(countys)]
+
+    df_history_scores2 = pd.DataFrame()
+    for county in countys:
+        df_temp = df_history_scores[df_history_scores["name"].isin([county])][["date",data_sources]]
+        df_history_scores2["date"] = df_temp["date"].reset_index(drop=True)
+        df_history_scores2[county] = df_temp[data_sources].reset_index(drop=True)
+    df_history_table = df_history_scores2.copy()
+    df_history_scores2 = df_history_scores2.melt("date")
+    df_history_scores2 = df_history_scores2.rename(columns = {'variable':'Stadt/Landkreis'})
+
+    st.altair_chart(alt.Chart(  df_history_scores2 ).mark_line().mark_line(point=True).encode(
+        x = alt.X('date:T', title="Datum"),
+        y = alt.Y('value:Q', title=data_sources),
+        color='Stadt/Landkreis:N'
+    ).properties(width=750,height=400))
+    check_show_raw_history = st.checkbox('Rohdaten anzeigen', value=False)
+    if check_show_raw_history:
+        st.write(df_history_table)
