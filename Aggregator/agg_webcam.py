@@ -4,9 +4,7 @@ from datetime import datetime, date, timedelta
 #os.chdir(os.path.dirname(__file__))
 import json
 import boto3
-from pathlib import Path
 from coords_to_kreis import coords_convert
-from normalization import normalize
 
 def aggregate(date):
     s3_client = boto3.client('s3')

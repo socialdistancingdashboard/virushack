@@ -5,9 +5,10 @@ from agg_webcam import aggregate as agg_webcam
 from agg_hystreet import aggregate as agg_hystreet
 from agg_gmap_transit_score import aggregate as agg_gmap_transit_score
 from agg_zugdaten import aggregate as agg_zugdaten
+from agg_fahrrad import aggregate as agg_fahrrad
 import json
 
-for x in range(0,5):
+for x in range(0,10):
     date = date.today() - timedelta(days = 1)
     list_result = pd.DataFrame(columns = ['landkreis'])
     list_result = list_result.set_index("landkreis")
@@ -37,6 +38,13 @@ for x in range(0,5):
         zugdaten_list = pd.DataFrame(agg_zugdaten(date))
         zugdaten_list = zugdaten_list.set_index('landkreis')
         list_result = list_result.join(zugdaten_list, how = "outer")
+    except Exception as e:
+        print(e)
+
+    try:
+        fahrrad_list = pd.DataFrame(agg_fahrrad(date))
+        fahrrad_list = fahrrad_list.set_index('landkreis')
+        list_result = list_result.join(fahrrad_list, how = "outer")
     except Exception as e:
         print(e)
 
