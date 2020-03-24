@@ -53,7 +53,6 @@ province_abbs = {
 from geopy.geocoders import Nominatim
 import holidays
 from prediction import BikePrediction
-#WEATHER_API_KEY='L8ouyjgU'
 
 def create_request():
     json_data={}
