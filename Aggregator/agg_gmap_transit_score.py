@@ -13,7 +13,7 @@ def aggregate(date):
     s3_client = boto3.client('s3')
 
     data = pd.DataFrame()
-    clientFirehose = boto3.client('firehose')
+    #clientFirehose = boto3.client('firehose')
 
     for x in range(9,19):
         try:
@@ -35,7 +35,7 @@ def aggregate(date):
             'name': landkreis,
             # todo time from request
             'date': date,
-             'gmap_score' : relative_popularity
+            'gmap_score' : relative_popularity
              #"airquality_score" : airquality_score
              #'hystreet_score' : hystreet_score
              # 'cycle_score' : cycle_score

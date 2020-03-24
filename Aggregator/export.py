@@ -5,7 +5,7 @@ import json
 import numpy as np
 
 #Specify Timeframe
-min_date = datetime.datetime.now().date() - datetime.timedelta(days=5)
+min_date = datetime.datetime.now().date() - datetime.timedelta(days=6)
 max_date = datetime.datetime.now().date()
 params = {"min_date": str(min_date), "max_date": str(max_date), "data_sources":"0,1,2"}
 response = requests.get('https://f3fp7p5z00.execute-api.eu-central-1.amazonaws.com/dev/sdd-lambda-request',params = params)
@@ -27,4 +27,8 @@ data.columns
 # 'nationalExpress_score': 'national_score', 'regional_score','suburban_score', 'bus_score', 'zug_score': How many connections got cancelled?
 
 data.replace(np.inf, np.nan, inplace=True)
+1/data["hystreet_score"].median()
+data.loc[data["date"] == "2020-03-22"]["hystreet_score"].corr(data.loc[data["date"] == "2020-03-22"]["gmap_score"])
+
+data.loc[data["date"] == "2020-03-22"].plot("hystreet_score", "gmap_score", kind ="scatter")
 data.to_csv("export.csv")

@@ -2,3 +2,4 @@ Rtree
 geopandas
 Pandas
 boto3
+sklearn

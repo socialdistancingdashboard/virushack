@@ -1,36 +1,44 @@
 import boto3
 import pandas as pd
 from datetime import date, timedelta
+from agg_webcam import aggregate as agg_webcam
 from agg_hystreet import aggregate as agg_hystreet
 from agg_gmap_transit_score import aggregate as agg_gmap_transit_score
 from agg_zugdaten import aggregate as agg_zugdaten
 import json
 
 for x in range(0,5):
-    date = date.today() - timedelta(days = x)
+    date = date.today() - timedelta(days = 1)
     list_result = pd.DataFrame(columns = ['landkreis'])
-    list_result =list_result.set_index("landkreis")
+    list_result = list_result.set_index("landkreis")
 
     try:
         gmapscore_list = pd.DataFrame(agg_gmap_transit_score(date))
         gmapscore_list = gmapscore_list.set_index('landkreis')
         list_result = list_result.join(gmapscore_list, how = "outer")
-    except:
-        pass
+    except Exception as e:
+        print(e)
+
+    try:
+        webcam_list = pd.DataFrame(agg_webcam(date))
+        webcam_list = webcam_list.set_index('landkreis')
+        list_result = list_result.join(webcam_list, how = "outer")
+    except Exception as e:
+        print(e)
 
     try:
         hystreet_list = pd.DataFrame(agg_hystreet(date))
         hystreet_list = hystreet_list.set_index('landkreis')
         list_result = list_result.join(hystreet_list, how = "outer")
-    except:
-        pass
+    except Exception as e:
+        print(e)
 
     try:
         zugdaten_list = pd.DataFrame(agg_zugdaten(date))
         zugdaten_list = zugdaten_list.set_index('landkreis')
         list_result = list_result.join(zugdaten_list, how = "outer")
-    except:
-        pass
+    except Exception as e:
+        print(e)
 
     list_result["date"] = str(date)
     #list_result.to_csv("test.csv")

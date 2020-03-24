@@ -1,5 +1,5 @@
 #To run this file you NEED
-#pip install Rtree AND 
+#pip install Rtree AND
 #sudo apt-get update && apt-get install -y libspatialindex-dev OR brew install spatialindex
 
 import geopandas.tools
@@ -24,7 +24,7 @@ Converts all lon lat columns in a dataframe into a Series of AGS (Landkreis) Dat
 
 def coords_convert(df):
     def coord_to_point(x):
-        return Point(x["lon"], x["lat"])
+        return Point(float(x["lon"]), float(x["lat"]))
     df["geometry"] = df.apply(coord_to_point, axis = 1)
     df = geopandas.GeoDataFrame(df, geometry="geometry")
     df = geopandas.sjoin(df, countries, how="left", op='intersects')
