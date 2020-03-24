@@ -1,22 +1,28 @@
 import boto3
 import pandas as pd
-from datetime import date
+from datetime import date, timedelta
 from agg_hystreet import aggregate as agg_hystreet
 from agg_gmapscore import aggregate as agg_gmapscore
+from agg_zugdaten import aggregate as agg_zugdaten
 import json
 
-date = date.today()
+date = date.today() - timedelta(days = 1)
 
 list_result = pd.DataFrame(columns = ['landkreis'])
 list_result =list_result.set_index("landkreis")
 
-gmapscore_list = pd.DataFrame(agg_gmapscore())
+gmapscore_list = pd.DataFrame(agg_gmapscore(date))
 gmapscore_list = gmapscore_list.set_index('landkreis')
 list_result = list_result.join(gmapscore_list, how = "outer")
 
-hystreet_list = pd.DataFrame(agg_hystreet())
+hystreet_list = pd.DataFrame(agg_hystreet(date))
 hystreet_list = hystreet_list.set_index('landkreis')
 list_result = list_result.join(hystreet_list, how = "outer")
+
+zugdaten_list = pd.DataFrame(agg_zugdaten(date))
+zugdaten_list = zugdaten_list.set_index('landkreis')
+list_result = list_result.join(zugdaten_list, how = "outer")
+
 
 list_result["date"] = str(date)
 list_result.to_csv("test.csv")

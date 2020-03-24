@@ -8,8 +8,8 @@ import pandas as pd
 import pymongo
 import csv
 
-date = date.today()
-def aggregate():
+
+def aggregate(date):
     s3_client = boto3.client('s3')
 
     data = pd.DataFrame()
@@ -54,7 +54,7 @@ def aggregate():
 
     data["lat"] = lat
     data["lon"] = lon
-    print(data)
+    #print(data)
     data["ags"] = coords_convert(data)
     data2 = data.loc[data["ags"].notna()]
 
@@ -94,11 +94,11 @@ def aggregate():
              # 'cycle_score' : cycle_score
         }
         list_results.append(data_index)
-        print (data_index)
+        #print (data_index)
         # clientFirehose.put_record(DeliveryStreamName='sdd-kinese-aggregator',  Record={'Data':data_index })
 
 
-        print(input)
+        #print(input)
     return list_results
 
 #aggregate()

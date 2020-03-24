@@ -4,8 +4,8 @@ import json
 from datetime import datetime, timedelta, date
 from coords_to_kreis import coords_convert
 
-date = date.today()  # - timedelta(days=10)  # only for test purposes
-def aggregate():
+  # - timedelta(days=10)  # only for test purposes
+def aggregate(date):
     s3_client = boto3.client('s3')
     data = pd.DataFrame()
     clientFirehose = boto3.client('firehose')
