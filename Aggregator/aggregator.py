@@ -6,6 +6,7 @@ from agg_hystreet import aggregate as agg_hystreet
 from agg_gmap_transit_score import aggregate as agg_gmap_transit_score
 from agg_zugdaten import aggregate as agg_zugdaten
 from agg_fahrrad import aggregate as agg_fahrrad
+from agg_airquality import aggregate as agg_airquality
 import json
 
 
@@ -40,23 +41,30 @@ for x in range(0,2):
     try:
         zugdaten_list = pd.DataFrame(agg_zugdaten(date))
         zugdaten_list = zugdaten_list.set_index('landkreis')
-        list_result = list_result.join(zugdaten_list, how = "outer")
+        list_result = list_result.join(zugdaten_list, how="outer")
     except Exception as e:
         print(e)
 
     try:
         fahrrad_list = pd.DataFrame(agg_fahrrad(date))
         fahrrad_list = fahrrad_list.set_index('landkreis')
-        list_result = list_result.join(fahrrad_list, how = "outer")
+        list_result = list_result.join(fahrrad_list, how="outer")
+    except Exception as e:
+        print(e)
+    try:
+        airquality_list = pd.DataFrame(agg_airquality(date))
+        airquality_list = airquality_list.set_index('landkreis')
+        list_result = list_result.join(airquality_list, how="outer")
     except Exception as e:
         print(e)
 
     list_result["date"] = str(date)
-    #list_result.to_csv("test.csv")
+    # list_result.to_csv("test.csv")
 
     dict = list_result.T.to_dict()
 
-
-    #s3_client.put_object(Bucket='sdd-s3-basebucket', Key="aggdata/live", Body=json.dumps(dict))
-    response = s3_client.put_object(Bucket='sdd-s3-basebucket', Key='aggdata/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2), str(date.day).zfill(2)), Body=json.dumps(dict))
+    # s3_client.put_object(Bucket='sdd-s3-basebucket', Key="aggdata/live", Body=json.dumps(dict))
+    response = s3_client.put_object(Bucket='sdd-s3-basebucket',
+                                    Key='aggdata/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2),
+                                                                  str(date.day).zfill(2)), Body=json.dumps(dict))
     print(response)
