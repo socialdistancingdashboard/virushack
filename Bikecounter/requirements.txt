@@ -1,0 +1,6 @@
+numpy
+boto3
+holidays
+geopy
+statsmodels
+matplotlib

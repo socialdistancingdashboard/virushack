@@ -1,0 +1,37 @@
+[
+  {
+    "name": "score_fahrrad",
+    "desc_short": "Beschreibt das Verh\\u00e4ltnis aus gew\\u00f6hnlichem Radaufkommen und tats\\u00e4chlichem Radaufkommen in diversen deutschen St\\u00e4dten.",
+    "desc_long": "Die Daten sind reichen teilweise bis 2013 zur\\u00fcck."
+  },
+  {
+    "name": "score_public_transportation",
+    "desc_short": "Beschreibt das Verh\\u00e4ltnis aus tats\\u00e4chlichen Haltestops und geplanten Haltestops f\\u00fcr diverse \\u00f6ffentliche Verkehrsmittel.",
+    "desc_long": "Die Daten sind ab 27.02.2020 f\\u00fcr alle Gemeinden verf\\u00fcgbar."
+  },
+  {
+    "name": "score_public_transportation_bus",
+    "desc_short": "Beschreibt das Verh\\u00e4ltnis aus tats\\u00e4chlichen Haltestops und geplanten Haltestops f\\u00fcr Busse.",
+    "desc_long": "Die Daten sind ab 27.02.2020 f\\u00fcr alle Gemeinden verf\\u00fcgbar."
+  },
+  {
+    "name": "score_public_transportation_national",
+    "desc_short": "Beschreibt das Verh\\u00e4ltnis aus tats\\u00e4chlichen Haltestops und geplanten Haltestops f\\u00fcr Intercity-Z\\u00fcge.",
+    "desc_long": "Die Daten sind ab 27.02.2020 f\\u00fcr alle Gemeinden verf\\u00fcgbar."
+  },
+  {
+    "name": "score_public_transportation_nationalExpress",
+    "desc_short": "Beschreibt das Verh\\u00e4ltnis aus tats\\u00e4chlichen Haltestops und geplanten Haltestops f\\u00fcr ICE-Z\\u00fcge.",
+    "desc_long": "Die Daten sind ab 27.02.2020 f\\u00fcr alle Gemeinden verf\\u00fcgbar."
+  },
+  {
+    "name": "score_public_transportation_regional",
+    "desc_short": "Beschreibt das Verh\\u00e4ltnis aus tats\\u00e4chlichen Haltestops und geplanten Haltestops f\\u00fcr Regionalz\\u00fcge.",
+    "desc_long": "Die Daten sind ab 27.02.2020 f\\u00fcr alle Gemeinden verf\\u00fcgbar."
+  },
+  {
+    "name": "score_public_transportation_suburban",
+    "desc_short": "Beschreibt das Verh\\u00e4ltnis aus tats\\u00e4chlichen Haltestops und geplanten Haltestops f\\u00fcr innerst\\u00e4dtische Z\\u00fcge.",
+    "desc_long": "Die Daten sind ab 27.02.2020 f\\u00fcr alle Gemeinden verf\\u00fcgbar."
+  }
+]

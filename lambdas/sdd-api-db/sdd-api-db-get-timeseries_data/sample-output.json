@@ -1,0 +1,78 @@
+{
+  "request": {
+    "start": "2020-01-27T00:00:00",
+    "end": "2020-01-28T00:00:00",
+    "timeline_specs": [
+      {
+        "category": "score_public_transportation_regional",
+        "spatial_granularity": 3,
+        "spatial_filters": []
+      },
+      {
+        "category": "score_public_transportation_all",
+        "spatial_granularity": 2,
+        "spatial_filters": [
+          "SN",
+          "BW",
+          "B"
+        ]
+      }
+    ]
+  },
+  "timelines": [
+    {
+      "category": "score_public_transportation_regional",
+      "description_short": "Beschreibt das Verh\\u00e4ltnis aus tats\\u00e4chlichen Haltestops und geplanten Haltestops f\\u00fcr Regionalz\\u00fcge.",
+      "description_long": "Die Daten sind ab 27.02.2020 f\\u00fcr alle Gemeinden verf\\u00fcgbar.",
+      "spatial_granularity": 3,
+      "spatial_filters": [],
+      "values": [
+        {
+          "datetime": "2020-01-27T12:00:00Z",
+          "score_value": 0.0076887057
+        },
+        {
+          "datetime": "2020-01-27T13:00:00Z",
+          "score_value": 0.0076887057
+        },
+        {
+          "datetime": "2020-01-27T14:00:00Z",
+          "score_value": 0.0076887057
+        },
+        {
+          "datetime": "2020-01-27T15:00:00Z",
+          "score_value": 0.0076887057
+        }
+      ]
+    },
+    {
+      "category": "score_public_transportation_all",
+      "description_short": "Beschreibt das Verh\\u00e4ltnis aus tats\\u00e4chlichen Haltestops und geplanten Haltestops f\\u00fcr diverse \\u00f6ffentliche Verkehrsmittel.",
+      "description_long": "Die Daten sind ab 27.02.2020 f\\u00fcr alle Gemeinden verf\\u00fcgbar.",
+      "spatial_granularity": 2,
+      "spatial_filters": [
+        "SN",
+        "BW",
+        "B"
+      ],
+      "values": [
+        {
+          "datetime": "2020-01-27T12:00:00Z",
+          "score_value": 0.0105906759
+        },
+        {
+          "datetime": "2020-01-27T13:00:00Z",
+          "score_value": 0.0105906759
+        },
+        {
+          "datetime": "2020-01-27T14:00:00Z",
+          "score_value": 0.0105906759
+        },
+        {
+          "datetime": "2020-01-27T15:00:00Z",
+          "score_value": 0.0105906759
+        }
+      ]
+    }
+  ]
+}

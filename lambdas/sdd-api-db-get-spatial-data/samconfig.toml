@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "prod"
+s3_bucket = "sdd-s3-basebucket"
+s3_prefix = "prod"
+region = "eu-central-1"
+capabilities = "CAPABILITY_IAM"
+
