@@ -7,11 +7,9 @@
 import json
 import pandas as pd
 import numpy as np
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 import boto3
 import requests
-import json
+import os
 from datetime import datetime, timedelta
 
 
@@ -61,15 +59,15 @@ def create_request():
     json_data={}
     data_sets = []
     BP = BikePrediction()
-  
+    WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
     for index, row in locations_df.iterrows():
         #print('index', index)
         url = 'http://data.eco-counter.com/ParcPublic/CounterData'
-        
+
         yesterday_day, yesterday_month, yesterday_year = yesterday_date.day, yesterday_date.month, yesterday_date.year
         today_day, today_month, today_year = today_date.day, today_date.month, today_date.year
-        
-        
+
+
         #start get bike count data
         #------------------------------------------------
         pratiques = ""
@@ -91,15 +89,15 @@ def create_request():
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.80 Safari/537.36",
             "X-Requested-With": "XMLHttpRequest"
         }
-        bike_count_data = requests.post(url, body, headers=headers) 
+        bike_count_data = requests.post(url, body, headers=headers)
         #no data available for location on current day
         if not bike_count_data.json()[:-1]:
             continue
         bike_count_data_entry = bike_count_data.json()[:-1][0]
         #-------------------------------------------------
         #end get bike count data
-        
-        
+
+
         #start get weather data
         #-------------------------------------------------
         weather_stations = requests.get(
@@ -122,8 +120,8 @@ def create_request():
         weather_data_entry = weather_data.json()['data'][0]
         #--------------------------------------------------
         #end get weather data
-        
-        
+
+
         #start get public holiday data
         #-------------------------------------------------
         province_public_holidays = []
@@ -139,8 +137,8 @@ def create_request():
             province_public_holidays.append(str(date))
         #end get public holiday data
         #-------------------------------------------------
-        
-        data_set={}   
+
+        data_set={}
         data_set['date']= str(yesterday_date).split()[0]
         data_set['bike_count']= str(bike_count_data_entry[1])
         data_set['name']= row['nom']
@@ -152,8 +150,8 @@ def create_request():
         data_set['windspeed']= weather_data_entry['windspeed']
         data_set['sunshine']= weather_data_entry['sunshine']
         data_set['is_holiday']= 1 if str(yesterday_date).split()[0] in province_public_holidays else 0
-        
-        
+
+
         #start get prediction for normal bike count
         #-------------------------------------------------
         prediction = BP.predict_single(
@@ -209,14 +207,10 @@ client = boto3.client('s3')
 
 response = client.put_object(
   Bucket='sdd-s3-basebucket',
-  Body=json.dumps(data_json),     
+  Body=json.dumps(data_json),
   Key='fahrrad/{}/{}.json'.format(yesterday_date.strftime('%Y/%m/%d'),str(yesterday_date).split()[0])
 )
-    
+
 
 
 # In[ ]:
-
-
-
-

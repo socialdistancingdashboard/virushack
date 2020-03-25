@@ -18,6 +18,7 @@ import geopandas.tools
 from shapely.geometry import Point
 import pymysql 
 from sqlalchemy import create_engine
+from sqlalchemy.pool import NullPool
 
 config = json.load(open("../credentials/credentials-aws-db.json", "r"))
 aws_engine = create_engine(
@@ -27,6 +28,7 @@ aws_engine = create_engine(
   config["host"] + ":" + 
   str(config["port"]) + "/" +
   config["database"]),
+  poolclass=NullPool, # dont maintain a pool of connections
   pool_recycle=3600 # handles timeouts better, I think...
 )
 
@@ -38,6 +40,7 @@ local_engine = create_engine(
   config["host"] + ":" + 
   str(config["port"]) + "/" +
   config["database"]),
+  poolclass=NullPool, # dont maintain a pool of connections
   pool_recycle=3600 # handles timeouts better, I think...
 )
 
@@ -49,7 +52,9 @@ countries = geopandas.GeoDataFrame.from_file(
   driver="TopoJSON")
 # clean unnecessary columns
 countries = countries[["id", "geometry"]]
-countries.columns = ["landkreis_id", "geometry"]
+countries.columns = ["district_id", "geometry"]
+
+locations = pd.read_sql("select * from locations", aws_engine)
 
 # path to data source
 # path = "/home/bemootzer/Documents/SoftwareProjekte/stewardless/stewardless-crawler/dbbackup"
@@ -164,67 +169,86 @@ for file in os.listdir(path):
     df.drop(["index_right", "geometry"], axis=1, inplace=True)
     df.dropna(inplace=True) # remove those that couldnt be matched to shapes
 
-    locations = pd.read_sql("select * from locations", aws_engine)
-    df.drop(["lon", "lat"], axis=1, inplace=True) # loose station coords and replace by aggregated landkreis centroid
+    df.drop(["lon", "lat"], axis=1, inplace=True) # loose station coords and replace by aggregated district centroid
     
     df = df.merge(
       locations,
-      on="landkreis_id",
+      on="district_id",
       how="left",
       suffixes=(False, False)
     )
 
     # aggregate by region
-    unique_landkreis_ids = df["landkreis_id"].unique()
+    unique_district_ids = df["district_id"].unique()
     unique_datetimes = df["date"].unique()
     unique_lineProducts = ['all', 'nationalExpress', 'regional', 'suburban', 'national', 'bus']
 
     cnt = 0
     scores = [] 
     meta = []
-    for landkreis_id in unique_landkreis_ids:
+    def append_to_scores_and_meta(df_filtered, district_id, category):
+      reference_value = 0 
+      score_value = df_filtered.cancelled_stops.sum() / df_filtered.planned_stops.sum() 
+
+      meta.append({
+        "district_id": district_id,
+        "category": category,
+        "meta": None,
+        "source_id": "aggregated source",
+        "description": "Aggregierte Daten aller verfügbaren Haltestellen im district.",
+      })
+
+      scores.append({
+        "dt": d,
+        "score_value": score_value,
+        "reference_value": reference_value,
+        "category": category,
+        "district_id": district_id,
+        "source_id": "aggregated source"
+      })
+
+    for district_id in unique_district_ids:
       cnt = cnt + 1
-      print("%2.4f" % (cnt / len(unique_landkreis_ids)))
-
-      for lineProduct in unique_lineProducts:
-        category = "score_public_transportation_" + lineProduct
-
-        #for d in unique_datetimes:
-        d = datetime(*[int(v) for v in date_string.split("-")])
-        df_filtered = df[
-          (df.landkreis_id==landkreis_id) & 
-          (df.lineProduct==lineProduct)
-        ]
+      if cnt % 100 == 0:
+        print("%2.4f" % (cnt / len(unique_district_ids)))
+      
+      for d in unique_datetimes:
+      #d = datetime(*[int(v) for v in date_string.split("-")])
+        # add score for all means of public transportation
+        category = "score_public_transportation_all"
+        df_filtered = df[ (df.district_id==district_id) ]
         if len(df_filtered) == 0:
           continue
         
-        reference_value = 0 
-        score_value = df_filtered.cancelled_stops.sum() / df_filtered.planned_stops.sum() 
+        append_to_scores_and_meta(
+          df_filtered,
+          district_id,
+          category
+        )
 
-        meta.append({
-          "landkreis_id": landkreis_id,
-          "category": category,
-          "meta": None,
-          "source_id": "aggregated source",
-          "description": "Aggregierte Daten aller verfügbaren Haltestellen im Landkreis.",
-        })
+        for lineProduct in unique_lineProducts:
+          category = "score_public_transportation_" + lineProduct
+          df_filtered = df[
+            (df.district_id==district_id) & 
+            (df.lineProduct==lineProduct)
+          ]
+          if len(df_filtered) == 0:
+            continue
+          
+          append_to_scores_and_meta(
+            df_filtered,
+            district_id,
+            category
+          )
+          
 
-        scores.append({
-          "dt": d,
-          "score_value": score_value,
-          "reference_value": reference_value,
-          "category": category,
-          "landkreis_id": landkreis_id,
-          "score_value": score_value,
-          "source_id": "aggregated source"
-        })
 
     meta = pd.DataFrame(meta)
 
     # use this upload to handle duplicates
     with aws_engine.connect() as cnx:
       q = """
-        INSERT INTO scores_meta (landkreis_id, category, meta, source_id, description)
+        INSERT INTO scores_meta (district_id, category, meta, source_id, description)
         VALUES(%s,%s,%s,%s,%s)
         ON DUPLICATE KEY UPDATE meta = meta, description = description
       """
@@ -233,15 +257,18 @@ for file in os.listdir(path):
 
     scores = pd.DataFrame(scores)
     
-    # retrieve meta data to assign foreign keys to score upload
-    q = """
+    # retrieve meta data to for all relevant categories to assign correct foreign keys to score upload
+    q = ("""
       SELECT * FROM scores_meta 
-      WHERE category = '%s'
-    """ % category
+      WHERE category IN 
+      ( """ +
+      ",".join(["'score_public_transportation_%s'" % lp for lp in unique_lineProducts])
+      + ")")
+
     scores_meta_foreign_keys = pd.read_sql(q, aws_engine) 
 
     def f(x):
-      return x["landkreis_id"] + x["category"] + x["source_id"]
+      return x["district_id"] + x["category"] + x["source_id"]
     scores_meta_foreign_keys["custom_index"] = scores_meta_foreign_keys.apply(f, axis=1)
     scores_meta_foreign_keys = scores_meta_foreign_keys[["custom_index", "id"]]
     scores_meta_foreign_keys.columns = ["custom_index", "meta_id"]
@@ -268,4 +295,9 @@ for file in os.listdir(path):
   except Exception as ex:
     print(ex)
     print("%s was not processed properly" % file)
+    break
 
+aws_engine.dispose()
+local_engine.dispose()
+# more information about how to close mysql connections
+# https://stackoverflow.com/questions/8645250/how-to-close-sqlalchemy-connection-in-mysql
