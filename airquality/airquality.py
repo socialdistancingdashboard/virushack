@@ -4,7 +4,17 @@ import boto3
 import requests
 import csv
 import json
-from datetime import datetime
+
+airquality_token = os.environ['AIR_QUALITY_API_TOKEN']
+
+client = boto3.client('firehose')
+
+
+def to_byte_record(airquality_record):
+    # new_record_encoded = str(airquality_record).encode('utf-8')
+
+    return json.dumps(airquality_record)
+
 
 def to_airquality(city_name, lat, lon, response):
     data = response['data']
@@ -12,7 +22,7 @@ def to_airquality(city_name, lat, lon, response):
     return {
         'landkreis_name': city_name,
         # todo time from request
-        'datetime': datetime.now().isoformat(),
+        'datetime': datetime.datetime.now().isoformat(),
         'lat': lat,
         'lon': lon,
         'airquality': {
@@ -20,11 +30,9 @@ def to_airquality(city_name, lat, lon, response):
             'iaqi': data['iaqi']
         }
     }
-airquality_token = os.environ['AIR_QUALITY_API_TOKEN']
-bucket=[]
+
 
 with open('kreise_mit_center.csv', newline='', encoding='utf-8') as csvfile:
-
     fileReader = csv.reader(csvfile, delimiter=',', quotechar='|')
     header = next(fileReader)
     # Check file as empty
@@ -39,13 +47,5 @@ with open('kreise_mit_center.csv', newline='', encoding='utf-8') as csvfile:
             if response.status_code == 200 and response.json()['status'] == 'ok':
                 airquality_record = to_airquality(city_name, lat, lon, response.json())
                 # print(str(airquality_record).encode('utf-8'))
-                bucket.append(airquality_record)
-
-s3_client = boto3.client('s3')
-date = datetime.now()
-
-if len(bucket) > 0 :
-    response = s3_client.put_object(Body=json.dumps(bucket), Bucket='sdd-s3-basebucket',
-                         Key='airquality/{}/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2),
-                                                               str(date.day).zfill(2), str(date.hour).zfill(2)))
-    print("Response: " + str(response))
+                client.put_record(DeliveryStreamName='sdd-kinesis-airquality',
+                                  Record={'Data': to_byte_record(airquality_record)})
