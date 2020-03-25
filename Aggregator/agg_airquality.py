@@ -6,11 +6,11 @@ import pandas as pd
 date = date.today()
 
 
-def getAirquality():
+def aggregate():
     s3_client = boto3.client('s3')
 
-    result = pd.DataFrame()
-    list = []
+    merged = pd.DataFrame()
+    object_list = []
     s3_objects = s3_client.list_objects_v2(Bucket='sdd-s3-basebucket',
                                            Prefix='airquality/{}/{}/{}/'.format(str(date.year).zfill(4),
                                                                                 str(date.month).zfill(2),
@@ -24,11 +24,12 @@ def getAirquality():
         object_body = str(airqualityObject["Body"].read(), 'utf-8')
         airquality_json = pd.json_normalize(json.loads(object_body))
 
-        list.append(pd.DataFrame(airquality_json))
+        object_list.append(pd.DataFrame(airquality_json))
 
-    merged = pd.concat(list)
+    merged = pd.concat(object_list)
 
-    merged = pd.DataFrame(merged.groupby("landkreis_name")[["airquality.aqi"]].mean())
+    merged['airquality.aqi'] = pd.to_numeric(merged['airquality.aqi'], errors='coerce')
+    merged = merged.groupby("landkreis_name")["airquality.aqi"].mean() / 100
 
     merged = merged.reset_index()
     list_results = []
@@ -37,8 +38,6 @@ def getAirquality():
         airquality = row['airquality.aqi']
         data_index = {
             'name': landkreis,
-            # todo time from request
-            # 'date': str(date),
             'airquality_score': airquality
 
         }
