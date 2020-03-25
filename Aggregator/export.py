@@ -19,6 +19,7 @@ for day, data_day in response.json()["body"].items():
     daily_data["date"] = day
     data = data.append(daily_data)
 
+
 data.columns
 # 'index': AGS-ID of Landkreis
 # 'date': Date of measurement
@@ -27,5 +28,9 @@ data.columns
 # 'nationalExpress_score': 'national_score', 'regional_score','suburban_score', 'bus_score', 'zug_score': How many connections got cancelled?
 
 data.replace(np.inf, np.nan, inplace=True)
+data.loc[data["hystreet_score"].notna()]["date"].unique()
+aggregate = data.groupby("date")[['bike_score', 'bus_score', 'gmap_score', 'hystreet_score', 'nationalExpress_score', 'national_score', 'regional_score','suburban_score', 'webcam_score', 'zug_score']].mean()
+pd.DataFrame(aggregate).to_csv("aggregate.csv")
+
 
 data.to_csv("export.csv")
