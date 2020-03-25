@@ -158,6 +158,6 @@ dmypy.json
 
 # credentials 
 **/credentials/**
-
+credentials-*.json
 
 # End of https://www.gitignore.io/api/r,python
