@@ -4,7 +4,7 @@ sudo yum install -y python3
 sudo pip3 install pandas
 sudo pip3 install streamlit
 cd /home/ec2-user
-curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virushack/master/virushack_dashboard.py
+curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virushack/master/EveryoneCounts.py
 cd /usr/bin
 sudo curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virushack/master/streamlit-beanstalk/rundashboard.sh
 cd /etc/systemd/system
