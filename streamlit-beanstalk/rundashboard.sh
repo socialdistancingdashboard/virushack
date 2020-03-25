@@ -1,3 +1,3 @@
 #!/bin/bash
 cd /home/ec2-user
-nohup /usr/local/bin/streamlit run /home/ec2-user/virushack_dashboard.py
+nohup /usr/local/bin/streamlit run /home/ec2-user/EveryoneCounts.py

@@ -13,5 +13,6 @@ sudo chmod 644 /etc/systemd/system/rundashboard.service
 sudo systemctl enable rundashboard.service
 sudo systemctl start rundashboard.service
 cd /home/ec2-user
+mkdir dashboard
 curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virushack/master/streamlit-beanstalk/update.sh
 chmod u+x update.sh
