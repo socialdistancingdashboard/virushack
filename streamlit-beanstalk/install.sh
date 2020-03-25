@@ -14,5 +14,6 @@ mkdir dashboard
 curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virushack/master/streamlit-beanstalk/update.sh
 sudo chmod u+x update.sh
 sudo ./update.sh
-echo  -e  "$(crontab -l)\n*/30 * * * * /home/ec2-user/update.sh >/dev/null 2>&1" | crontab -
+sudo su echo '*/30 * * * * /home/ec2-user/update.sh >/dev/null 2>&1' > /tmp/mycrontab.txt
+sudo -u ec2-user bash -c 'crontab /tmp/mycrontab.txt'
 sudo systemctl start rundashboard.service
