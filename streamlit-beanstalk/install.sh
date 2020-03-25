@@ -16,3 +16,4 @@ cd /home/ec2-user
 mkdir dashboard
 curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virushack/master/streamlit-beanstalk/update.sh
 chmod u+x update.sh
+echo  -e  "$(crontab -l)\n*/30 * * * * /home/ec2-user/update.sh >/dev/null 2>&1" | crontab -
