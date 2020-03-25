@@ -2,7 +2,6 @@
 
 import json
 import pandas as pd
-import pymysql
 from datetime import datetime, timedelta
 import re
 import pymysql 
@@ -22,11 +21,12 @@ aws_engine = create_engine(
   pool_recycle=3600 # handles timeouts better, I think...
 )
 
-event = {
-  "date": "2020-01-27",
-  "categories": ["score_public_transportation_regional"],
-  "spatial_granularity": 3
-}
+# use this for testing
+# event = {
+#   "date": "2020-01-27",
+#   "categories": ["score_public_transportation_regional"],
+#   "spatial_granularity": 3
+# }
 
 pattern_date = re.compile(r"^\d\d\d\d-\d\d-\d\d$")
 
@@ -38,6 +38,7 @@ def on_error(e):
 
 def lambda_handler(event, context):
  try:
+   # check user inputs and return error state if input is not valid
   assert "categories" in event, "Please provide cateogries as array"
   assert "date" in event, "Provide a date as 'YYYY-MM-DD'"
   assert "spatial_granularity" in event, "Please provide a spatial granularity identifier (1: country, 2: state, 3: district)"
@@ -47,7 +48,6 @@ def lambda_handler(event, context):
   param_spatial_granularity = event["spatial_granularity"]
 
   assert re.match(pattern_date, param_date) != None, "Please provide date as YYYY-MM-DD"
-  #param_date = datetime.strptime(param_date, '%Y-%m-%d')
   assert type(param_categories) == list, "Please provide a list of categories."
   assert len(param_categories) > 0, "Please provide at least one category. Found type " + str(type(param_categories))
   assert type(param_spatial_granularity) == int, "Please provide spatial_granularity as integer values"
@@ -55,7 +55,6 @@ def lambda_handler(event, context):
   assert param_spatial_granularity <= 3, "Please provide a spatial_granularity value of less or equal 3"
  except Exception as e:
   return on_error(e)
-
 
   param_start = datetime(*[int(v) for v in param_date.split("-")])
   param_end = param_start + timedelta(days=1)
@@ -70,13 +69,18 @@ def lambda_handler(event, context):
   spatial_id = spatial_id_lookup[param_spatial_granularity]
 
   q = """
-    SELECT score_value AS score, locations.%s AS spatial_id, category
+    SELECT 
+      SUM(score_value) AS score, 
+      locations.%s AS spatial_id, 
+      category
     FROM scores
     JOIN locations ON scores.district_id = locations.district_id
     WHERE scores.dt >= '%s' 
     AND scores.dt < '%s'
     AND category IN ('%s')
+    GROUP BY spatial_id, category
   """ % (spatial_id, param_start, param_end, q_categories)
+
 
   df = pd.read_sql(q, aws_engine)
   result = {
@@ -100,7 +104,7 @@ def lambda_handler(event, context):
     "body": json.dumps(result),
   }
 
-lambda_handler(event, None)
+# lambda_handler(event, None)
 
 
 
