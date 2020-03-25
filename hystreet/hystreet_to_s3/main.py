@@ -31,7 +31,6 @@ for location in locations:
 
         measurement['date'] = date.strftime("%Y-%m-%d")
         df = df.append(measurement, ignore_index=True)
-    break
 
 # Upload data to S3
 for name, group in df.groupby('timestamp'):
