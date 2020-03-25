@@ -117,6 +117,7 @@ def dashboard():
         df_scores["filtered_score"] = df_scores["average_score"]
 
     df_scores["date"] = pd.to_datetime(df_scores["date"])
+    df_scores = df_scores.round(2)
 
     germany_average = np.mean(df_scores[df_scores["date"] == str(latest_date)]["average_score"])
     st.write("Zum Vergleich - die durchschnittliche Soziale Distanz am {} in Deutschland: {:.2f}".format(latest_date,germany_average))
