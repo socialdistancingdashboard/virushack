@@ -4,7 +4,6 @@ import pymysql
 from datetime import datetime
 import re
 
-
 config = json.load(open("sdd-db.conf", "r"))
 
 # Connect to the database.
