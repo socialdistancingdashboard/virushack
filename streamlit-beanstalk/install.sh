@@ -12,3 +12,5 @@ sudo curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virusha
 sudo chmod 644 /etc/systemd/system/rundashboard.service
 sudo systemctl enable rundashboard.service
 sudo systemctl start rundashboard.service
+cd /home/ec2-user
+curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virushack/master/streamlit-beanstalk/update.sh
