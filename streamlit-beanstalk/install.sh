@@ -15,8 +15,8 @@ curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virushack/ma
 sudo chmod u+x update.sh
 sudo ./update.sh
 sudo chown -R ec2-user:ec2-user /home/ec2-user
+sudo systemctl start rundashboard.service
 sudo su
 crontab -u ec2-user -l
 echo -e "*/30 * * * * /home/ec2-user/update.sh >/dev/null 2>&1" | crontab -u ec2-user -
 exit
-sudo systemctl start rundashboard.service
