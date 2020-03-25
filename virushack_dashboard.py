@@ -76,8 +76,14 @@ def load_real_data(county_names, county_ids,history_length=5):
                 gmaps_scores_prod.append(scores["gmap_score"])
             else:
                 gmaps_scores_prod.append(np.nan)
-            hystreet_scores_prod.append(scores["hystreet_score"])
-            zug_scores_prod.append(scores["zug_score"])
+            if "hystreet_score" in scores:
+                hystreet_scores_prod.append(scores["hystreet_score"])
+            else:
+                hystreet_scores_prod.append(np.nan)
+            if "zug_score" in scores:
+                zug_scores_prod.append(scores["zug_score"])
+            else:
+                zug_scores_prod.append(np.nan)
 
 
     df_mock_scores = pd.DataFrame(
