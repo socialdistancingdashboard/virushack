@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[36]:
 
 
 import json
@@ -15,7 +15,7 @@ import json
 from datetime import datetime, timedelta
 
 
-# In[24]:
+# In[37]:
 
 
 pratiques_path = "pratiques.csv"
@@ -24,7 +24,7 @@ pratiques_df = pd.read_csv(pratiques_path,sep='\t')
 locations_df = pd.read_csv(locations_path,sep='\t')
 
 
-# In[26]:
+# In[38]:
 
 
 province_abbs = {
@@ -47,12 +47,15 @@ province_abbs = {
 }
 
 
-# In[27]:
+# In[51]:
 
 
 from geopy.geocoders import Nominatim
 import holidays
 from prediction import BikePrediction
+
+today_date = datetime.today()
+yesterday_date = today_date - timedelta(1)
 
 def create_request():
     json_data={}
@@ -62,8 +65,7 @@ def create_request():
     for index, row in locations_df.iterrows():
         #print('index', index)
         url = 'http://data.eco-counter.com/ParcPublic/CounterData'
-        today_date = datetime.today()
-        yesterday_date = today_date - timedelta(1)
+        
         yesterday_day, yesterday_month, yesterday_year = yesterday_date.day, yesterday_date.month, yesterday_date.year
         today_day, today_month, today_year = today_date.day, today_date.month, today_date.year
         
@@ -154,7 +156,7 @@ def create_request():
         
         #start get prediction for normal bike count
         #-------------------------------------------------
-        data_set['prediction'] = BP.predict_single(
+        prediction = BP.predict_single(
             station_string=row['nom'],
             day=yesterday_date,
             temperature=data_set['temperature'] or 0,
@@ -166,46 +168,45 @@ def create_request():
         )
         #end get prediction for normal bike count
         #-------------------------------------------------
-        
-        
+        #predict 0 if prediction -ve
+        data_set['prediction'] = max(prediction,0)
         data_sets.append(data_set)
     return data_sets
 
 
-# In[28]:
+# In[52]:
 
 
 data = create_request()
 
 
-# In[29]:
+# In[53]:
 
 
 df = pd.DataFrame(data=data)
 
 
-# In[30]:
+# In[55]:
 
 
 df1 = df.fillna(0)
 
 
-# In[32]:
+# In[56]:
 
 
 data_json = df1.to_json(orient='records')
 
 
-# In[34]:
+# In[48]:
 
 
 client = boto3.client('s3')
 
 
-# In[35]:
+# In[57]:
 
 
-yesterday_date = datetime.today() - timedelta(1)
 response = client.put_object(
   Bucket='sdd-s3-basebucket',
   Body=json.dumps(data_json),     
