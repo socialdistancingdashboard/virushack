@@ -3,3 +3,6 @@ geopandas
 Pandas
 boto3
 sklearn
+
+#You need libspatialindex to run coords_to_kreis:
+#sudo apt-get update && apt-get install -y libspatialindex-dev OR brew install spatialindex OR for Windows maybe: https://libspatialindex.org/#binaries

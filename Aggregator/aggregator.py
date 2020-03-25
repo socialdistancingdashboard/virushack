@@ -10,7 +10,7 @@ import json
 
 
 s3_client = boto3.client('s3')
-for x in range(10,30):
+for x in range(0,2):
     print(x)
     date = date.today() - timedelta(days = x)
     list_result = pd.DataFrame(columns = ['landkreis'])
