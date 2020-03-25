@@ -1,6 +1,5 @@
 #!/bin/bash
 RESSOURCE="SddApiDbGetTimeseriesData"
-
 STACK="sdd-get-timeseries-data"
 
 # build 

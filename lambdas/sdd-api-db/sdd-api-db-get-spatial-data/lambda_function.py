@@ -98,6 +98,7 @@ def lambda_handler(event, context):
   """ % (spatial_id, param_start, param_end, q_categories)
 
   df = pd.read_sql(q, aws_engine)
+  df["prediction"] = 0
 
   result = {
     "request": {
@@ -113,7 +114,7 @@ def lambda_handler(event, context):
     df_filtered = df[df.category == category]
     result["data"].append({
       "category": category,
-      "values": json.loads(df_filtered[["score", "spatial_id"]].to_json(orient="records"))
+      "values": json.loads(df_filtered[["score", "spatial_id", "prediction"]].to_json(orient="records"))
     })
 
   return {

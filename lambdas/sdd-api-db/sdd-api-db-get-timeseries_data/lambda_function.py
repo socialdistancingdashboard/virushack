@@ -23,16 +23,21 @@ aws_engine = create_engine(
 )
 
 # use this for testing
-event = {
-  "start": "2020-01-27",
-  "end": "2020-01-28",
-  "timeline_specs": [{
-      "category": "score_public_transportation_regional",
-      "spatial_granularity": 3,
-      "spatial_filter": []
-    }
-  ]
-}
+# event = {
+#   "start": "2020-01-27",
+#   "end": "2020-01-28",
+#   "timeline_specs": [{
+#       "category": "score_public_transportation_regional",
+#       "spatial_granularity": 3,
+#       "spatial_filters": []
+#     }, {
+#       "category": "score_public_transportation_all",
+#       "spatial_granularity": 2,
+#       "spatial_filters": ["SN", "BW", "B"]
+#     }
+
+#   ]
+# }
 
 def on_error(e):
  return {
@@ -42,6 +47,9 @@ def on_error(e):
 
 def lambda_handler(event, context):
   try:
+    assert "body" in event, "provide body"
+    event = json.loads(event["body"])
+
     # check user inputs and return error state if input is not valid
     assert "start" in event, "Provide a date as 'YYYY-MM-DDTHH:MM:SS' (ISO 8601 extended format)"
     assert "end" in event, "Provide a date as 'YYYY-MM-DDTHH:MM:SS' (ISO 8601 extended format)"
@@ -53,12 +61,12 @@ def lambda_handler(event, context):
     for ts in event["timeline_specs"]:
       assert "category" in ts, "timeline_specs malformed."
       assert "spatial_granularity" in ts, "Please provide a spatial granularity identifier (1: country, 2: state, 3: district)"
-      assert "spatial_filter" in ts, "timeline_specs malformed."
+      assert "spatial_filters" in ts, "timeline_specs malformed."
 
-      assert type(ts["spatial_filter"]) == list, "timeline_specs malformed. Spatial filter needs to be a list."
+      assert type(ts["spatial_filters"]) == list, "timeline_specs malformed. Spatial filter needs to be a list."
 
-      for sf in ts["spatial_filter"]:
-        assert "spatial_id" in sf, "If spatial_filter is used, please provide an array of spatial_ids as strings."
+    #  for sf in ts["spatial_filters"]:
+    #    assert "spatial_id" in sf, "If spatial_filters is used, please provide an array of spatial_ids as strings."
   except Exception as e:
     return on_error(e)
 
@@ -72,47 +80,64 @@ def lambda_handler(event, context):
   q = "SELECT * FROM categories"
   df_categories = pd.read_sql(q, aws_engine)    
 
+#  ts = event["timeline_specs"][0]
 
+  start = dateutil.parser.isoparse(event["start"])
+  end = dateutil.parser.isoparse(event["end"])
+  timelines = []
   for ts in event["timeline_specs"]:
     category = ts["category"]
     spatial_granularity = ts["spatial_granularity"]
-    spatial_filter = ts["spatial_filter"]
+    spatial_filters = ts["spatial_filters"]
 
-    q_filter = ",".join(spatial_filter)
-    spatial = spatial_id_lookup[param_spatial_granularity]
+   
+    spatial = spatial_id_lookup[spatial_granularity]
 
+    timeline = {
+      "category": category,
+      "description_short": df_categories[df_categories.name == category].desc_short.values[0],
+      "description_long": df_categories[df_categories.name == category].desc_long.values[0],
+      "spatial_granularity": spatial_granularity,
+      "spatial_filters": spatial_filters,
+    }
 
     q = """
       SELECT 
-        SUM(score_value) AS score, 
-        locations.%s_id AS spatial_id,
-        locations.%s AS spatial_name,
-        category
+        DATE_FORMAT(dt, '%%Y-%%m-%%dT%%TZ') AS datetime,
+        AVG(score_value) AS score
       FROM scores
       JOIN locations ON scores.district_id = locations.district_id
-      WHERE scores.dt >= '%s' 
+      WHERE category = '%s'
+      AND scores.dt >= '%s'
       AND scores.dt < '%s'
-      AND category = %s
-      GROUP BY spatial_id, category
-    """ % (spatial_id, param_start, param_end, q_categories)
+    """ % (category, start, end)
 
+    if len(spatial_filters ) > 0:
+      q_spatial_filters = ",".join(["'" + sf + "'" for sf in spatial_filters])
+      q = q + (" AND locations.%s_id in (%s) " % (spatial, q_spatial_filters))
 
-  df = pd.read_sql(q, aws_engine)
+    q = q + """
+      GROUP BY scores.dt
+    """
+
+    df = pd.read_sql(q.replace("%", "%%"), aws_engine)
+    df["prediction"] = 0
+    
+    #df.date = df.date.apply(lambda x: x.isoformat())
+
+    timeline["values"] = json.loads(df.to_json(orient="records"))
+    timelines.append(timeline)
+
   result = {
     "request": {
-      "date": event["date"],
-      "categories": event["categories"],
-      "spatial_granularity": event["spatial_granularity"]
+      "start": start.isoformat(),
+      "end": str(end.isoformat()),
+      "timeline_specs": event["timeline_specs"]
     },
-    "data": []
+    "timelines": timelines
   }
 
-  for category in param_categories:
-    df_filtered = df[df.category == category]
-    result["data"].append({
-      "category": category,
-      "values": json.loads(df_filtered[["score", "spatial_id"]].to_json(orient="records"))
-    })
+  result
 
   return {
     "statusCode": 200,
