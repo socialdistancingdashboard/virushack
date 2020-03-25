@@ -1,7 +1,8 @@
 import streamlit as st
+import requests
 
 def about():
-    #file = 'https://raw.githubusercontent.com/socialdistancingdashboard/virushack/master/README.md'
+    response = requests.get('https://raw.githubusercontent.com/socialdistancingdashboard/virushack/master/README.md')
     st.markdown("""
         <style type='text/css'>
             img {
@@ -9,8 +10,7 @@ def about():
             }
         </style>
     """, unsafe_allow_html=True)
-    with open('README.md','r') as f:
-        st.markdown(f.read())
+    st.markdown(response.text)
 
 def impressum():
     st.write('Impressum')
