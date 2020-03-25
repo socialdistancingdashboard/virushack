@@ -82,6 +82,7 @@ def lambda_handler(event, context):
     2: "state_id",
     3: "district_id"
   }
+  
   spatial_id = spatial_id_lookup[param_spatial_granularity]
 
   q = """
