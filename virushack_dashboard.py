@@ -55,7 +55,7 @@ def load_real_data(county_names, county_ids,history_length=5):
     min_date = datetime.datetime.now().date() - datetime.timedelta(days=history_length)
     max_date = datetime.datetime.now().date()
     params = {"min_date": str(min_date), "max_date": str(max_date), "data_sources":"0,1,2"}
-    response = requests.get('https://f3fp7p5z00.execute-api.eu-central-1.amazonaws.com/dev/sdd-lambda-request',params = params)
+    response = requests.get('https://0he6m5aakd.execute-api.eu-central-1.amazonaws.com/prod',params = params)
 
     county_names_prod = []
     county_ids_prod = []
