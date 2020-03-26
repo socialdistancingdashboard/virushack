@@ -75,8 +75,21 @@ def dashboard():
         
         return df_scores, scorenames
     
+    # make page here with placeholders
+    # thus later elements (e.g. county selector) can influence
+    # earlier elements (the map) because they can appear earlier in 
+    # the code without appearing earlier in the webpage
     st.title("EveryoneCounts")
     st.header("Das Social Distancing Dashboard")
+    st_info_text       = st.empty()
+    st_map_header      = st.empty()
+    st_map             = st.empty()
+    st_timeline_header = st.empty()
+    st_county_select   = st.empty()
+    st_timeline_desc   = st.empty()
+    st_timeline        = st.empty()
+    st_footer_title    = st.empty()
+    st_footer          = st.empty()
     
     # get counties
     county_names, county_ids, state_names, state_ids = load_topojson()
@@ -89,7 +102,7 @@ def dashboard():
     df_scores = df_scores_full.copy()
     
     # build sidebar
-    st.sidebar.subheader("Datenfilter")
+    st.sidebar.subheader("Datenauswahl")
     use_states_select = st.sidebar.selectbox('Detailgrad:', ('Landkreise', 'Bundesländer'))
     use_states = use_states_select == 'Bundesländer'
     
@@ -159,7 +172,7 @@ def dashboard():
     if use_states:
         countys = []
     else:
-        countys = st.sidebar.multiselect('Wähle Landkreis aus:',options = available_countys)
+        countys = st_county_select.multiselect('Wähle Landkreise aus:',options = available_countys)
 
     #selected_date = st.sidebar.date_input('für den Zeitraum vom', datetime.date(2020,3,24))
     #end_date = st.sidebar.date_input('bis', datetime.date(2020,3,22))
@@ -174,13 +187,13 @@ def dashboard():
     df_scores = df_scores.round(2)
 
     germany_average = np.mean(df_scores[df_scores["date"] == str(latest_date)][selected_score])
-    st.markdown('''
+    st_info_text.markdown('''
         In der Karte siehst Du wie sich Social Distancing auf die verschiedenen **{regionen}** in Deutschland auswirkt. Wir nutzen Daten über **{datasource}** (Du kannst die Datenquelle links im Menü ändern) um ein Maß zu berechnen, wie gut Social Distancing aktuell funktioniert. Ein Wert von 1 entspricht dem Normal-Wert vor der Covid-Pandemie, also bevor die Bürger zu Social Distancing aufgerufen wurden. Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung des Verkehrsaufkommen gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist.
     '''.format(regionen=use_states_select,datasource=selected_score_desc)
     )
     #st.write("Zum Vergleich - die durchschnittliche Soziale Distanz am {} in Deutschland: {:.2f}".format(latest_date,germany_average))
 
-    st.subheader('Social Distancing Karte vom {}'.format(latest_date))
+    st_map_header.subheader('Social Distancing Karte vom {}'.format(latest_date))
     
     
     if use_states:
@@ -221,7 +234,7 @@ def dashboard():
         c = alt.layer(basemap, layer).configure_view(
             strokeOpacity=0
         )
-        st.altair_chart(c)
+        st_map.altair_chart(c)
     else:
         # draw counties map
         layer = alt.Chart(data_topojson_remote).mark_geoshape(
@@ -240,14 +253,14 @@ def dashboard():
         c = alt.layer(basemap, layer).configure_view(
             strokeOpacity=0
         )
-        st.altair_chart(c)
+        st_map.altair_chart(c)
 
     # draw timelines
-    st.subheader("Zeitlicher Verlauf")
+    st_timeline_header.subheader("Zeitlicher Verlauf")
     df_scores[df_scores["name"].isin(countys)][["name", "date", "filtered_score"]].dropna()
     if len(countys) > 0 and not use_states:
         
-        st.altair_chart(alt.Chart(
+        st_timeline.altair_chart(alt.Chart(
             df_scores[df_scores["name"].isin(countys)][["name", "date", "filtered_score"]].dropna()).mark_line(point=True).encode(
             x=alt.X('date:T', axis=alt.Axis(title='Datum', format=("%d %b"))),
             y=alt.Y('filtered_score:Q', title=selected_score_axis),
@@ -262,7 +275,7 @@ def dashboard():
             height=400
         ))
     elif use_states:
-        st.altair_chart(alt.Chart(
+        st_timeline.altair_chart(alt.Chart(
             df_states).mark_line(point=True).encode(
             x=alt.X('date:T', axis=alt.Axis(title='Datum', format=("%d %b"))),
             y=alt.Y(selected_score+':Q', title=selected_score_axis),
@@ -277,12 +290,12 @@ def dashboard():
             height=400
         ))
     else:
-        st.markdown('''
-            Wähle links im Menü einen oder mehrere Landkreise aus um hier die zeitliche Entwicklung der Daten für {datasource} zu sehen.
+        st_timeline_desc.markdown('''
+            Wähle einen oder mehrere Landkreise aus um hier die zeitliche Entwicklung der Daten für {datasource} zu sehen.
         '''.format(datasource=selected_score_desc))
     
-    st.subheader("Unsere Datenquellen")
-    st.markdown("""
+    st_footer_title.subheader("Unsere Datenquellen")
+    st_footer.markdown("""
         <style type='text/css'>
             img {
                 max-width: 100%;
