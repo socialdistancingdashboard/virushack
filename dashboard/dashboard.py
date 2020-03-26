@@ -10,11 +10,6 @@ from PIL import Image
 from io import BytesIO
 
 def dashboard():
-    @st.cache(persist=True)
-    def load_mock_data():
-        df = pd.read_csv("/Users/Sebastian/Desktop/scores.csv", index_col = 0, dtype = {"id": str, 'name': str,'date': str,
-                                                          'gmap_score': float,'hystreet_score': float, 'cycle_score': float,})
-        return df
 
     @st.cache(persist=True)
     def load_topojson():
@@ -33,75 +28,103 @@ def dashboard():
             state_ids.append(state["id"])
         return county_names, county_ids, state_names, state_ids
 
-    @st.cache(persist=True)
-    def load_real_data(county_names, county_ids):
-
+    @st.cache()
+    def load_real_data(id_to_name):
         response = requests.get('https://0he6m5aakd.execute-api.eu-central-1.amazonaws.com/prod')
-
-        county_names_prod = []
-        county_ids_prod = []
-        dates_prod = []
-        gmaps_scores_prod = []
-        hystreet_scores_prod = []
-        zug_scores_prod = []
-
-        data_dict = response.json()["body"]
-
-        for (date, row) in list(data_dict.items()):
-            print(date)
+        jsondump = response.json()["body"]
+        
+        # get names for all scores
+        entry_keys = list(list(list(jsondump.items())[0][1].values())[0].keys()) # sorry
+        scorenames = [key for key in entry_keys if '_score' in key]
+        
+        # prepare lists
+        scorevalues = {scorename:[] for scorename in scorenames}
+        ids = []
+        names = []
+        dates = []
+        
+        # loop over data
+        for (date, row) in list(jsondump.items()):
             for cid, scores in row.items():
-                county_names_prod.append(id_to_name[cid])
-                county_ids_prod.append(cid)
-                dates_prod.append(date)
-                if "gmap_score" in scores:
-                    gmaps_scores_prod.append(scores["gmap_score"])
-                else:
-                    gmaps_scores_prod.append(None)
-                if "hystreet_score" in scores:
-                    hystreet_scores_prod.append(scores["hystreet_score"])
-                else:
-                    hystreet_scores_prod.append(None)
-                if "zug_score" in scores:
-                    zug_scores_prod.append(scores["zug_score"])
-                else:
-                    zug_scores_prod.append(None)
-
-        df_scores = pd.DataFrame(
-            {"id": county_ids_prod, "name": county_names_prod, "date": dates_prod, "gmap_score": gmaps_scores_prod, "hystreet_score": hystreet_scores_prod, "zug_score": zug_scores_prod})
-
+                ids.append(cid)
+                names.append(id_to_name[cid])
+                dates.append(date)
+                for scorename in scorenames:
+                    if scorename in scores:
+                        scorevalue = scores[scorename]
+                    else:
+                        scorevalue = None
+                    scorevalues[scorename].append(scorevalue)
+        
+        # create dataframe
+        df_scores = pd.DataFrame({
+            "id": ids, 
+            "name": names, 
+            "date": dates
+        })
+        
+        # add scores
+        for scorename in scorenames:
+            df_scores[scorename] = scorevalues[scorename]
         df_scores = df_scores.replace([np.inf, -np.inf], np.nan)
-
-        return df_scores
+        
+        return df_scores, scorenames
     
-    st.title("#EveryoneCounts - Das Social Distancing Dashboard")
+    st.title("EveryoneCounts")
+    st.header("Das Social Distancing Dashboard")
     
+    # get counties
     county_names, county_ids, state_names, state_ids = load_topojson()
     id_to_name = {cid:county_names[idx] for idx,cid in enumerate(county_ids)}
     state_id_to_name = {cid:state_names[idx] for idx,cid in enumerate(state_ids)}
     state_name_to_id = {state_names[idx]:cid for idx,cid in enumerate(state_ids)}
     
-    df_scores_full = load_real_data(county_names, county_ids)
+    # get score data
+    df_scores_full, scorenames = load_real_data(id_to_name)
     df_scores = df_scores_full.copy()
     
+    # build sidebar
     st.sidebar.subheader("Datenfilter")
     use_states_select = st.sidebar.selectbox('Detailgrad:', ('Landkreise', 'Bundesländer'))
     use_states = use_states_select == 'Bundesländer'
     
-    data_sources_names = {'gmap_score':"Google Popularitätsdaten","hystreet_score":"Fußgänger-Daten (Hystreet)", "zug_score":"Zug-Daten"}
-    available_data_sources = [value for value in df_scores.columns if value in data_sources_names.keys()]
-    data_sources = st.sidebar.selectbox('Datenquelle:',available_data_sources, format_func=lambda x: data_sources_names[x])
+    # descriptive names for each score
+    # hardcoded here. otherwise use column name
+    scorenames_desc_manual = {
+        'gmap_score':"Beliebtheit öffentlicher Orte",
+        "hystreet_score":"Fußgänger",
+        "zug_score":"Züge",
+        "bike_score":"Fahradfahrer",
+        "bus_score":"ÖPV Busse",
+        "national_score":"ÖPV IC-Züge",
+        "suburban_score":"ÖPV Nahverkehr",
+        "regional_score":"ÖPV Regionalzüge",
+        "nationalExpress_score":"ÖPV ICE-Züge"
+        }
+        
+    scorenames_desc = {}
+    for scorename in scorenames:
+        if scorename in scorenames_desc_manual:
+            scorenames_desc[scorename] = scorenames_desc_manual[scorename]
+        else:
+            scorenames_desc[scorename] = scorename
+    inverse_scorenames_desc = {scorenames_desc[key]:key for key in scorenames_desc.keys()}
+    selected_score_desc = st.sidebar.selectbox(
+        'Datenquelle:', list(scorenames_desc.values()), 
+        )
+    selected_score = inverse_scorenames_desc[selected_score_desc]
+    
+    #calculate average score based on selected selected_score
+    #if len(selected_score) == 0:
+    #    df_scores[selected_score] = df_scores[[scorenames]].mean(axis = 1)
+    #elif len(selected_score) == 1:
+    #    df_scores[selected_score] = df_scores[[selected_score]]
+    #else:
+    #    df_scores[selected_score] = df_scores[[selected_score]].mean(axis = 1)
 
-    #calculate average score based on selected data_sources
-    if len(data_sources) == 0:
-        df_scores["average_score"] = df_scores[[available_data_sources]].mean(axis = 1)
-    elif len(data_sources) == 1:
-        df_scores["average_score"] = df_scores[[data_sources]]
-    else:
-        df_scores["average_score"] = df_scores[[data_sources]].mean(axis = 1)
+    latest_date = pd.Series(df_scores[df_scores[selected_score] > 0]["date"]).values[-1]
 
-    latest_date = pd.Series(df_scores[df_scores["average_score"] > 0]["date"]).values[-1]
-
-    available_countys = [value for value in county_names if value in df_scores[df_scores["average_score"] > 0]["name"].values]
+    available_countys = [value for value in county_names if value in df_scores[df_scores[selected_score] > 0]["name"].values]
     if use_states:
         countys = []
     else:
@@ -112,17 +135,21 @@ def dashboard():
 
     #filter scores based on selected places
     if len(countys) > 0:
-        df_scores["filtered_score"] = np.where(df_scores["name"].isin(countys), df_scores["average_score"],[0] * len(df_scores))
+        df_scores["filtered_score"] = np.where(df_scores["name"].isin(countys), df_scores[selected_score],[0] * len(df_scores))
     else:
-        df_scores["filtered_score"] = df_scores["average_score"]
+        df_scores["filtered_score"] = df_scores[selected_score]
 
     df_scores["date"] = pd.to_datetime(df_scores["date"])
     df_scores = df_scores.round(2)
 
-    germany_average = np.mean(df_scores[df_scores["date"] == str(latest_date)]["average_score"])
-    st.write("Zum Vergleich - die durchschnittliche Soziale Distanz am {} in Deutschland: {:.2f}".format(latest_date,germany_average))
+    germany_average = np.mean(df_scores[df_scores["date"] == str(latest_date)][selected_score])
+    st.markdown('''
+        In der Karte siehst Du wie sich Social Distancing auf die verschiedenen **{regionen}** in Deutschland auswirkt. Wir nutzen Daten über **{datasource}** (Du kannst die Datenquelle links im Menü ändern) um ein Maß zu berechnen, wie gut Social Distancing aktuell funktioniert. Ein Wert von 1 entspricht dem Normal-Wert vor der Covid-Pandemie, also bevor die Bürger zu Social Distancing aufgerufen wurden. Ein kleiner Wert weißt darauf hin, dass in unserer Datenquelle eine Verringerung des Verkehrsaufkommen gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist.
+    '''.format(regionen=use_states_select,datasource=selected_score_desc)
+    )
+    #st.write("Zum Vergleich - die durchschnittliche Soziale Distanz am {} in Deutschland: {:.2f}".format(latest_date,germany_average))
 
-    st.subheader('Social Distancing Map vom {}'.format(latest_date))
+    st.subheader('Social Distancing Karte vom {}'.format(latest_date))
     
     
     if use_states:
@@ -150,11 +177,11 @@ def dashboard():
         layer = alt.Chart(data_topojson_remote).mark_geoshape(
             stroke='white'
         ).encode(
-            color=alt.Color(data_sources+':Q', title="Soziale Distanz", scale=alt.Scale(domain=(2, 0),scheme='redyellowgreen')),
-            tooltip=[alt.Tooltip("state_name:N", title="Bundesland"),alt.Tooltip(data_sources+":N", title="Soziale Distanz")]
+            color=alt.Color(selected_score+':Q', title=selected_score_desc, scale=alt.Scale(domain=(2, 0),scheme='redyellowgreen')),
+            tooltip=[alt.Tooltip("state_name:N", title="Bundesland"),alt.Tooltip(selected_score+":N", title=selected_score_desc)]
         ).transform_lookup(
             lookup='id',
-            from_= alt.LookupData(df_states[(df_states["date"] < str(latest_date)) & (df_states[data_sources] > 0)], 'id', [data_sources])
+            from_= alt.LookupData(df_states[(df_states["date"] < str(latest_date)) & (df_states[selected_score] > 0)], 'id', [selected_score])
         ).transform_lookup(
             lookup='id',
             from_= alt.LookupData(df_states, 'id', ['state_name'])
@@ -169,8 +196,8 @@ def dashboard():
         layer = alt.Chart(data_topojson_remote).mark_geoshape(
             stroke='white'
         ).encode(
-            color=alt.Color('filtered_score:Q', title="Soziale Distanz", scale=alt.Scale(domain=(2, 0),scheme='redyellowgreen')),
-            tooltip=[alt.Tooltip("name:N", title="Kreis"),alt.Tooltip("filtered_score:N", title="Soziale Distanz")]
+            color=alt.Color('filtered_score:Q', title=selected_score_desc, scale=alt.Scale(domain=(2, 0),scheme='redyellowgreen')),
+            tooltip=[alt.Tooltip("name:N", title="Kreis"),alt.Tooltip("filtered_score:N", title=selected_score_desc)]
         ).transform_lookup(
             lookup='id',
             from_= alt.LookupData(df_scores[(df_scores["date"] < str(latest_date)) & (df_scores["filtered_score"] > 0)], 'id', ['filtered_score'])
@@ -185,9 +212,10 @@ def dashboard():
         st.altair_chart(c)
 
     # draw timelines
+    st.subheader("Zeitlicher Verlauf")
     df_scores[df_scores["name"].isin(countys)][["name", "date", "filtered_score"]].dropna()
     if len(countys) > 0 and not use_states:
-        st.subheader("Zeitlicher Verlauf")
+        
         st.altair_chart(alt.Chart(
             df_scores[df_scores["name"].isin(countys)][["name", "date", "filtered_score"]].dropna()).mark_line(point=True).encode(
             x=alt.X('date:T', axis=alt.Axis(title='Datum', format=("%d %b"))),
@@ -198,26 +226,26 @@ def dashboard():
             height=400
         ))
     elif use_states:
-        st.subheader("Zeitlicher Verlauf")
         st.altair_chart(alt.Chart(
             df_states).mark_line(point=True).encode(
             x=alt.X('date:T', axis=alt.Axis(title='Datum', format=("%d %b"))),
-            y=alt.Y(data_sources+':Q', title="Soziale Distanz"),
+            y=alt.Y(selected_score+':Q', title=selected_score_desc),
             color=alt.Color('state_name', title="Bundesland", scale=alt.Scale(scheme='category20'))
         ).properties(
             width=750,
             height=400
         ))
+    else:
+        st.markdown('''
+            Wähle links im Menü einen oder mehrere Landkreise aus um hier die zeitliche Entwicklung der Daten für {datasource} zu sehen.
+        '''.format(datasource=selected_score_desc))
     
     st.subheader("Unsere Datenquellen")
-    response_data_sources = requests.get('https://github.com/socialdistancingdashboard/virushack/raw/master/logo/Datenquellen.PNG')
-    img_data_sources = Image.open(BytesIO(response_data_sources.content))
-    st.image(img_data_sources, use_column_width=True)
-
     st.markdown("""
         <style type='text/css'>
-            details {
-                display: none;
+            img {
+                max-width: 100%;
             }
         </style>
+        ![](https://github.com/socialdistancingdashboard/virushack/raw/master/logo/Datenquellen.PNG)
     """, unsafe_allow_html=True)
