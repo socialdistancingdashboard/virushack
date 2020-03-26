@@ -3,7 +3,7 @@ from datetime import date
 import boto3
 import pandas as pd
 
-date = date.today()
+#date = date.today()
 
 
 def aggregate(date):
