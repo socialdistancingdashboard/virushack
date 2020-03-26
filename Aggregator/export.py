@@ -5,10 +5,10 @@ import json
 import numpy as np
 
 #Specify Timeframe
-min_date = datetime.datetime.now().date() - datetime.timedelta(days=6)
+min_date = datetime.datetime.now().date() - datetime.timedelta(days=2)
 max_date = datetime.datetime.now().date()
 params = {"min_date": str(min_date), "max_date": str(max_date), "data_sources":"0,1,2"}
-response = requests.get('https://0he6m5aakd.execute-api.eu-central-1.amazonaws.com/prod',params = params)
+response = requests.get('https://f3fp7p5z00.execute-api.eu-central-1.amazonaws.com/test/sdd-lambda-request',params = params)
 response.json()
 data = pd.DataFrame()
 for day, data_day in response.json()["body"].items():

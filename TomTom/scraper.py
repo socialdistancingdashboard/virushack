@@ -8,7 +8,7 @@ import json
 
 s3_client = boto3.client('s3')
 
-cities = pd.read_csv("staedte_koordinaten_ueber_20k.CSV", sep = ";")
+cities = pd.read_csv("staedte_koordinaten_ueber_50k.CSV", sep = ";")
 cities
 errors = []
 result = pd.DataFrame()
