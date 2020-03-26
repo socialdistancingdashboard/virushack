@@ -34,8 +34,13 @@ def dashboard():
         jsondump = response.json()["body"]
         
         # get names for all scores
-        entry_keys = list(list(list(jsondump.items())[0][1].values())[0].keys()) # sorry
-        scorenames = [key for key in entry_keys if '_score' in key]
+        scorenames = []
+        for (date, row) in list(jsondump.items()):
+            for cid, scores in row.items():
+                for key in scores.keys():
+                    if key not in scorenames:
+                        scorenames.append(key)
+        scorenames = [key for key in scorenames if '_score' in key]
         
         # prepare lists
         scorevalues = {scorename:[] for scorename in scorenames}
@@ -89,30 +94,56 @@ def dashboard():
     use_states = use_states_select == 'Bundesländer'
     
     # descriptive names for each score
-    # hardcoded here. otherwise use column name
     scorenames_desc_manual = {
-        'gmap_score':"Beliebtheit öffentlicher Orte",
-        "hystreet_score":"Fußgänger",
-        "zug_score":"Züge",
+        "gmap_score":"Besucherzahlen an öffentlichen Orten",
+        "hystreet_score":"Fußgänger in Innenstädten (Laserscanner-Messung)",
+        "zug_score":"DB Züge",
         "bike_score":"Fahradfahrer",
         "bus_score":"ÖPV Busse",
         "national_score":"ÖPV IC-Züge",
         "suburban_score":"ÖPV Nahverkehr",
         "regional_score":"ÖPV Regionalzüge",
-        "nationalExpress_score":"ÖPV ICE-Züge"
+        "nationalExpress_score":"ÖPV ICE-Züge",
+        "webcam_score":"Fußgänger auf öffentlichen Webcams",
+        "tomtom_score":"Autoverkehr"
         }
-        
+    # very short axis labels for each score
+    scorenames_axis_manual = {
+        "gmap_score":"Besucherzahlen",
+        "hystreet_score":"Fußgänger",
+        "zug_score":"Züge",
+        "bike_score":"Fahradfahrer",
+        "bus_score":"Busse",
+        "national_score":"IC-Züge",
+        "suburban_score":"Nahverkehr",
+        "regional_score":"Regionalzüge",
+        "nationalExpress_score":"ICE-Züge",
+        "webcam_score":"Fußgänger",
+        "tomtom_score":"Autoverkehr"
+        }
+    
+    # for scores not in the hardcoded list above
+    # default to their scorename as a fallback
     scorenames_desc = {}
+    scorenames_axis = {}
     for scorename in scorenames:
         if scorename in scorenames_desc_manual:
             scorenames_desc[scorename] = scorenames_desc_manual[scorename]
         else:
             scorenames_desc[scorename] = scorename
+        if scorename in scorenames_axis_manual:
+            scorenames_axis[scorename] = scorenames_axis_manual[scorename]
+        else:
+            scorenames_desc[scorename] = scorename
     inverse_scorenames_desc = {scorenames_desc[key]:key for key in scorenames_desc.keys()}
+    
+    # data source selector
     selected_score_desc = st.sidebar.selectbox(
-        'Datenquelle:', list(scorenames_desc.values()), 
+        'Datenquelle:', sorted(list(scorenames_desc.values())), 
+        index = 1
         )
     selected_score = inverse_scorenames_desc[selected_score_desc]
+    selected_score_axis = scorenames_axis[selected_score]
     
     #calculate average score based on selected selected_score
     #if len(selected_score) == 0:
@@ -144,7 +175,7 @@ def dashboard():
 
     germany_average = np.mean(df_scores[df_scores["date"] == str(latest_date)][selected_score])
     st.markdown('''
-        In der Karte siehst Du wie sich Social Distancing auf die verschiedenen **{regionen}** in Deutschland auswirkt. Wir nutzen Daten über **{datasource}** (Du kannst die Datenquelle links im Menü ändern) um ein Maß zu berechnen, wie gut Social Distancing aktuell funktioniert. Ein Wert von 1 entspricht dem Normal-Wert vor der Covid-Pandemie, also bevor die Bürger zu Social Distancing aufgerufen wurden. Ein kleiner Wert weißt darauf hin, dass in unserer Datenquelle eine Verringerung des Verkehrsaufkommen gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist.
+        In der Karte siehst Du wie sich Social Distancing auf die verschiedenen **{regionen}** in Deutschland auswirkt. Wir nutzen Daten über **{datasource}** (Du kannst die Datenquelle links im Menü ändern) um ein Maß zu berechnen, wie gut Social Distancing aktuell funktioniert. Ein Wert von 1 entspricht dem Normal-Wert vor der Covid-Pandemie, also bevor die Bürger zu Social Distancing aufgerufen wurden. Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung des Verkehrsaufkommen gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist.
     '''.format(regionen=use_states_select,datasource=selected_score_desc)
     )
     #st.write("Zum Vergleich - die durchschnittliche Soziale Distanz am {} in Deutschland: {:.2f}".format(latest_date,germany_average))
@@ -196,8 +227,8 @@ def dashboard():
         layer = alt.Chart(data_topojson_remote).mark_geoshape(
             stroke='white'
         ).encode(
-            color=alt.Color('filtered_score:Q', title=selected_score_desc, scale=alt.Scale(domain=(2, 0),scheme='redyellowgreen')),
-            tooltip=[alt.Tooltip("name:N", title="Kreis"),alt.Tooltip("filtered_score:N", title=selected_score_desc)]
+            color=alt.Color('filtered_score:Q', title=selected_score_axis, scale=alt.Scale(domain=(2, 0),scheme='redyellowgreen')),
+            tooltip=[alt.Tooltip("name:N", title="Kreis"),alt.Tooltip("filtered_score:N", title=selected_score_axis)]
         ).transform_lookup(
             lookup='id',
             from_= alt.LookupData(df_scores[(df_scores["date"] < str(latest_date)) & (df_scores["filtered_score"] > 0)], 'id', ['filtered_score'])
@@ -219,7 +250,7 @@ def dashboard():
         st.altair_chart(alt.Chart(
             df_scores[df_scores["name"].isin(countys)][["name", "date", "filtered_score"]].dropna()).mark_line(point=True).encode(
             x=alt.X('date:T', axis=alt.Axis(title='Datum', format=("%d %b"))),
-            y=alt.Y('filtered_score:Q', title="Soziale Distanz"),
+            y=alt.Y('filtered_score:Q', title=selected_score_axis),
             color=alt.Color('name', title="Landkreis")
         ).properties(
             width=750,
@@ -229,7 +260,7 @@ def dashboard():
         st.altair_chart(alt.Chart(
             df_states).mark_line(point=True).encode(
             x=alt.X('date:T', axis=alt.Axis(title='Datum', format=("%d %b"))),
-            y=alt.Y(selected_score+':Q', title=selected_score_desc),
+            y=alt.Y(selected_score+':Q', title=selected_score_axis),
             color=alt.Color('state_name', title="Bundesland", scale=alt.Scale(scheme='category20'))
         ).properties(
             width=750,
