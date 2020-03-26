@@ -1,6 +1,13 @@
 TRUNCATE TABLE sdd.categories;
 INSERT INTO sdd.categories (name, desc_short, desc_long, contributors) 
 VALUES(
+  "score_google_places",
+  "score google places",
+  "Lange Beschreibung",
+  "contributors todo"
+);
+INSERT INTO sdd.categories (name, desc_short, desc_long, contributors) 
+VALUES(
   "score_fahrrad",
   "Beschreibt das Verhältnis aus gewöhnlichem Radaufkommen und tatsächlichem Radaufkommen in diversen deutschen Städten.",
   "Die Daten sind reichen teilweise bis 2013 zurück.",

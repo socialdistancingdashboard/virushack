@@ -2,6 +2,18 @@ DROP DATABASE IF EXISTS sdd;
 CREATE DATABASE sdd;
 USE sdd;
 
+/* contains holidays for each state */
+DROP TABLE IF EXISTS holidays;
+CREATE TABLE holidays (
+  id INT UNSIGNED auto_increment PRIMARY KEY,
+  state_id VARCHAR(3) NOT NULL,
+  dt DATETIME NOT NULL,
+  ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX(state_id),
+  INDEX(dt),
+  UNIQUE(state_id, dt)
+) CHARACTER SET utf8;
+
 /* contains weather information since 2007-01-01 */
 DROP TABLE IF EXISTS weather;
 CREATE TABLE weather (
@@ -22,7 +34,7 @@ CREATE TABLE weather (
   ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   INDEX(district_id),
   INDEX(dt)
-)
+) CHARACTER SET utf8;
 
 /* Contains meta information for all amtliche Gemeindeschlüssel */
 DROP TABLE IF EXISTS locations;
@@ -58,10 +70,11 @@ CREATE TABLE scores_meta (
   meta TEXT NULL, /* stringified JSON dump with additional characteristics */
   description TEXT NULL, /* BHF Name, Webcam Standort, etc */
   source_id VARCHAR(128), /* Dient dazu innerhalb eines districtes Quellen zu unterscheiden. Bspw. "Webcam Marktplatz" */
+  ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   INDEX(category),
   INDEX(district_id),
   UNIQUE(district_id, category, source_id) /* Meta Daten sind zeitunabhängig */
-);
+) CHARACTER SET utf8;
 
 
 
@@ -76,6 +89,7 @@ CREATE TABLE  scores (
   district_id VARCHAR(32) NOT NULL, /* regional identifier */
   ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   meta_id INT UNSIGNED NOT NULL,
+  source_id VARCHAR(128) NOT NULL, /* allows to distinguish multiple sources within one district */
   INDEX(category),
   INDEX(dt),
   INDEX(district_id)
