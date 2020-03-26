@@ -36,7 +36,7 @@ st.sidebar.image(img, use_column_width=True)
 st.sidebar.markdown("<br>", unsafe_allow_html=True)
 
 # sidebar menu
-menuitems = {'Dashboard':1,'Über das Dashboard':2,'Impressum':3}
+menuitems = {'Dashboard':1,'Über das Dashboard':2}#,'Impressum':3}
 menu = st.sidebar.radio('',list(menuitems.keys()), index=0)
 
 # hack in some css to style the menu
@@ -72,8 +72,8 @@ if menu=='Dashboard':
     dashboard.dashboard()
 elif menu=='Über das Dashboard':
     dashboard_pages.about()
-elif menu=='Impressum':
-    dashboard_pages.impressum()
+#elif menu=='Impressum':
+#    dashboard_pages.impressum()
 
 # sidebar footer
 st.sidebar.markdown("<br><br><br><br>", unsafe_allow_html=True)
