@@ -6,18 +6,18 @@ import json
 from datetime import datetime, timedelta
 import requests
 import pandas as pd
-import pymysql 
+import pymysql
 from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
 import dateutil.parser
 
 config = json.load(open("../credentials/credentials-aws-db.json", "r"))
-WEATHER_API_KEY = json.load(open("credentials-weather-api.json"))["key"]
+WEATHER_API_KEY = json.load(open("../credentials/credentials-weather-api.json"))["key"]
 aws_engine = create_engine(
   ("mysql+pymysql://" +
   config["user"] + ":" +
   config["password"] + "@" +
-  config["host"] + ":" + 
+  config["host"] + ":" +
   str(config["port"]) + "/" +
   config["database"]),
   poolclass=NullPool, # dont maintain a pool of connections
@@ -28,7 +28,7 @@ q = """
   SELECT district_id, lat, lon, district
   FROM locations
   WHERE district_id NOT IN (SELECT DISTINCT district_id FROM weather)
-""" 
+"""
 df_todoliste = pd.read_sql(q, aws_engine)
 
 # In[138]:
@@ -37,7 +37,7 @@ start_date = datetime(2007,1,1)
 
 cnt_requests = 0
 data_df=pd.DataFrame()
-# for _, district in df_todoliste.loc[0:40].iterrows(): 
+# for _, district in df_todoliste.loc[0:40].iterrows():
 
 # fetch data until limit is reached
 while cnt_requests < 200:
@@ -70,9 +70,9 @@ while cnt_requests < 200:
       cnt_requests += 1
 
       #exit loop if current station already has data for current day
-      if ( 
-        weather_data.json()['data'] and 
-        len(weather_data.json()['data']) > 365 and 
+      if (
+        weather_data.json()['data'] and
+        len(weather_data.json()['data']) > 365 and
         weather_data.json()['data'][-1]['date'] > '2020-01-01'):
           break
 
@@ -90,7 +90,7 @@ while cnt_requests < 200:
 data_df = data_df.rename( columns={
   "date": "dt",
   "temperature": "temp",
-  "temperature_min": "temp_min", 
+  "temperature_min": "temp_min",
   "temperature_max": "temp_max",
   "precipitation": "rainfall"
 })
@@ -110,7 +110,3 @@ data_df.to_sql(
 
 
 # In[ ]:
-
-
-
-
