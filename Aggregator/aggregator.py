@@ -11,7 +11,7 @@ import json
 
 
 s3_client = boto3.client('s3')
-for x in range(0,2):
+for x in range(0,40):
     print(x)
     date = date.today() - timedelta(days = x)
     list_result = pd.DataFrame(columns = ['landkreis'])
@@ -51,6 +51,7 @@ for x in range(0,2):
         list_result = list_result.join(fahrrad_list, how="outer")
     except Exception as e:
         print(e)
+
     try:
         airquality_list = pd.DataFrame(agg_airquality(date))
         airquality_list = airquality_list.set_index('landkreis')
