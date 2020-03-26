@@ -251,7 +251,12 @@ def dashboard():
             df_scores[df_scores["name"].isin(countys)][["name", "date", "filtered_score"]].dropna()).mark_line(point=True).encode(
             x=alt.X('date:T', axis=alt.Axis(title='Datum', format=("%d %b"))),
             y=alt.Y('filtered_score:Q', title=selected_score_axis),
-            color=alt.Color('name', title="Landkreis")
+            color=alt.Color('name', title="Landkreis"),
+            tooltip=[
+                alt.Tooltip("name:N", title="Landkreis"),
+                alt.Tooltip('filtered_score:Q', title=selected_score_axis),
+                alt.Tooltip("date:T", title="Datum"),
+                ]
         ).properties(
             width=750,
             height=400
@@ -261,7 +266,12 @@ def dashboard():
             df_states).mark_line(point=True).encode(
             x=alt.X('date:T', axis=alt.Axis(title='Datum', format=("%d %b"))),
             y=alt.Y(selected_score+':Q', title=selected_score_axis),
-            color=alt.Color('state_name', title="Bundesland", scale=alt.Scale(scheme='category20'))
+            color=alt.Color('state_name', title="Bundesland", scale=alt.Scale(scheme='category20')),
+            tooltip=[
+                alt.Tooltip("state_name:N", title="Bundesland"),
+                alt.Tooltip(selected_score+":Q", title=selected_score_axis),
+                alt.Tooltip("date:T", title="Datum"),
+                ]
         ).properties(
             width=750,
             height=400
