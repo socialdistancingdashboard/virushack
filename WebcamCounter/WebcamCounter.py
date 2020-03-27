@@ -129,7 +129,9 @@ if __name__ == '__main__':
                {'ID':36,'URL':'http://webcam.oelsnitz.de/jpg/image.jpg', 'Lat':'50.4156035',"Lon":'12.1696213','Name':'Oelsnitz Marktplatz, 'Personenzahl':None, 'Stand':None },
                {'ID':37,'URL':'http://www.ku-weit.eu/zittau/Gallery/cam_1.jpg', 'Lat':'50.8962152',"Lon":'14.8080447','Name':'Zittau Salzhaus', 'Personenzahl':None, 'Stand':None },
                {'ID':38,'URL':'https://www.altenburg.eu//WebCam1/axis-cgi/jpg/image.cgi?resolution=640x480', 'Lat':'50.984929',"Lon":'12.4310653','Name':'Altenburg Markt', 'Personenzahl':None, 'Stand':None }, 
-               {'ID':39,'URL':'http://webcam.wilhelma.de/webcam02/webcam02.jpg', 'Lat':'48.8041551',"Lon":'9.2058097','Name':'Stuttgart Wilhelma', 'Personenzahl':None, 'Stand':None }]
+               {'ID':39,'URL':'http://wovi95.ddns-instar.com:81/snapshot.jpg?user=gast&pwd=gast&Fri%20Mar%2027%202020%2010%3A15%3A01%20GMT+0100%20%28Mitteleurop%E4ische%20Normalzeit%29', 'Lat':'50.4474983',"Lon":'11.6380773','Name':'Bad Lobenstein Markt', 'Personenzahl':None, 'Stand':None }, 
+               {'ID':40,'URL':'https://www.erfurt.de/webcam/domplatz.jpg', 'Lat':'50.9772478',"Lon":'11.0218204','Name':'Erfurt Domplatz', 'Personenzahl':None, 'Stand':None },  
+               {'ID':41,'URL':'http://webcam.wilhelma.de/webcam02/webcam02.jpg', 'Lat':'48.8041551',"Lon":'9.2058097','Name':'Stuttgart Wilhelma', 'Personenzahl':None, 'Stand':None }]
 
     pc = PeopleCounter(model_path)
 
