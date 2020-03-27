@@ -122,7 +122,14 @@ if __name__ == '__main__':
                {'ID':30,'URL':'https://www.mvv.de/fileadmin/user_upload/Systemdateien/Webcam/current.jpg', 'Lat':'49.4840612',"Lon":'8.4733678','Name':'Mannheim Wasserturm', 'Personenzahl':None, 'Stand':None },
                {'ID':31,'URL':'https://www.theater-schwedt.de/ubs/cam/130/', 'Lat':'53.0617394',"Lon":'14.2838004','Name':'Schwedt Lindenallee', 'Personenzahl':None, 'Stand':None },
                {'ID':32,'URL':'https://webcam.stuttgart.de/wcam007/current.jpg', 'Lat':'48.7754909',"Lon":'9.1763283','Name':'Stuttgart Marktplatz', 'Personenzahl':None, 'Stand':None },
-               {'ID':33,'URL':'http://webcam.wilhelma.de/webcam02/webcam02.jpg', 'Lat':'48.8041551',"Lon":'9.2058097','Name':'Stuttgart Wilhelma', 'Personenzahl':None, 'Stand':None }]
+               {'ID':33,'URL':'http://gewerbeverein-adorf.de/Webcam/webcam.jpg', 'Lat':'50.320905',"Lon":'12.2520966','Name':'Adorf Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':34,'URL':'https://www.coswig.de/files/coswig/rathaus/webcam/webcam.jpg', 'Lat':'51.1271276',"Lon":'13.5782501','Name':'Coswig Hauptstrasse', 'Personenzahl':None, 'Stand':None },
+               {'ID':35,'URL':'https://ewerk.tv/lvb/LVBHBF/lvbhbf.jpg', 'Lat':'51.3447766',"Lon":'12.379377','Name':'Leipzig Hauptbahnhof', 'Personenzahl':None, 'Stand':None },
+               {'ID':35,'URL':'http://www1.mittweida.de/live/current.jpg', 'Lat':'50.9853543',"Lon":'12.9791249','Name':'Mittweida Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':36,'URL':'http://webcam.oelsnitz.de/jpg/image.jpg', 'Lat':'50.4156035',"Lon":'12.1696213','Name':'Oelsnitz Marktplatz, 'Personenzahl':None, 'Stand':None },
+               {'ID':37,'URL':'http://www.ku-weit.eu/zittau/Gallery/cam_1.jpg', 'Lat':'50.8962152',"Lon":'14.8080447','Name':'Zittau Salzhaus', 'Personenzahl':None, 'Stand':None },
+               {'ID':38,'URL':'https://www.altenburg.eu//WebCam1/axis-cgi/jpg/image.cgi?resolution=640x480', 'Lat':'50.984929',"Lon":'12.4310653','Name':'Altenburg Markt', 'Personenzahl':None, 'Stand':None }, 
+               {'ID':39,'URL':'http://webcam.wilhelma.de/webcam02/webcam02.jpg', 'Lat':'48.8041551',"Lon":'9.2058097','Name':'Stuttgart Wilhelma', 'Personenzahl':None, 'Stand':None }]
 
     pc = PeopleCounter(model_path)
 
