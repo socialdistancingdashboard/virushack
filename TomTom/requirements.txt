@@ -1,0 +1,7 @@
+requests
+boto3
+pandas
+unidecode
+time
+tqdm
+json
