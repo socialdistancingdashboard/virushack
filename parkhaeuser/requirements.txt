@@ -1,6 +1,4 @@
 requests
-re
-json
 boto3
 bs4
 selenium
