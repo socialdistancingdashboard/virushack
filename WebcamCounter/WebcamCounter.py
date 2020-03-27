@@ -156,8 +156,9 @@ if __name__ == '__main__':
                {'ID':63,'URL':'https://www.vvo-online.de/img/webcamimages/marienbruecke-102.jpg', 'Lat':'51.0615957,',"Lon":'13.7320668','Name':'Dresden Marienbrücke', 'Personenzahl':None, 'Stand':None },
                {'ID':64,'URL':'https://www.vvo-online.de/img/webcamimages/koenigsbruecker_strasse_richtung_sued-111.jpg', 'Lat':'51.0700056',"Lon":'13.74682','Name':'Dresden Königsbrücker Str.', 'Personenzahl':None, 'Stand':None },  
                {'ID':65,'URL':'https://www.vvo-online.de/img/webcamimages/albertbruecke-135.jpg', 'Lat':'51.0571946',"Lon":'13.7523692','Name':'Dresden Albertbrücke', 'Personenzahl':None, 'Stand':None },  
-               {'ID':66,'URL':'https://www.vvo-online.de/img/webcamimages/bergstrasse-149.jpg', 'Lat':'51.0302823',"Lon":'13.7284321','Name':'Dresden Bergstraße', 'Personenzahl':None, 'Stand':None },  
-               {'ID':67,'URL':'http://webcam.wilhelma.de/webcam02/webcam02.jpg', 'Lat':'48.8041551',"Lon":'9.2058097','Name':'Stuttgart Wilhelma', 'Personenzahl':None, 'Stand':None }]
+               {'ID':66,'URL':'https://www.vvo-online.de/img/webcamimages/bergstrasse-149.jpg', 'Lat':'51.0302823',"Lon":'13.7284321','Name':'Dresden Bergstraße', 'Personenzahl':None, 'Stand':None }, 
+               {'ID':67,'URL':'http://allthos.de/lions/dresden.jpg', 'Lat':'51.0564335',"Lon":'13.736906','Name':'Dresden Neustädter Elbufer', 'Personenzahl':None, 'Stand':None },  
+               {'ID':68,'URL':'http://webcam.wilhelma.de/webcam02/webcam02.jpg', 'Lat':'48.8041551',"Lon":'9.2058097','Name':'Stuttgart Wilhelma', 'Personenzahl':None, 'Stand':None }]
 
     pc = PeopleCounter(model_path)
 
