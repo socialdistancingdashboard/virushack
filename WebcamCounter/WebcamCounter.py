@@ -126,7 +126,7 @@ if __name__ == '__main__':
                {'ID':34,'URL':'https://www.coswig.de/files/coswig/rathaus/webcam/webcam.jpg', 'Lat':'51.1271276',"Lon":'13.5782501','Name':'Coswig Hauptstrasse', 'Personenzahl':None, 'Stand':None },
                {'ID':35,'URL':'https://ewerk.tv/lvb/LVBHBF/lvbhbf.jpg', 'Lat':'51.3447766',"Lon":'12.379377','Name':'Leipzig Hauptbahnhof', 'Personenzahl':None, 'Stand':None },
                {'ID':35,'URL':'http://www1.mittweida.de/live/current.jpg', 'Lat':'50.9853543',"Lon":'12.9791249','Name':'Mittweida Marktplatz', 'Personenzahl':None, 'Stand':None },
-               {'ID':36,'URL':'http://webcam.oelsnitz.de/jpg/image.jpg', 'Lat':'50.4156035',"Lon":'12.1696213','Name':'Oelsnitz Marktplatz, 'Personenzahl':None, 'Stand':None },
+               {'ID':36,'URL':'http://webcam.oelsnitz.de/jpg/image.jpg', 'Lat':'50.4156035',"Lon":'12.1696213','Name':'Oelsnitz Marktplatz', 'Personenzahl':None, 'Stand':None },
                {'ID':37,'URL':'http://www.ku-weit.eu/zittau/Gallery/cam_1.jpg', 'Lat':'50.8962152',"Lon":'14.8080447','Name':'Zittau Salzhaus', 'Personenzahl':None, 'Stand':None },
                {'ID':38,'URL':'https://www.altenburg.eu//WebCam1/axis-cgi/jpg/image.cgi?resolution=640x480', 'Lat':'50.984929',"Lon":'12.4310653','Name':'Altenburg Markt', 'Personenzahl':None, 'Stand':None }, 
                {'ID':39,'URL':'http://wovi95.ddns-instar.com:81/snapshot.jpg?user=gast&pwd=gast&Fri%20Mar%2027%202020%2010%3A15%3A01%20GMT+0100%20%28Mitteleurop%E4ische%20Normalzeit%29', 'Lat':'50.4474983',"Lon":'11.6380773','Name':'Bad Lobenstein Markt', 'Personenzahl':None, 'Stand':None }, 
