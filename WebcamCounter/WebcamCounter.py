@@ -131,7 +131,23 @@ if __name__ == '__main__':
                {'ID':38,'URL':'https://www.altenburg.eu//WebCam1/axis-cgi/jpg/image.cgi?resolution=640x480', 'Lat':'50.984929',"Lon":'12.4310653','Name':'Altenburg Markt', 'Personenzahl':None, 'Stand':None }, 
                {'ID':39,'URL':'http://wovi95.ddns-instar.com:81/snapshot.jpg?user=gast&pwd=gast&Fri%20Mar%2027%202020%2010%3A15%3A01%20GMT+0100%20%28Mitteleurop%E4ische%20Normalzeit%29', 'Lat':'50.4474983',"Lon":'11.6380773','Name':'Bad Lobenstein Markt', 'Personenzahl':None, 'Stand':None }, 
                {'ID':40,'URL':'https://www.erfurt.de/webcam/domplatz.jpg', 'Lat':'50.9772478',"Lon":'11.0218204','Name':'Erfurt Domplatz', 'Personenzahl':None, 'Stand':None },  
-               {'ID':41,'URL':'http://webcam.wilhelma.de/webcam02/webcam02.jpg', 'Lat':'48.8041551',"Lon":'9.2058097','Name':'Stuttgart Wilhelma', 'Personenzahl':None, 'Stand':None }]
+               {'ID':41,'URL':'http://www.thueringer-webcams.de/kunden/mdr/weimar/livebild-pal.jpg', 'Lat':'50.9798182',"Lon":'11.3233716','Name':'Weimar Theaterplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':42,'URL':'http://www.aschersleben.de/webcams/Rathaus.jpeg', 'Lat':'48.6939552',"Lon":'9.1178365','Name':'Aschersleben Markt', 'Personenzahl':None, 'Stand':None },
+               {'ID':43,'URL':'https://www.gardelegen.de/webcam/webcam.jpg', 'Lat':'52.446933',"Lon":'11.4835116','Name':'Gardelegen Markt', 'Personenzahl':None, 'Stand':None },
+               {'ID':44,'URL':'http://swhcam2.evh.de/vhughsize.jpg', 'Lat':'51.4868011',"Lon":'11.9384423','Name':'Halle (Saale) Markt', 'Personenzahl':None, 'Stand':None },                
+               {'ID':45,'URL':'https://webcam.lutherstadt-eisleben.de/markt.jpg', 'Lat':'51.5282306',"Lon":'11.5452827','Name':'Lutherstadt Eisleben Markt', 'Personenzahl':None, 'Stand':None }, 
+               {'ID':46,'URL':'http://webcam.naumburg.de/camimage.jpg', 'Lat':'51.152475',"Lon":'11.8073854','Name':'Naumburg (Saale) Markt', 'Personenzahl':None, 'Stand':None },
+               {'ID':47,'URL':'https://www.hotelzumbaer.de/cam/image.jpg', 'Lat':'51.789',"Lon":'11.1392834','Name':'Quedlingburg Markt', 'Personenzahl':None, 'Stand':None },  
+               {'ID':48,'URL':'https://www.exempel.de/images/webcam/snapshot_current.jpg?', 'Lat':'52.5403281',"Lon":'11.9694902','Name':'Tangermünde Markt', 'Personenzahl':None, 'Stand':None }, 
+               {'ID':49,'URL':'https://www.ostseebad-ahrenshoop.de/webcam/ahrenshoop-strand.jpg', 'Lat':'54.3785813',"Lon":'12.4102697','Name':'Ahrenshoop Strand', 'Personenzahl':None, 'Stand':None }, 
+               {'ID':50,'URL':'http://www.nwm-net.de/markt/aktuellesbild.jpg', 'Lat':'53.8646453',"Lon":'11.1818843','Name':'Grevesmühlen Markt', 'Personenzahl':None, 'Stand':None },   
+               {'ID':51,'URL':'https://media.webdatendienst.de/webcam1_a.jpg', 'Lat':'53.9570837',"Lon":'14.1651142','Name':'Heringsdorf', 'Personenzahl':None, 'Stand':None },
+               {'ID':52,'URL':'http://usedomhafen.selfhost.eu:8080/cam_3.jpg', 'Lat':'53.8724447',"Lon":'13.915819','Name':'Usedom', 'Personenzahl':None, 'Stand':None },               
+               {'ID':53,'URL':'http://webcam.aichach.de/webaic.jpg', 'Lat':'48.4591603',"Lon":'11.1289321','Name':'Aichach Marktplatz', 'Personenzahl':None, 'Stand':None }, 
+               {'ID':54,'URL':'https://mzcam.kunden-mediamachine.de/markt/bild.jpg', 'Lat':'49.9986667',"Lon":'8.2721841','Name':'Mainz Dom', 'Personenzahl':None, 'Stand':None },  
+               {'ID':55,'URL':'http://www2.neustadt.eu/download/webcam/current.jpg', 'Lat':'49.3533866',"Lon":'8.1338495','Name':'Neustadt Weinstraße Marktplatz', 'Personenzahl':None, 'Stand':None },   
+               {'ID':56,'URL':'https://falken-webcam.worms.de/webcam/current.jpg', 'Lat':'49.6302144',"Lon":'8.3591628','Name':'Worms Marktplatz', 'Personenzahl':None, 'Stand':None },    
+               {'ID':57,'URL':'http://webcam.wilhelma.de/webcam02/webcam02.jpg', 'Lat':'48.8041551',"Lon":'9.2058097','Name':'Stuttgart Wilhelma', 'Personenzahl':None, 'Stand':None }]
 
     pc = PeopleCounter(model_path)
 
