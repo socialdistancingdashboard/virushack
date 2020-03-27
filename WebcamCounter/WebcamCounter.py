@@ -146,8 +146,18 @@ if __name__ == '__main__':
                {'ID':53,'URL':'http://webcam.aichach.de/webaic.jpg', 'Lat':'48.4591603',"Lon":'11.1289321','Name':'Aichach Marktplatz', 'Personenzahl':None, 'Stand':None }, 
                {'ID':54,'URL':'https://mzcam.kunden-mediamachine.de/markt/bild.jpg', 'Lat':'49.9986667',"Lon":'8.2721841','Name':'Mainz Dom', 'Personenzahl':None, 'Stand':None },  
                {'ID':55,'URL':'http://www2.neustadt.eu/download/webcam/current.jpg', 'Lat':'49.3533866',"Lon":'8.1338495','Name':'Neustadt Weinstraße Marktplatz', 'Personenzahl':None, 'Stand':None },   
-               {'ID':56,'URL':'https://falken-webcam.worms.de/webcam/current.jpg', 'Lat':'49.6302144',"Lon":'8.3591628','Name':'Worms Marktplatz', 'Personenzahl':None, 'Stand':None },    
-               {'ID':57,'URL':'http://webcam.wilhelma.de/webcam02/webcam02.jpg', 'Lat':'48.8041551',"Lon":'9.2058097','Name':'Stuttgart Wilhelma', 'Personenzahl':None, 'Stand':None }]
+               {'ID':56,'URL':'https://falken-webcam.worms.de/webcam/current.jpg', 'Lat':'49.6302144',"Lon":'8.3591628','Name':'Worms Marktplatz', 'Personenzahl':None, 'Stand':None }, 
+               {'ID':57,'URL':'https://www.bensheim.org/Webcams/images/webcams/current2.jpg', 'Lat':'49.6781939',"Lon":'8.6216948','Name':'Bensheim Fußgängerzone', 'Personenzahl':None, 'Stand':None },
+               {'ID':58,'URL':'https://www.bensheim.org/Webcams/images/webcams/current0.jpg', 'Lat':'49.680983',"Lon":'8.6207077','Name':'Bensheim Marktplatz', 'Personenzahl':None, 'Stand':None },               
+               {'ID':59,'URL':'http://www.safetec-cam.biz/images/webcam/standard/kaiserstrasse_friedberg.jpg', 'Lat':'50.3347517',"Lon":'8.750523','Name':'Friedberg Kaiserstrasse', 'Personenzahl':None, 'Stand':None },
+               {'ID':60,'URL':'http://www.webcam-rimbach.de/images/c1image_big.jpg', 'Lat':'49.623281',"Lon":'8.7570742','Name':'Rimbach Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':61,'URL':'https://www.hal-oever.de/webcam/schlastshut.jpg', 'Lat':'53.0749188',"Lon":'8.8016672','Name':'Bremen Werserpromenande', 'Personenzahl':None, 'Stand':None },
+               {'ID':62,'URL':'http://fischmarkt.no-ip.biz/record/current.jpg', 'Lat':'53.5440922',"Lon":'9.9187187','Name':'Hamburg Fischmarkt', 'Personenzahl':None, 'Stand':None },               
+               {'ID':63,'URL':'https://www.vvo-online.de/img/webcamimages/marienbruecke-102.jpg', 'Lat':'51.0615957,',"Lon":'13.7320668','Name':'Dresden Marienbrücke', 'Personenzahl':None, 'Stand':None },
+               {'ID':64,'URL':'https://www.vvo-online.de/img/webcamimages/koenigsbruecker_strasse_richtung_sued-111.jpg', 'Lat':'51.0700056',"Lon":'13.74682','Name':'Dresden Königsbrücker Str.', 'Personenzahl':None, 'Stand':None },  
+               {'ID':65,'URL':'https://www.vvo-online.de/img/webcamimages/albertbruecke-135.jpg', 'Lat':'51.0571946',"Lon":'13.7523692','Name':'Dresden Albertbrücke', 'Personenzahl':None, 'Stand':None },  
+               {'ID':66,'URL':'https://www.vvo-online.de/img/webcamimages/bergstrasse-149.jpg', 'Lat':'51.0302823',"Lon":'13.7284321','Name':'Dresden Bergstraße', 'Personenzahl':None, 'Stand':None },  
+               {'ID':67,'URL':'http://webcam.wilhelma.de/webcam02/webcam02.jpg', 'Lat':'48.8041551',"Lon":'9.2058097','Name':'Stuttgart Wilhelma', 'Personenzahl':None, 'Stand':None }]
 
     pc = PeopleCounter(model_path)
 
