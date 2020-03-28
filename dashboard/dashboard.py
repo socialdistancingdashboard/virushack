@@ -28,8 +28,10 @@ def dashboard():
             state_ids.append(state["id"])
         return county_names, county_ids, state_names, state_ids
 
-    #@st.cache()
-    def load_real_data(id_to_name):
+    @st.cache(persist=True)
+    def load_real_data(id_to_name,dummy_time):
+        # dummy_time parameter changes twice daily. Otherwise, streamlit 
+        # would always return cached data
         response = requests.get('https://0he6m5aakd.execute-api.eu-central-1.amazonaws.com/prod')
         jsondump = response.json()["body"]
         
@@ -83,6 +85,7 @@ def dashboard():
     st.header("Das Social Distancing Dashboard")
     st_info_text       = st.empty()
     st_map_header      = st.empty()
+    st_legend = st.empty()
     st_map             = st.empty()
     st_timeline_header = st.empty()
     st_county_select   = st.empty()
@@ -94,8 +97,12 @@ def dashboard():
     # Insert custom CSS
     st.markdown("""
         <style type='text/css'>
+            .image-container {
+                width: 100%;
+            }
             img {
                 max-width: 100%;
+                margin:auto;
             }
             div.stVegaLiteChart, fullScreenFrame {
                 width:100%;
@@ -110,7 +117,8 @@ def dashboard():
     state_name_to_id = {state_names[idx]:cid for idx,cid in enumerate(state_ids)}
     
     # get score data
-    df_scores_full, scorenames = load_real_data(id_to_name)
+    dummy_time = datetime.datetime.now().strftime("%Y-%m-%d-%p") # 2020-03-28-PM, changes twice daily
+    df_scores_full, scorenames = load_real_data(id_to_name,dummy_time)
     df_scores = df_scores_full.copy()
     
     # build sidebar
@@ -201,6 +209,7 @@ def dashboard():
     df_scores = df_scores.round(1)
 
     germany_average = np.mean(df_scores[df_scores["date"] == str(latest_date)][selected_score])
+
     st_info_text.markdown('''
         In der Karte siehst Du wie sich Social Distancing auf die verschiedenen **{regionen}** in Deutschland auswirkt. Wir nutzen Daten über **{datasource}** (Du kannst die Datenquelle links im Menü ändern) um zu berechnen, wie gut Social Distancing aktuell funktioniert. Ein Wert von **100% entspricht dem Normal-Wert vor der Covid-Pandemie**, also bevor die Bürger zu Social Distancing aufgerufen wurden. Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung des Verkehrsaufkommen gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist. **Weniger ist besser!**
     '''.format(regionen=use_states_select,datasource=selected_score_desc)
@@ -218,7 +227,8 @@ def dashboard():
     MAPHEIGHT = 600
     basemap = alt.Chart(data_topojson_remote).mark_geoshape(
             fill='lightgray',
-            stroke='white'
+            stroke='white',
+            strokeWidth=0.5
         ).properties(width='container',height = MAPHEIGHT)
     selected_score_axis_percent = selected_score_axis + ' (%)'
     if use_states:
@@ -236,7 +246,7 @@ def dashboard():
         layer = alt.Chart(data_topojson_remote).mark_geoshape(
             stroke='white'
         ).encode(
-            color=alt.Color(selected_score+':Q', title=selected_score_axis_percent, scale=alt.Scale(domain=(200, 0),scheme='redyellowgreen')),
+            color=alt.Color(selected_score+':Q', title=selected_score_axis_percent, scale=alt.Scale(domain=(200, 0),scheme='redyellowgreen'),legend=None),
             tooltip=[alt.Tooltip("state_name:N", title="Bundesland"),alt.Tooltip(selected_score+":Q", title=selected_score_axis_percent)]
         ).transform_lookup(
             lookup='id',
@@ -275,9 +285,8 @@ def dashboard():
 
     # draw timelines
     st_timeline_header.subheader("Zeitlicher Verlauf")
-    df_scores[df_scores["name"].isin(countys)][["name", "date", "filtered_score"]].dropna()
     if len(countys) > 0 and not use_states:
-        
+        df_scores[df_scores["name"].isin(countys)][["name", "date", "filtered_score"]].dropna()
         st_timeline.altair_chart(alt.Chart(
             df_scores[df_scores["name"].isin(countys)][["name", "date", "filtered_score"]].dropna()).mark_line(point=True).encode(
             x=alt.X('date:T', axis=alt.Axis(title='Datum', format=("%d %b"))),
@@ -293,11 +302,13 @@ def dashboard():
             height=400
         ))
     elif use_states:
+        df_states=df_states[["state_name", "date", selected_score]].dropna()
         st_timeline.altair_chart(alt.Chart(
             df_states).mark_line(point=True).encode(
             x=alt.X('date:T', axis=alt.Axis(title='Datum', format=("%d %b"))),
             y=alt.Y(selected_score+':Q', title=selected_score_axis_percent),
             color=alt.Color('state_name', title="Bundesland", scale=alt.Scale(scheme='category20')),
+            
             tooltip=[
                 alt.Tooltip("state_name:N", title="Bundesland"),
                 alt.Tooltip(selected_score+":Q", title=selected_score_axis_percent),
