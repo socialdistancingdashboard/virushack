@@ -91,6 +91,18 @@ def dashboard():
     st_footer_title    = st.empty()
     st_footer          = st.empty()
     
+    # Insert custom CSS
+    st.markdown("""
+        <style type='text/css'>
+            img {
+                max-width: 100%;
+            }
+            div.stVegaLiteChart, fullScreenFrame {
+                width:100%;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+    
     # get counties
     county_names, county_ids, state_names, state_ids = load_topojson()
     id_to_name = {cid:county_names[idx] for idx,cid in enumerate(county_ids)}
@@ -103,7 +115,7 @@ def dashboard():
     
     # build sidebar
     st.sidebar.subheader("Datenauswahl")
-    use_states_select = st.sidebar.selectbox('Detailgrad:', ('Landkreise', 'Bundesländer'))
+    use_states_select = st.sidebar.selectbox('Detailgrad:', ('Bundesländer', 'Landkreise'))
     use_states = use_states_select == 'Bundesländer'
     
     # descriptive names for each score
@@ -190,7 +202,7 @@ def dashboard():
 
     germany_average = np.mean(df_scores[df_scores["date"] == str(latest_date)][selected_score])
     st_info_text.markdown('''
-        In der Karte siehst Du wie sich Social Distancing auf die verschiedenen **{regionen}** in Deutschland auswirkt. Wir nutzen Daten über **{datasource}** (Du kannst die Datenquelle links im Menü ändern) um ein Maß zu berechnen, wie gut Social Distancing aktuell funktioniert. Ein Wert von 1 entspricht dem Normal-Wert vor der Covid-Pandemie, also bevor die Bürger zu Social Distancing aufgerufen wurden. Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung des Verkehrsaufkommen gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist.
+        In der Karte siehst Du wie sich Social Distancing auf die verschiedenen **{regionen}** in Deutschland auswirkt. Wir nutzen Daten über **{datasource}** (Du kannst die Datenquelle links im Menü ändern) um zu berechnen, wie gut Social Distancing aktuell funktioniert. Ein Wert von **100% entspricht dem Normal-Wert vor der Covid-Pandemie**, also bevor die Bürger zu Social Distancing aufgerufen wurden. Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung des Verkehrsaufkommen gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist. **Weniger ist besser!**
     '''.format(regionen=use_states_select,datasource=selected_score_desc)
     )
     #st.write("Zum Vergleich - die durchschnittliche Soziale Distanz am {} in Deutschland: {:.2f}".format(latest_date,germany_average))
@@ -203,10 +215,11 @@ def dashboard():
         features = 'counties'
     url_topojson = 'https://raw.githubusercontent.com/AliceWi/TopoJSON-Germany/master/germany.json'
     data_topojson_remote = alt.topo_feature(url=url_topojson, feature=features)
+    MAPHEIGHT = 600
     basemap = alt.Chart(data_topojson_remote).mark_geoshape(
             fill='lightgray',
             stroke='white'
-        ).properties(width=750,height = 1000)
+        ).properties(width='container',height = MAPHEIGHT)
     selected_score_axis_percent = selected_score_axis + ' (%)'
     if use_states:
         # aggregate state data
@@ -231,7 +244,7 @@ def dashboard():
         ).transform_lookup(
             lookup='id',
             from_= alt.LookupData(df_states[(df_states["date"] == str(latest_date)) & (df_states[selected_score] > 0)], 'id', ['state_name'])
-        ).properties(width=750,height = 1000)
+        ).properties(width='container',height = MAPHEIGHT)
 
         c = alt.layer(basemap, layer).configure_view(
             strokeOpacity=0
@@ -253,7 +266,7 @@ def dashboard():
         ).transform_lookup(
             lookup='id',
             from_= alt.LookupData(df_scores_lookup, 'id', ['name'])
-        ).properties(width=750,height = 1000)
+        ).properties(width='container',height = MAPHEIGHT)
 
         c = alt.layer(basemap, layer).configure_view(
             strokeOpacity=0
@@ -276,7 +289,7 @@ def dashboard():
                 alt.Tooltip("date:T", title="Datum"),
                 ]
         ).properties(
-            width=750,
+            width='container',
             height=400
         ))
     elif use_states:
@@ -291,7 +304,7 @@ def dashboard():
                 alt.Tooltip("date:T", title="Datum"),
                 ]
         ).properties(
-            width=750,
+            width='container',
             height=400
         ))
     else:
@@ -301,10 +314,5 @@ def dashboard():
     
     st_footer_title.subheader("Unsere Datenquellen")
     st_footer.markdown("""
-        <style type='text/css'>
-            img {
-                max-width: 100%;
-            }
-        </style>
         ![](https://github.com/socialdistancingdashboard/virushack/raw/master/logo/Datenquellen.PNG)
-    """, unsafe_allow_html=True)
+    """)
