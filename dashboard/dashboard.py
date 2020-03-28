@@ -195,7 +195,6 @@ def dashboard():
 
     st_map_header.subheader('Social Distancing Karte vom {}'.format(latest_date))
     
-    
     if use_states:
         features = 'states'
     else:
@@ -228,7 +227,7 @@ def dashboard():
             from_= alt.LookupData(df_states[(df_states["date"] < str(latest_date)) & (df_states[selected_score] > 0)], 'id', [selected_score])
         ).transform_lookup(
             lookup='id',
-            from_= alt.LookupData(df_states, 'id', ['state_name'])
+            from_= alt.LookupData(df_states[(df_states["date"] < str(latest_date)) & (df_states[selected_score] > 0)], 'id', ['state_name'])
         ).properties(width=750,height = 1000)
 
         c = alt.layer(basemap, layer).configure_view(
@@ -247,7 +246,7 @@ def dashboard():
             from_= alt.LookupData(df_scores[(df_scores["date"] < str(latest_date)) & (df_scores["filtered_score"] > 0)], 'id', ['filtered_score'])
         ).transform_lookup(
             lookup='id',
-            from_= alt.LookupData(df_scores, 'id', ['name'])
+            from_= alt.LookupData(df_scores[(df_scores["date"] < str(latest_date)) & (df_scores["filtered_score"] > 0)], 'id', ['name'])
         ).properties(width=750,height = 1000)
 
         c = alt.layer(basemap, layer).configure_view(
