@@ -10,7 +10,7 @@ data = pd.DataFrame()
 for id in tqdm(place_ids):
     #print(id)
     params = {
-        "key": "AIzaSyDfH8y7gMIzRhrsaeM7f-caHfFpxHwFfKo",
+        "key": "",
         "place_id": id,
         "fields": ",".join(["place_id","address_component","name"])
     }

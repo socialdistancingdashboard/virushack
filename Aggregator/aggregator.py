@@ -9,7 +9,7 @@ from agg_zugdaten import aggregate as agg_zugdaten
 from agg_fahrrad import aggregate as agg_fahrrad
 from agg_airquality import aggregate as agg_airquality
 from agg_lemgo_digital import aggregate as agg_lemgo_digital
-from agg_tomtom import aggregate as agg_tomtomgit
+from agg_tomtom import aggregate as agg_tomtom
 import json
 
 #How far back do you want to aggregate data?
@@ -28,6 +28,7 @@ for x in range(0,days):
         list_result = list_result.join(lemgo_digital_list, how="outer")
     except Exception as e:
         print(e)
+
     try:
         gmapscore_list = pd.DataFrame(agg_gmap_transit_score(date))
         gmapscore_list = gmapscore_list.set_index('landkreis')
@@ -75,13 +76,13 @@ for x in range(0,days):
         print("Error Fahrrad")
         print(e)
 
-    try:
-        airquality_list = pd.DataFrame(agg_airquality(date))
-        airquality_list = airquality_list.set_index('landkreis')
-        list_result = list_result.join(airquality_list, how="outer")
-    except Exception as e:
-        print("Error Airquality")
-        print(e)
+    # try:
+    #     airquality_list = pd.DataFrame(agg_airquality(date))
+    #     airquality_list = airquality_list.set_index('landkreis')
+    #     list_result = list_result.join(airquality_list, how="outer")
+    # except Exception as e:
+    #     print("Error Airquality")
+    #     print(e)
 
     try:
         tomtom_list = pd.DataFrame(agg_tomtom(date))
@@ -94,8 +95,9 @@ for x in range(0,days):
     list_result["date"] = str(date)
     list_result.to_csv("test.csv")
 
+    list_result
     dict = list_result.T.to_dict()
-
+    dict
     # s3_client.put_object(Bucket='sdd-s3-basebucket', Key="aggdata/live", Body=json.dumps(dict))
     response = s3_client.put_object(Bucket='sdd-s3-basebucket', Key='aggdata/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2),
                                                                   str(date.day).zfill(2)), Body=json.dumps(dict))

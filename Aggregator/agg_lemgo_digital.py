@@ -36,8 +36,8 @@ def aggregate(date):
                                            Prefix='lemgo-digital/{}/{}/{}/'.format(str(date.year).zfill(4),
                                                                                    str(date.month).zfill(2),
                                                                                    str(date.day).zfill(2)))
-    if 'Contents' not in s3_objects:
-        return []
+    # if 'Contents' not in s3_objects:
+    #     return []
 
     print("Found " + str(len(s3_objects['Contents'])) + " elements")
     dict_s3_objects = {}
@@ -60,14 +60,14 @@ def aggregate(date):
     aggregated_value.reset_index()
     aggregated_value['lemgoDigitalAggregated'] = 0.3 * aggregated_value['relativTraffic'] + 0.7 * aggregated_value[
         'relativPasserby']
-
+    aggregated_value['lemgoDigitalAggregated']
     list_results = []
     date_minus_one = date - timedelta(days=1)
-    # aggregated_value_for_day = aggregated_value.loc[aggregated_value['timestamp'] == str(date_minus_one)]
+    aggregated_value_for_day = aggregated_value.loc[aggregated_value['timestamp'] == str(date)]
     data_index = {
-        'landkreis': 'Lemgo',
-        'timestamp': aggregated_value['timestamp'],
-        'lemgoDigitalAggregated': aggregated_value['lemgoDigitalAggregated']
+        'landkreis': '05766',
+        #'timestamp': aggregated_value['timestamp'],
+        'lemgoDigitalAggregated': aggregated_value_for_day['lemgoDigitalAggregated']
     }
     list_results.append(data_index)
 
