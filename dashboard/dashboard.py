@@ -28,7 +28,7 @@ def dashboard():
             state_ids.append(state["id"])
         return county_names, county_ids, state_names, state_ids
 
-    @st.cache()
+    #@st.cache()
     def load_real_data(id_to_name):
         response = requests.get('https://0he6m5aakd.execute-api.eu-central-1.amazonaws.com/prod')
         jsondump = response.json()["body"]
