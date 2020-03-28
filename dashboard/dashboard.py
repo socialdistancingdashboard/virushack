@@ -28,8 +28,10 @@ def dashboard():
             state_ids.append(state["id"])
         return county_names, county_ids, state_names, state_ids
 
-    #@st.cache()
-    def load_real_data(id_to_name):
+    @st.cache(persist=True)
+    def load_real_data(id_to_name,dummy_time):
+        # dummy_time parameter changes twice daily. Otherwise, streamlit 
+        # would always return cached data
         response = requests.get('https://0he6m5aakd.execute-api.eu-central-1.amazonaws.com/prod')
         jsondump = response.json()["body"]
         
@@ -115,7 +117,8 @@ def dashboard():
     state_name_to_id = {state_names[idx]:cid for idx,cid in enumerate(state_ids)}
     
     # get score data
-    df_scores_full, scorenames = load_real_data(id_to_name)
+    dummy_time = datetime.datetime.now().strftime("%Y-%m-%d-%p") # 2020-03-28-PM, changes twice daily
+    df_scores_full, scorenames = load_real_data(id_to_name,dummy_time)
     df_scores = df_scores_full.copy()
     
     # build sidebar
