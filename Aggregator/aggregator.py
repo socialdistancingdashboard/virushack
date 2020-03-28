@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import date, timedelta
 from agg_webcam import aggregate as agg_webcam
 from agg_hystreet import aggregate as agg_hystreet
+from agg_gmap_supermarket_score import aggregate as agg_gmap_supermarket_score
 from agg_gmap_transit_score import aggregate as agg_gmap_transit_score
 from agg_zugdaten import aggregate as agg_zugdaten
 from agg_fahrrad import aggregate as agg_fahrrad
@@ -11,12 +12,12 @@ from agg_tomtom import aggregate as agg_tomtom
 import json
 
 #How far back do you want to aggregate data?
-days = 10
+days = 4
 
 s3_client = boto3.client('s3')
-for x in range(0,10):
-    print(x)
+for x in range(0,days):
     date = date.today() - timedelta(days = x)
+    print(date)
     list_result = pd.DataFrame(columns = ['landkreis'])
     list_result = list_result.set_index("landkreis")
 
@@ -25,6 +26,15 @@ for x in range(0,10):
         gmapscore_list = gmapscore_list.set_index('landkreis')
         list_result = list_result.join(gmapscore_list, how = "outer")
     except Exception as e:
+        print("Error GMAP:")
+        print(e)
+
+    try:
+        gmapscore_supermarket_list = pd.DataFrame(agg_gmap_supermarket_score(date))
+        gmapscore_supermarket_list = gmapscore_supermarket_list.set_index('landkreis')
+        list_result = list_result.join(gmapscore_supermarket_list, how = "outer")
+    except Exception as e:
+        print("Error GMAP Super")
         print(e)
 
     try:
@@ -32,6 +42,7 @@ for x in range(0,10):
         webcam_list = webcam_list.set_index('landkreis')
         list_result = list_result.join(webcam_list, how = "outer")
     except Exception as e:
+        print("Error Webcam")
         print(e)
 
     try:
@@ -39,6 +50,7 @@ for x in range(0,10):
         hystreet_list = hystreet_list.set_index('landkreis')
         list_result = list_result.join(hystreet_list, how = "outer")
     except Exception as e:
+        print("Error Hystreet")
         print(e)
 
     try:
@@ -46,6 +58,7 @@ for x in range(0,10):
         zugdaten_list = zugdaten_list.set_index('landkreis')
         list_result = list_result.join(zugdaten_list, how="outer")
     except Exception as e:
+        print("Error Zugdaten")
         print(e)
 
     try:
@@ -53,6 +66,7 @@ for x in range(0,10):
         fahrrad_list = fahrrad_list.set_index('landkreis')
         list_result = list_result.join(fahrrad_list, how="outer")
     except Exception as e:
+        print("Error Fahrrad")
         print(e)
 
     try:
@@ -60,6 +74,7 @@ for x in range(0,10):
         airquality_list = airquality_list.set_index('landkreis')
         list_result = list_result.join(airquality_list, how="outer")
     except Exception as e:
+        print("Error Airquality")
         print(e)
 
     try:
@@ -67,6 +82,7 @@ for x in range(0,10):
         tomtom_list = tomtom_list.set_index('landkreis')
         list_result = list_result.join(tomtom_list, how="outer")
     except Exception as e:
+        print("Error Tomtom")
         print(e)
 
     list_result["date"] = str(date)
@@ -75,7 +91,6 @@ for x in range(0,10):
     dict = list_result.T.to_dict()
 
     # s3_client.put_object(Bucket='sdd-s3-basebucket', Key="aggdata/live", Body=json.dumps(dict))
-    response = s3_client.put_object(Bucket='sdd-s3-basebucket',
-                                    Key='aggdata/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2),
+    response = s3_client.put_object(Bucket='sdd-s3-basebucket', Key='aggdata/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2),
                                                                   str(date.day).zfill(2)), Body=json.dumps(dict))
     print(response)

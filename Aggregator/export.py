@@ -11,7 +11,7 @@ params = {"min_date": str(min_date), "max_date": str(max_date), "data_sources":"
 response = requests.get('https://f3fp7p5z00.execute-api.eu-central-1.amazonaws.com/test/sdd-lambda-request',params = params)
 response.json()
 data = pd.DataFrame()
-for day, data_day in response.json()["body"].items():
+for day, data_day in json.loads(response.json()["body"])["body"].items():
     # if day == "2020-03-23":
     #     continue
     daily_data = pd.DataFrame.from_dict(data_day, orient='index')
@@ -30,7 +30,7 @@ data.columns
 # 'webcam_score': How many people are visible on webcams in public places divided by 2.4 (->we dont have a "normal" value here so we use 1/highscore median)
 
 data.replace(np.inf, np.nan, inplace=True)
-data.loc[data["hystreet_score"].notna()]["date"].unique()
+data.loc[data["hystreet_score"].notna()]["date"].value_counts()
 aggregate = data.groupby("date")[['bike_score', 'bus_score', 'gmap_score', 'hystreet_score', 'nationalExpress_score', 'national_score', 'regional_score','suburban_score', 'webcam_score', 'zug_score']].mean()
 pd.DataFrame(aggregate).to_csv("aggregate.csv")
 data.to_csv("export.csv")

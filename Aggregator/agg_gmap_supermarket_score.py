@@ -15,14 +15,13 @@ def aggregate(date):
 
     for x in range(9,19):
         try:
-            response = s3_client.get_object(Bucket='sdd-s3-basebucket', Key='googleplaces/{}/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2), str(date.day).zfill(2), str(x).zfill(2)))
+            response = s3_client.get_object(Bucket='sdd-s3-basebucket', Key='googleplaces_supermarket/{}/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2), str(date.day).zfill(2), str(x).zfill(2)))
             result = pd.DataFrame(json.loads(response["Body"].read()))
             result["date"] = date
             result["hour"] = x
             data = data.append(result)
-        except Exception as e:
-            print("No gmap data for " + str(date) + " " + e)
-            return
+        except:
+            pass
 
     def normal_popularity(row):
         return row["populartimes"][row["date"].weekday()]["data"][row["hour"]]
@@ -76,18 +75,7 @@ def aggregate(date):
             "landkreis": landkreis,
             # todo time from request
             #'date': str(date),
-            'gmap_score' : relative_popularity
-             #"airquality_score" : airquality_score
-             #'hystreet_score' : hystreet_score
-             # 'cycle_score' : cycle_score
-        }
-        data_index2 = {
-            'landkreis': landkreis,
-            "lon" : lon,
-            "lat" : lat,
-            # todo time from request
-            'date': str(date),
-            'gmap_transit_score' : relative_popularity
+            'gmap_supermarket_score' : relative_popularity
              #"airquality_score" : airquality_score
              #'hystreet_score' : hystreet_score
              # 'cycle_score' : cycle_score

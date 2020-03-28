@@ -7,12 +7,12 @@ from tqdm import tqdm
 import json
 
 s3_client = boto3.client('s3')
-
-cities = pd.read_csv("staedte_koordinaten_ueber_50k.CSV", sep = ";")
+response = s3_client.get_object(Bucket="sdd-s3-basebucket", Key="codebuild-tomtom/staedte_koordinaten_ueber_50k.CSV")
+cities = pd.read_csv(response["Body"], sep = ";")
 cities
 errors = []
 result = pd.DataFrame()
-for x, row in tqdm(cities.iterrows()[:50], total=50):
+for x, row in tqdm(cities[:50].iterrows(), total=50):
     time.sleep(1)
     #print(row)
     try:

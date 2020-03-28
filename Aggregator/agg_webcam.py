@@ -26,7 +26,7 @@ def aggregate(date):
     result = result.reset_index()
     list_results = []
     #print(result["personenzahl"])
-    result["personenzahl"] = result[["personenzahl"]] / 2.4
+    #result["personenzahl"] = result[["personenzahl"]] / 2.4
     #print(result["personenzahl"])
     for index, row in result.iterrows():
         landkreis = row['ags']

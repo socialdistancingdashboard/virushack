@@ -127,10 +127,13 @@ if __name__ == '__main__':
     pc = PeopleCounter(model_path)
 
     for cam in webcams:
-        pc.get_image(cam['URL'])
-        cam['Personenzahl'] = pc.count_people(verbose=False)
-        cam['Stand'] = datetime.now().strftime("%Y-%m-%d %H:%M")
-        print(cam["Name"]+" :"+str(cam["Personenzahl"]))
+        try:
+            pc.get_image(cam['URL'])
+            cam['Personenzahl'] = pc.count_people(verbose=False)
+            cam['Stand'] = datetime.now().strftime("%Y-%m-%d %H:%M")
+            print(cam["Name"]+" :"+str(cam["Personenzahl"]))
+        except:
+            pass
 
     client_s3 = boto3.client("s3" )
 

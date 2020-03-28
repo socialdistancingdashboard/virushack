@@ -2,6 +2,7 @@ import json
 from datetime import date
 import boto3
 import pandas as pd
+from pandas.io.json import json_normalize
 
 #date = date.today()
 
@@ -22,7 +23,7 @@ def aggregate(date):
     for key in s3_objects['Contents']:
         airqualityObject = s3_client.get_object(Bucket='sdd-s3-basebucket', Key=key['Key'])
         object_body = str(airqualityObject["Body"].read(), 'utf-8')
-        airquality_json = pd.json_normalize(json.loads(object_body))
+        airquality_json = json_normalize(json.loads(object_body))
 
         object_list.append(pd.DataFrame(airquality_json))
 
@@ -39,7 +40,6 @@ def aggregate(date):
         data_index = {
             'landkreis': landkreis,
             'airquality_score': airquality
-
         }
         list_results.append(data_index)
     return list_results

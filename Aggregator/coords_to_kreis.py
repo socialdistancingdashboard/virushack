@@ -24,7 +24,10 @@ Converts all lon lat columns in a dataframe into a Series of AGS (Landkreis) Dat
 
 def coords_convert(df):
     def coord_to_point(x):
-        return Point(float(x["lon"]), float(x["lat"]))
+        try:
+            return Point(float(x["lon"]), float(x["lat"]))
+        except:
+            return None
     df["geometry"] = df.apply(coord_to_point, axis = 1)
     df = geopandas.GeoDataFrame(df, geometry="geometry")
     df = geopandas.sjoin(df, countries, how="left", op='intersects')

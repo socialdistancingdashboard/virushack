@@ -11,14 +11,14 @@ df = pd.DataFrame(columns=['timestamp', 'station_id', 'pedestrians_count',
                            'unverified', 'weather_condition', 'temperature', 'min_temperature'])
 
 headers = {'Content-Type': 'application/json',
-           'X-API-Token': os.getenv('HYSTREET_TOKEN')}
+           'X-API-Token': "dWfpGRD3aBNocEbZNdLrhRDe"}
 res = requests.get('https://hystreet.com/api/locations/', headers=headers)
 locations = res.json()
 
 # Crawl data
 for location in locations:
     current_date = datetime.now()
-    form_date = (current_date - timedelta(days=2)).strftime("%Y-%m-%d")
+    form_date = (current_date - timedelta(days=4)).strftime("%Y-%m-%d")
     to_date = current_date.strftime("%Y-%m-%d")
     res = requests.get('https://hystreet.com/api/locations/' +
                        str(location['id'])+'?resolution=day&from='+form_date+'&to='+to_date, headers=headers)

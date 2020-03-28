@@ -61,7 +61,7 @@ def read_data_csv(file, encoding = "UTF-8", sep = ","):
     with open("place_ids/missing_ids.csv") as f:
          id_list = [key.strip() for key in f.readlines()]
     #id_list = []
-    for index , row in tqdm(places[43:].iterrows()):
+    for index , row in tqdm(places[65:].iterrows()):
         print(row[0])
         time.sleep(5)
         id_list = id_list + filter_popularity_available(get_all_places(row[1],row[2], 2000))
@@ -71,3 +71,4 @@ def read_data_csv(file, encoding = "UTF-8", sep = ","):
 #"Weißenburg"
 
 read_data_csv("missing.csv")
+#populartimes.get_id(api_key, "ChIJnc3vbEgJvUcRxGJfy-eGHW8")
