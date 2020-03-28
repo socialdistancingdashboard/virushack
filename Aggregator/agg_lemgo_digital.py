@@ -67,7 +67,7 @@ def aggregate(date):
     data_index = {
         'landkreis': '05766',
         #'timestamp': aggregated_value['timestamp'],
-        'lemgoDigitalAggregated': aggregated_value_for_day['lemgoDigitalAggregated']
+        'lemgoDigitalAggregated': aggregated_value_for_day['lemgoDigitalAggregated'].iloc[0]
     }
     list_results.append(data_index)
 
