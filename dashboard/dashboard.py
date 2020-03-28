@@ -85,7 +85,7 @@ def dashboard():
     st.header("Das Social Distancing Dashboard")
     st_info_text       = st.empty()
     st_map_header      = st.empty()
-    st_legend = st.empty()
+    st_legend          = st.empty()
     st_map             = st.empty()
     st_timeline_header = st.empty()
     st_county_select   = st.empty()
@@ -175,7 +175,7 @@ def dashboard():
     # data source selector
     selected_score_desc = st.sidebar.selectbox(
         'Datenquelle:', sorted(list(scorenames_desc.values())), 
-        index = 1
+        index = 1 # default value in sorted list
         )
     selected_score = inverse_scorenames_desc[selected_score_desc]
     selected_score_axis = scorenames_axis[selected_score]
@@ -217,7 +217,10 @@ def dashboard():
     #st.write("Zum Vergleich - die durchschnittliche Soziale Distanz am {} in Deutschland: {:.2f}".format(latest_date,germany_average))
 
     st_map_header.subheader('Social Distancing Karte vom {}'.format(latest_date))
-    
+    st_legend.markdown("""
+        ![Legende](https://github.com/socialdistancingdashboard/virushack/raw/master/dashboard/legende.png)
+    """)
+    st_legend.image("https://github.com/socialdistancingdashboard/virushack/raw/master/dashboard/legende.png") 
     if use_states:
         features = 'states'
     else:
@@ -268,7 +271,7 @@ def dashboard():
         layer = alt.Chart(data_topojson_remote).mark_geoshape(
             stroke='white'
         ).encode(
-            color=alt.Color('filtered_score:Q', title=selected_score_axis_percent, scale=alt.Scale(domain=(200, 0),scheme='redyellowgreen')),
+            color=alt.Color('filtered_score:Q', title=selected_score_axis_percent, scale=alt.Scale(domain=(200, 0),scheme='redyellowgreen'),legend=None),
             tooltip=[alt.Tooltip("name:N", title="Kreis"),alt.Tooltip("filtered_score:Q", title=selected_score_axis_percent)]
         ).transform_lookup(
             lookup='id',
