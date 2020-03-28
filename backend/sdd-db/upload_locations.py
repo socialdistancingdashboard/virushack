@@ -17,7 +17,7 @@ from shapely.geometry import Point
 import pymysql 
 from sqlalchemy import create_engine
 
-config = json.load(open("sdd-db.conf", "r"))
+config = json.load(open("../../credentials/credentials-aws-db.json", "r"))
 
 engine = create_engine(
   ("mysql+pymysql://" +
@@ -38,7 +38,7 @@ countries = geopandas.GeoDataFrame.from_file(
   driver="TopoJSON")
 # clean unnecessary columns
 countries = countries[["id", "name", "districtType", "state", "geometry"]]
-countries.columns = ["landkreis_id", "landkreis", "landkreis_type", "state", "geometry"]
+countries.columns = ["district_id", "district", "district_type", "state", "geometry"]
 
 countries["lat"] = countries.geometry.apply(lambda x: x.centroid.y)
 countries["lon"] = countries.geometry.apply(lambda x: x.centroid.x)

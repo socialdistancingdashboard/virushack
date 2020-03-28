@@ -8,11 +8,11 @@ import json
 
 s3_client = boto3.client('s3')
 
-cities = pd.read_csv("staedte_koordinaten_ueber_20k.CSV", sep = ";")
+cities = pd.read_csv("staedte_koordinaten_ueber_50k.CSV", sep = ";")
 cities
 errors = []
 result = pd.DataFrame()
-for x, row in tqdm(cities.iterrows(), total=cities.shape[0]):
+for x, row in tqdm(cities.iterrows()[:50], total=50):
     time.sleep(1)
     #print(row)
     try:

@@ -56,16 +56,18 @@ def filter_popularity_available(place_ids):
 
 def read_data_csv(file, encoding = "UTF-8", sep = ","):
     places = pd.read_csv(file, encoding = encoding, sep = sep, names = ["city", "lat", "long"], header = 0)
-    print(places.head())
-    print(places.shape)
-    # with open("place_ids/staedte_koordinaten_ueber_50k_ids.csv") as f:
-    #     id_list = [key.strip() for key in f.readlines()]
-    id_list = []
-    for index , row in tqdm(places.iterrows()):
+    #print(places.head())
+    #print(places.shape)
+    with open("place_ids/missing_ids.csv") as f:
+         id_list = [key.strip() for key in f.readlines()]
+    #id_list = []
+    for index , row in tqdm(places[43:].iterrows()):
         print(row[0])
+        time.sleep(5)
         id_list = id_list + filter_popularity_available(get_all_places(row[1],row[2], 2000))
         print(len(id_list))
         pd.DataFrame(id_list).to_csv("place_ids/" + str(file.split(".")[0]) + "_ids.csv", index=False, header=False)
 
+#"Weißenburg"
 
-read_data_csv("staedte_koordinaten_ueber_50k.csv", sep = ";")
+read_data_csv("missing.csv")

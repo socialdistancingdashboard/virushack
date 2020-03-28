@@ -8,11 +8,14 @@ from agg_zugdaten import aggregate as agg_zugdaten
 from agg_fahrrad import aggregate as agg_fahrrad
 from agg_airquality import aggregate as agg_airquality
 from agg_lemgo_digital import aggregate as agg_lemgo_digital
+from agg_tomtom import aggregate as agg_tomtomgit
 import json
 
+#How far back do you want to aggregate data?
+days = 10
 
 s3_client = boto3.client('s3')
-for x in range(0,2):
+for x in range(0,10):
     print(x)
     date = date.today() - timedelta(days=x)
     list_result = pd.DataFrame(columns=['landkreis'])
@@ -65,8 +68,15 @@ for x in range(0,2):
     except Exception as e:
         print(e)
 
+    try:
+        tomtom_list = pd.DataFrame(agg_tomtom(date))
+        tomtom_list = tomtom_list.set_index('landkreis')
+        list_result = list_result.join(tomtom_list, how="outer")
+    except Exception as e:
+        print(e)
+
     list_result["date"] = str(date)
-    # list_result.to_csv("test.csv")
+    list_result.to_csv("test.csv")
 
     dict = list_result.T.to_dict()
 

@@ -122,15 +122,54 @@ if __name__ == '__main__':
                {'ID':30,'URL':'https://www.mvv.de/fileadmin/user_upload/Systemdateien/Webcam/current.jpg', 'Lat':'49.4840612',"Lon":'8.4733678','Name':'Mannheim Wasserturm', 'Personenzahl':None, 'Stand':None },
                {'ID':31,'URL':'https://www.theater-schwedt.de/ubs/cam/130/', 'Lat':'53.0617394',"Lon":'14.2838004','Name':'Schwedt Lindenallee', 'Personenzahl':None, 'Stand':None },
                {'ID':32,'URL':'https://webcam.stuttgart.de/wcam007/current.jpg', 'Lat':'48.7754909',"Lon":'9.1763283','Name':'Stuttgart Marktplatz', 'Personenzahl':None, 'Stand':None },
-               {'ID':33,'URL':'http://webcam.wilhelma.de/webcam02/webcam02.jpg', 'Lat':'48.8041551',"Lon":'9.2058097','Name':'Stuttgart Wilhelma', 'Personenzahl':None, 'Stand':None }]
+               {'ID':33,'URL':'http://gewerbeverein-adorf.de/Webcam/webcam.jpg', 'Lat':'50.320905',"Lon":'12.2520966','Name':'Adorf Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':34,'URL':'https://www.coswig.de/files/coswig/rathaus/webcam/webcam.jpg', 'Lat':'51.1271276',"Lon":'13.5782501','Name':'Coswig Hauptstrasse', 'Personenzahl':None, 'Stand':None },
+               {'ID':35,'URL':'https://ewerk.tv/lvb/LVBHBF/lvbhbf.jpg', 'Lat':'51.3447766',"Lon":'12.379377','Name':'Leipzig Hauptbahnhof', 'Personenzahl':None, 'Stand':None },
+               {'ID':35,'URL':'http://www1.mittweida.de/live/current.jpg', 'Lat':'50.9853543',"Lon":'12.9791249','Name':'Mittweida Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':36,'URL':'http://webcam.oelsnitz.de/jpg/image.jpg', 'Lat':'50.4156035',"Lon":'12.1696213','Name':'Oelsnitz Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':37,'URL':'http://www.ku-weit.eu/zittau/Gallery/cam_1.jpg', 'Lat':'50.8962152',"Lon":'14.8080447','Name':'Zittau Salzhaus', 'Personenzahl':None, 'Stand':None },
+               {'ID':38,'URL':'https://www.altenburg.eu//WebCam1/axis-cgi/jpg/image.cgi?resolution=640x480', 'Lat':'50.984929',"Lon":'12.4310653','Name':'Altenburg Markt', 'Personenzahl':None, 'Stand':None }, 
+               {'ID':39,'URL':'http://wovi95.ddns-instar.com:81/snapshot.jpg?user=gast&pwd=gast&Fri%20Mar%2027%202020%2010%3A15%3A01%20GMT+0100%20%28Mitteleurop%E4ische%20Normalzeit%29', 'Lat':'50.4474983',"Lon":'11.6380773','Name':'Bad Lobenstein Markt', 'Personenzahl':None, 'Stand':None }, 
+               {'ID':40,'URL':'https://www.erfurt.de/webcam/domplatz.jpg', 'Lat':'50.9772478',"Lon":'11.0218204','Name':'Erfurt Domplatz', 'Personenzahl':None, 'Stand':None },  
+               {'ID':41,'URL':'http://www.thueringer-webcams.de/kunden/mdr/weimar/livebild-pal.jpg', 'Lat':'50.9798182',"Lon":'11.3233716','Name':'Weimar Theaterplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':42,'URL':'http://www.aschersleben.de/webcams/Rathaus.jpeg', 'Lat':'48.6939552',"Lon":'9.1178365','Name':'Aschersleben Markt', 'Personenzahl':None, 'Stand':None },
+               {'ID':43,'URL':'https://www.gardelegen.de/webcam/webcam.jpg', 'Lat':'52.446933',"Lon":'11.4835116','Name':'Gardelegen Markt', 'Personenzahl':None, 'Stand':None },
+               {'ID':44,'URL':'http://swhcam2.evh.de/vhughsize.jpg', 'Lat':'51.4868011',"Lon":'11.9384423','Name':'Halle (Saale) Markt', 'Personenzahl':None, 'Stand':None },                
+               {'ID':45,'URL':'https://webcam.lutherstadt-eisleben.de/markt.jpg', 'Lat':'51.5282306',"Lon":'11.5452827','Name':'Lutherstadt Eisleben Markt', 'Personenzahl':None, 'Stand':None }, 
+               {'ID':46,'URL':'http://webcam.naumburg.de/camimage.jpg', 'Lat':'51.152475',"Lon":'11.8073854','Name':'Naumburg (Saale) Markt', 'Personenzahl':None, 'Stand':None },
+               {'ID':47,'URL':'https://www.hotelzumbaer.de/cam/image.jpg', 'Lat':'51.789',"Lon":'11.1392834','Name':'Quedlingburg Markt', 'Personenzahl':None, 'Stand':None },  
+               {'ID':48,'URL':'https://www.exempel.de/images/webcam/snapshot_current.jpg?', 'Lat':'52.5403281',"Lon":'11.9694902','Name':'Tangermünde Markt', 'Personenzahl':None, 'Stand':None }, 
+               {'ID':49,'URL':'https://www.ostseebad-ahrenshoop.de/webcam/ahrenshoop-strand.jpg', 'Lat':'54.3785813',"Lon":'12.4102697','Name':'Ahrenshoop Strand', 'Personenzahl':None, 'Stand':None }, 
+               {'ID':50,'URL':'http://www.nwm-net.de/markt/aktuellesbild.jpg', 'Lat':'53.8646453',"Lon":'11.1818843','Name':'Grevesmühlen Markt', 'Personenzahl':None, 'Stand':None },   
+               {'ID':51,'URL':'https://media.webdatendienst.de/webcam1_a.jpg', 'Lat':'53.9570837',"Lon":'14.1651142','Name':'Heringsdorf', 'Personenzahl':None, 'Stand':None },
+               {'ID':52,'URL':'http://usedomhafen.selfhost.eu:8080/cam_3.jpg', 'Lat':'53.8724447',"Lon":'13.915819','Name':'Usedom', 'Personenzahl':None, 'Stand':None },               
+               {'ID':53,'URL':'http://webcam.aichach.de/webaic.jpg', 'Lat':'48.4591603',"Lon":'11.1289321','Name':'Aichach Marktplatz', 'Personenzahl':None, 'Stand':None }, 
+               {'ID':54,'URL':'https://mzcam.kunden-mediamachine.de/markt/bild.jpg', 'Lat':'49.9986667',"Lon":'8.2721841','Name':'Mainz Dom', 'Personenzahl':None, 'Stand':None },  
+               {'ID':55,'URL':'http://www2.neustadt.eu/download/webcam/current.jpg', 'Lat':'49.3533866',"Lon":'8.1338495','Name':'Neustadt Weinstraße Marktplatz', 'Personenzahl':None, 'Stand':None },   
+               {'ID':56,'URL':'https://falken-webcam.worms.de/webcam/current.jpg', 'Lat':'49.6302144',"Lon":'8.3591628','Name':'Worms Marktplatz', 'Personenzahl':None, 'Stand':None }, 
+               {'ID':57,'URL':'https://www.bensheim.org/Webcams/images/webcams/current2.jpg', 'Lat':'49.6781939',"Lon":'8.6216948','Name':'Bensheim Fußgängerzone', 'Personenzahl':None, 'Stand':None },
+               {'ID':58,'URL':'https://www.bensheim.org/Webcams/images/webcams/current0.jpg', 'Lat':'49.680983',"Lon":'8.6207077','Name':'Bensheim Marktplatz', 'Personenzahl':None, 'Stand':None },               
+               {'ID':59,'URL':'http://www.safetec-cam.biz/images/webcam/standard/kaiserstrasse_friedberg.jpg', 'Lat':'50.3347517',"Lon":'8.750523','Name':'Friedberg Kaiserstrasse', 'Personenzahl':None, 'Stand':None },
+               {'ID':60,'URL':'http://www.webcam-rimbach.de/images/c1image_big.jpg', 'Lat':'49.623281',"Lon":'8.7570742','Name':'Rimbach Marktplatz', 'Personenzahl':None, 'Stand':None },
+               {'ID':61,'URL':'https://www.hal-oever.de/webcam/schlastshut.jpg', 'Lat':'53.0749188',"Lon":'8.8016672','Name':'Bremen Werserpromenande', 'Personenzahl':None, 'Stand':None },
+               {'ID':62,'URL':'http://fischmarkt.no-ip.biz/record/current.jpg', 'Lat':'53.5440922',"Lon":'9.9187187','Name':'Hamburg Fischmarkt', 'Personenzahl':None, 'Stand':None },               
+               {'ID':63,'URL':'https://www.vvo-online.de/img/webcamimages/marienbruecke-102.jpg', 'Lat':'51.0615957,',"Lon":'13.7320668','Name':'Dresden Marienbrücke', 'Personenzahl':None, 'Stand':None },
+               {'ID':64,'URL':'https://www.vvo-online.de/img/webcamimages/koenigsbruecker_strasse_richtung_sued-111.jpg', 'Lat':'51.0700056',"Lon":'13.74682','Name':'Dresden Königsbrücker Str.', 'Personenzahl':None, 'Stand':None },  
+               {'ID':65,'URL':'https://www.vvo-online.de/img/webcamimages/albertbruecke-135.jpg', 'Lat':'51.0571946',"Lon":'13.7523692','Name':'Dresden Albertbrücke', 'Personenzahl':None, 'Stand':None },  
+               {'ID':66,'URL':'https://www.vvo-online.de/img/webcamimages/bergstrasse-149.jpg', 'Lat':'51.0302823',"Lon":'13.7284321','Name':'Dresden Bergstraße', 'Personenzahl':None, 'Stand':None }, 
+               {'ID':67,'URL':'http://allthos.de/lions/dresden.jpg', 'Lat':'51.0564335',"Lon":'13.736906','Name':'Dresden Neustädter Elbufer', 'Personenzahl':None, 'Stand':None },  
+               {'ID':68,'URL':'http://webcam.wilhelma.de/webcam02/webcam02.jpg', 'Lat':'48.8041551',"Lon":'9.2058097','Name':'Stuttgart Wilhelma', 'Personenzahl':None, 'Stand':None }]
 
     pc = PeopleCounter(model_path)
 
     for cam in webcams:
-        pc.get_image(cam['URL'])
-        cam['Personenzahl'] = pc.count_people(verbose=False)
-        cam['Stand'] = datetime.now().strftime("%Y-%m-%d %H:%M")
-        print(cam["Name"]+" :"+str(cam["Personenzahl"]))
+        try:
+            pc.get_image(cam['URL'])
+            cam['Personenzahl'] = pc.count_people(verbose=False)
+            cam['Stand'] = datetime.now().strftime("%Y-%m-%d %H:%M")
+            print(cam["Name"]+" :"+str(cam["Personenzahl"]))
+        except:
+            pass
 
     client_s3 = boto3.client("s3" )
 

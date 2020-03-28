@@ -1,10 +1,4 @@
-import requests
-import re
-import json
-import time
-import boto3
-from datetime import datetime
-from bs4 import BeautifulSoup
-from selenium import webdriver
-
-geckodriver in Verzeichnis das in der PATH-Variable hinterlegt ist (kann auch Chrome sein, muss dann in parkhaeuser.py entsprechend angepasst werden)
+requests
+boto3
+bs4
+selenium

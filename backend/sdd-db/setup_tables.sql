@@ -2,12 +2,46 @@ DROP DATABASE IF EXISTS sdd;
 CREATE DATABASE sdd;
 USE sdd;
 
+/* contains holidays for each state */
+DROP TABLE IF EXISTS holidays;
+CREATE TABLE holidays (
+  id INT UNSIGNED auto_increment PRIMARY KEY,
+  state_id VARCHAR(3) NOT NULL,
+  dt DATETIME NOT NULL,
+  ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX(state_id),
+  INDEX(dt),
+  UNIQUE(state_id, dt)
+) CHARACTER SET utf8;
+
+/* contains weather information since 2007-01-01 */
+DROP TABLE IF EXISTS weather;
+CREATE TABLE weather (
+  id INT UNSIGNED auto_increment PRIMARY KEY,
+  temp DOUBLE NULL,
+  temp_min DOUBLE NULL,
+  temp_max DOUBLE NULL,
+  rainfall DOUBLE NULL,
+  snowfall DOUBLE NULL,
+  snowdepth DOUBLE NULL,
+  winddirection DOUBLE NULL,
+  windspeed DOUBLE NULL,
+  peakgust DOUBLE NULL,
+  sunshine DOUBLE NULL,
+  pressure DOUBLE NULL,
+  district_id VARCHAR(32) NOT NULL,
+  dt DATETIME NOT NULL,
+  ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX(district_id),
+  INDEX(dt)
+) CHARACTER SET utf8;
+
 /* Contains meta information for all amtliche Gemeindeschlüssel */
 DROP TABLE IF EXISTS locations;
 CREATE TABLE locations (
-  landkreis_id VARCHAR(5) PRIMARY KEY, /* landkreis_id */
-  landkreis VARCHAR(128) NOT NULL,
-  landkreis_type VARCHAR(128) NOT NULL,
+  district_id VARCHAR(5) PRIMARY KEY, /* district_id */
+  district VARCHAR(128) NOT NULL,
+  district_type VARCHAR(128) NOT NULL,
   state_id VARCHAR(32) NOT NULL, /* "BW" "B" etc */
   state VARCHAR(128) NOT NULL, /* "Baden-Württemberg" */
   country_id VARCHAR(32) NOT NULL, /* "DE" */
@@ -31,13 +65,17 @@ CREATE TABLE categories (
 DROP TABLE IF EXISTS scores_meta;
 CREATE TABLE scores_meta (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  landkreis_id VARCHAR(32) NOT NULL, /* regional identifier */
+  district_id VARCHAR(32) NOT NULL, /* regional identifier */
   category VARCHAR(64) NOT NULL, /* which source */
   meta TEXT NULL, /* stringified JSON dump with additional characteristics */
   description TEXT NULL, /* BHF Name, Webcam Standort, etc */
+  source_id VARCHAR(128), /* Dient dazu innerhalb eines districtes Quellen zu unterscheiden. Bspw. "Webcam Marktplatz" */
+  ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   INDEX(category),
-  INDEX(landkreis_id)
-);
+  INDEX(district_id),
+  UNIQUE(district_id, category, source_id) /* Meta Daten sind zeitunabhängig */
+) CHARACTER SET utf8;
+
 
 
 /* Contains the actual data */
@@ -46,14 +84,15 @@ CREATE TABLE  scores (
   id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
   dt DATETIME NOT NULL,
   score_value DOUBLE NOT NULL,
-  reference_value DOUBLE NULL,
-  category VARCHAR(32) NOT NULL,
-  landkreis_id VARCHAR(32) NOT NULL, /* regional identifier */
+  reference_value DOUBLE NULL DEFAULT 0, /* expceted value without corona */
+  category VARCHAR(64) NOT NULL,
+  district_id VARCHAR(32) NOT NULL, /* regional identifier */
   ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   meta_id INT UNSIGNED NOT NULL,
+  source_id VARCHAR(128) NOT NULL, /* allows to distinguish multiple sources within one district */
   INDEX(category),
   INDEX(dt),
-  INDEX(landkreis_id)
+  INDEX(district_id)
 ) CHARACTER SET utf8;
 
 
