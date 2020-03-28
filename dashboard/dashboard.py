@@ -91,6 +91,18 @@ def dashboard():
     st_footer_title    = st.empty()
     st_footer          = st.empty()
     
+    # Insert custom CSS
+    st.markdown("""
+        <style type='text/css'>
+            img {
+                max-width: 100%;
+            }
+            div.stVegaLiteChart, fullScreenFrame {
+                width:100%;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+    
     # get counties
     county_names, county_ids, state_names, state_ids = load_topojson()
     id_to_name = {cid:county_names[idx] for idx,cid in enumerate(county_ids)}
@@ -203,10 +215,11 @@ def dashboard():
         features = 'counties'
     url_topojson = 'https://raw.githubusercontent.com/AliceWi/TopoJSON-Germany/master/germany.json'
     data_topojson_remote = alt.topo_feature(url=url_topojson, feature=features)
+    MAPHEIGHT = 600
     basemap = alt.Chart(data_topojson_remote).mark_geoshape(
             fill='lightgray',
             stroke='white'
-        ).properties(width=750,height = 1000)
+        ).properties(width='container',height = MAPHEIGHT)
     selected_score_axis_percent = selected_score_axis + ' (%)'
     if use_states:
         # aggregate state data
@@ -231,7 +244,7 @@ def dashboard():
         ).transform_lookup(
             lookup='id',
             from_= alt.LookupData(df_states[(df_states["date"] == str(latest_date)) & (df_states[selected_score] > 0)], 'id', ['state_name'])
-        ).properties(width=750,height = 1000)
+        ).properties(width='container',height = MAPHEIGHT)
 
         c = alt.layer(basemap, layer).configure_view(
             strokeOpacity=0
@@ -253,7 +266,7 @@ def dashboard():
         ).transform_lookup(
             lookup='id',
             from_= alt.LookupData(df_scores_lookup, 'id', ['name'])
-        ).properties(width=750,height = 1000)
+        ).properties(width='container',height = MAPHEIGHT)
 
         c = alt.layer(basemap, layer).configure_view(
             strokeOpacity=0
@@ -276,7 +289,7 @@ def dashboard():
                 alt.Tooltip("date:T", title="Datum"),
                 ]
         ).properties(
-            width=750,
+            width='container',
             height=400
         ))
     elif use_states:
@@ -291,7 +304,7 @@ def dashboard():
                 alt.Tooltip("date:T", title="Datum"),
                 ]
         ).properties(
-            width=750,
+            width='container',
             height=400
         ))
     else:
@@ -301,10 +314,5 @@ def dashboard():
     
     st_footer_title.subheader("Unsere Datenquellen")
     st_footer.markdown("""
-        <style type='text/css'>
-            img {
-                max-width: 100%;
-            }
-        </style>
         ![](https://github.com/socialdistancingdashboard/virushack/raw/master/logo/Datenquellen.PNG)
-    """, unsafe_allow_html=True)
+    """)
