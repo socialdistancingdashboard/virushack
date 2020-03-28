@@ -194,7 +194,13 @@ def dashboard():
     if use_states:
         countys = []
     else:
-        countys = st_county_select.multiselect('Wähle Landkreise aus:',options = available_countys)
+        if len(available_countys) > 2:
+            # pick two random counties for inital plotting
+            idx = np.random.random_integers(0,len(available_countys),2)
+            default = [available_countys[i] for i in idx]
+        else:
+            default = []
+        countys = st_county_select.multiselect('Wähle Landkreise aus:',options = available_countys, default=default)
 
     #selected_date = st.sidebar.date_input('für den Zeitraum vom', datetime.date(2020,3,24))
     #end_date = st.sidebar.date_input('bis', datetime.date(2020,3,22))
