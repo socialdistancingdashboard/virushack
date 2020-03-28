@@ -103,7 +103,7 @@ def dashboard():
     
     # build sidebar
     st.sidebar.subheader("Datenauswahl")
-    use_states_select = st.sidebar.selectbox('Detailgrad:', ('Landkreise', 'Bundesländer'))
+    use_states_select = st.sidebar.selectbox('Detailgrad:', ('Bundesländer', 'Landkreise'))
     use_states = use_states_select == 'Bundesländer'
     
     # descriptive names for each score
@@ -190,7 +190,7 @@ def dashboard():
 
     germany_average = np.mean(df_scores[df_scores["date"] == str(latest_date)][selected_score])
     st_info_text.markdown('''
-        In der Karte siehst Du wie sich Social Distancing auf die verschiedenen **{regionen}** in Deutschland auswirkt. Wir nutzen Daten über **{datasource}** (Du kannst die Datenquelle links im Menü ändern) um ein Maß zu berechnen, wie gut Social Distancing aktuell funktioniert. Ein Wert von 1 entspricht dem Normal-Wert vor der Covid-Pandemie, also bevor die Bürger zu Social Distancing aufgerufen wurden. Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung des Verkehrsaufkommen gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist.
+        In der Karte siehst Du wie sich Social Distancing auf die verschiedenen **{regionen}** in Deutschland auswirkt. Wir nutzen Daten über **{datasource}** (Du kannst die Datenquelle links im Menü ändern) um zu berechnen, wie gut Social Distancing aktuell funktioniert. Ein Wert von **100% entspricht dem Normal-Wert vor der Covid-Pandemie**, also bevor die Bürger zu Social Distancing aufgerufen wurden. Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung des Verkehrsaufkommen gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist. **Weniger ist besser!**
     '''.format(regionen=use_states_select,datasource=selected_score_desc)
     )
     #st.write("Zum Vergleich - die durchschnittliche Soziale Distanz am {} in Deutschland: {:.2f}".format(latest_date,germany_average))
