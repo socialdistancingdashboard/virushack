@@ -8,7 +8,8 @@ from agg_gmap_transit_score import aggregate as agg_gmap_transit_score
 from agg_zugdaten import aggregate as agg_zugdaten
 from agg_fahrrad import aggregate as agg_fahrrad
 from agg_airquality import aggregate as agg_airquality
-from agg_tomtom import aggregate as agg_tomtom
+from agg_lemgo_digital import aggregate as agg_lemgo_digital
+from agg_tomtom import aggregate as agg_tomtomgit
 import json
 
 #How far back do you want to aggregate data?
@@ -22,9 +23,15 @@ for x in range(0,days):
     list_result = list_result.set_index("landkreis")
 
     try:
+        lemgo_digital_list = pd.DataFrame(agg_lemgo_digital(date))
+        lemgo_digital_list = lemgo_digital_list.set_index('landkreis')
+        list_result = list_result.join(lemgo_digital_list, how="outer")
+    except Exception as e:
+        print(e)
+    try:
         gmapscore_list = pd.DataFrame(agg_gmap_transit_score(date))
         gmapscore_list = gmapscore_list.set_index('landkreis')
-        list_result = list_result.join(gmapscore_list, how = "outer")
+        list_result = list_result.join(gmapscore_list, how="outer")
     except Exception as e:
         print("Error GMAP:")
         print(e)
@@ -36,11 +43,10 @@ for x in range(0,days):
     except Exception as e:
         print("Error GMAP Super")
         print(e)
-
     try:
         webcam_list = pd.DataFrame(agg_webcam(date))
         webcam_list = webcam_list.set_index('landkreis')
-        list_result = list_result.join(webcam_list, how = "outer")
+        list_result = list_result.join(webcam_list, how="outer")
     except Exception as e:
         print("Error Webcam")
         print(e)

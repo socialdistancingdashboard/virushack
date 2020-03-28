@@ -12,6 +12,6 @@ def about():
     """, unsafe_allow_html=True)
     st.markdown(response.text)
 
-def impressum():
-    st.write('Impressum')
-    pass
+#def impressum():
+#    st.write('Impressum')
+#    pass
