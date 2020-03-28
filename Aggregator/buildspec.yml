@@ -1,0 +1,43 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+    commands:
+      - echo Entered the install phase...
+      - apt-get update -y
+      - apt-get install -y libspatialindex-dev
+
+    finally:
+      - echo This always runs even if the update or install command fails
+      
+  pre_build:
+    commands:
+      - echo BEGIN PRE_BUILD PHASE
+      - pip install -r requirements.txt
+    finally:
+      - echo END PRE_BUILD PHASE
+
+  build:
+    commands:
+      - echo BEGIN BUILD PHASE
+      - python aggregator.py
+      -
+    finally:
+      - echo END BUILD PHASE
+
+  post_build:
+    commands:
+      - echo BEGIN POST_BUILD PHASE
+      -
+
+    finally:
+      - echo END POST_BUILD PHASE
+
+
+artifacts:
+  files:
+    - '**/*'
+  name: $AWS_REGION-$(date +%Y-%m-%d)
+  base-directory: my-codebuild
