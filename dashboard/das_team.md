@@ -1,9 +1,5 @@
 # Das Team
-Wir sind eine Gruppe die sich im Rahmen des #WirVsVirus Hackathon, mit [Philip Kreißel](https://twitter.com/pkreissel/) als Ideengeber, zusammengefunden hat. Seit Freitag den 20.03.2020 arbeiten  über 25 Menschen, die sich zuvor noch nicht kannten, und sich immernoch nicht persönlich kennen, an dieser Idee. Dabei passiert alles in ihrer Freizeit und wird über verschiedene Plattformen im Internet koordiniert. Konkret aufgeteilt arbeiten die beteiligten an den Bereichen: 
-- Backend
-- Frontend
-- Storytelling 
-- Design
+Wir sind eine Gruppe die sich im Rahmen des [#WirVsVirus Hackathons](https://wirvsvirushackathon.org/) der Bundesregierung zusammengefunden hat. Die ursprüngliche Idee für das Social Distancing Dashboard kam dabei von [Philip Kreißel](https://twitter.com/pkreissel/). Seit Freitag dem 20.03.2020 arbeitet unser Team aus über 25 Menschen, die sich zuvor noch nicht kannten, und sich teilweise immer noch nicht persönlich kennen, an einer gemeinsamen Vision. Dabei passiert alles in unserer Freizeit und wird über verschiedene Plattformen im Internet koordiniert. 
 
 Das aktuelle "Kern"-Team besteht aus:
 <style = "text/css">
