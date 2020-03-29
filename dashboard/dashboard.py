@@ -85,8 +85,10 @@ def dashboard():
     st.header("Das Social Distancing Dashboard")
     st_info_text       = st.empty()
     st_map_header      = st.empty()
-    st_legend          = st.empty()
+    st_levelofdetail   = st.empty()
+    st_scoreselect     = st.empty()
     st_map             = st.empty()
+    st_legend          = st.empty()
     st_timeline_header = st.empty()
     st_county_select   = st.empty()
     st_timeline_desc   = st.empty()
@@ -99,6 +101,7 @@ def dashboard():
     # - restrict images to container width
     # - restrict altair plots to container width
     # - hide hamburger dropdown menu
+    # - make inputs better visible
     st.markdown("""
         <style type='text/css'>
             .block-container>div {
@@ -118,6 +121,10 @@ def dashboard():
             #MainMenu.dropdown {
                 display: none;
             }
+            .stSelectbox div[data-baseweb="select"]>div,
+            .stMultiSelect div[data-baseweb="select"]>div{
+                border:1px solid #fcbfcf;
+            }
         </style>
     """, unsafe_allow_html=True)
     
@@ -133,8 +140,7 @@ def dashboard():
     df_scores = df_scores_full.copy()
     
     # build sidebar
-    st.sidebar.subheader("Datenauswahl")
-    use_states_select = st.sidebar.selectbox('Detailgrad:', ('Bundesländer', 'Landkreise'))
+    use_states_select = st_levelofdetail.selectbox('Detailgrad:', ('Bundesländer', 'Landkreise'))
     use_states = use_states_select == 'Bundesländer'
     
     # descriptive names for each score
@@ -184,7 +190,7 @@ def dashboard():
     inverse_scorenames_desc = {scorenames_desc[key]:key for key in scorenames_desc.keys()}
     
     # data source selector
-    selected_score_desc = st.sidebar.selectbox(
+    selected_score_desc = st_scoreselect.selectbox(
         'Datenquelle:', sorted(list(scorenames_desc.values())), 
         index = 1 # default value in sorted list
         )
@@ -232,8 +238,10 @@ def dashboard():
     '''.format(regionen=use_states_select,datasource=selected_score_desc)
     )
     #st.write("Zum Vergleich - die durchschnittliche Soziale Distanz am {} in Deutschland: {:.2f}".format(latest_date,germany_average))
-
-    st_map_header.subheader('Social Distancing Karte vom {}'.format(latest_date))
+    try:
+        st_map_header.subheader('Social Distancing Karte vom {}'.format( datetime.datetime.strptime(latest_date,"%Y-%m-%d").strftime("%d.%m.%Y") ))
+    except:
+        st_map_header.subheader('Social Distancing Karte vom {}'.format(latest_date))
     st_legend.markdown("""
         ![Legende](https://github.com/socialdistancingdashboard/virushack/raw/master/dashboard/legende.png)
     """)

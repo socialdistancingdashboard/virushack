@@ -65,7 +65,7 @@ st.markdown("""
     </style>
     """.format(selected=menuitems[menu]), unsafe_allow_html=True)
 
-st.sidebar.markdown("---")
+
 
 # main content
 if menu=='Dashboard':
