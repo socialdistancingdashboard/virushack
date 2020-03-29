@@ -239,7 +239,7 @@ def dashboard():
     
     # descriptive names for each score
     scorenames_desc_manual = {
-        "gmap_score":"Besucher an öffentlichen Orten",
+        "gmap_score":"Menschen an Haltestellen des ÖPNV",
         "gmap_supermarket_score":"Besucher in Supermärkten",
         "hystreet_score":"Fußgänger in Innenstädten (Laserscanner-Messung)",
         "zug_score":"DB Züge",
@@ -254,7 +254,7 @@ def dashboard():
         }
     # very short axis labels for each score
     scorenames_axis_manual = {
-        "gmap_score":"Besucher",
+        "gmap_score":"Menschen",
         "gmap_supermarket_score":"Besucher",
         "hystreet_score":"Fußgänger",
         "zug_score":"Züge",
