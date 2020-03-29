@@ -75,7 +75,7 @@ def load_real_data(id_to_name,dummy_time):
     
     return df_scores, scorenames
     
-@st.cache(persist=True)
+#@st.cache(persist=True)
 def get_map(df_scores,use_states,selected_score,selected_score_axis,features,latest_date):
     url_topojson = 'https://raw.githubusercontent.com/AliceWi/TopoJSON-Germany/master/germany.json'
     data_topojson_remote = alt.topo_feature(url=url_topojson, feature=features)
@@ -132,7 +132,7 @@ def get_map(df_scores,use_states,selected_score,selected_score_axis,features,lat
     c = alt.layer(basemap, layer).configure_view(strokeOpacity=0)
     return c
     
-@st.cache(persist=True)
+#@st.cache(persist=True)
 def get_timeline_plots(df_scores, selected_score, selected_score_axis, countys, use_states):
     if len(countys) > 0 and not use_states:
         # Landkreise
