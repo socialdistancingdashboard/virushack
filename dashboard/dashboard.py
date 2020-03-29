@@ -75,7 +75,7 @@ def load_real_data(id_to_name,dummy_time):
     
     return df_scores, scorenames
     
-#@st.cache(persist=True)
+@st.cache(persist=True)
 def get_map(df_scores,use_states,selected_score,selected_score_axis,features,latest_date):
     url_topojson = 'https://raw.githubusercontent.com/AliceWi/TopoJSON-Germany/master/germany.json'
     data_topojson_remote = alt.topo_feature(url=url_topojson, feature=features)
@@ -132,7 +132,7 @@ def get_map(df_scores,use_states,selected_score,selected_score_axis,features,lat
     c = alt.layer(basemap, layer).configure_view(strokeOpacity=0)
     return c
     
-#@st.cache(persist=True)
+@st.cache(persist=True)
 def get_timeline_plots(df_scores, selected_score, selected_score_axis, countys, use_states):
     if len(countys) > 0 and not use_states:
         # Landkreise
@@ -186,16 +186,9 @@ def dashboard():
     st.header("Das Social Distancing Dashboard")
     st_info_text       = st.empty()
     st_map_header      = st.empty()
-    st_levelofdetail   = st.empty()
-    st_scoreselect     = st.empty()
-    st_map             = st.empty()
-    st_legend          = st.empty()
-    st_timeline_header = st.empty()
-    st_county_select   = st.empty()
-    st_timeline_desc   = st.empty()
-    st_timeline        = st.empty()
-    st_footer_title    = st.empty()
-    st_footer          = st.empty()
+   
+    use_states_select  = st.selectbox('Detailgrad:', ('Bundesländer', 'Landkreise'))
+    
     
     # Insert custom CSS
     # - prevent horizontal scrolling on mobile
@@ -241,7 +234,7 @@ def dashboard():
     df_scores = df_scores_full.copy()
     
     # build sidebar
-    use_states_select = st_levelofdetail.selectbox('Detailgrad:', ('Bundesländer', 'Landkreise'))
+    
     use_states = use_states_select == 'Bundesländer'
     
     # descriptive names for each score
@@ -291,16 +284,26 @@ def dashboard():
     inverse_scorenames_desc = {scorenames_desc[key]:key for key in scorenames_desc.keys()}
     
     # data source selector
-    selected_score_desc = st_scoreselect.selectbox(
+    
+    selected_score_desc = st.selectbox(
         'Datenquelle:', sorted(list(scorenames_desc.values())), 
         index = 1 # default value in sorted list
         )
+
+    st_map             = st.empty()
+    st_legend          = st.empty()
+    st_timeline_header = st.empty()
+    
+    
+    
     selected_score = inverse_scorenames_desc[selected_score_desc]
     selected_score_axis = scorenames_axis[selected_score] + ' (%)'
     
     latest_date = pd.Series(df_scores[df_scores[selected_score] > 0]["date"]).values[-1]
 
     available_countys = [value for value in county_names if value in df_scores[df_scores[selected_score] > 0]["name"].values]
+    
+    
     if use_states:
         countys = []
     else:
@@ -308,7 +311,10 @@ def dashboard():
             default=available_countys[:2]
         else:
             default = []
-        countys = st_county_select.multiselect('Wähle Landkreise aus:',options = available_countys, default=default)
+        countys = st.multiselect('Wähle Landkreise aus:',options = available_countys, default=default)
+    
+    st_timeline_desc   = st.empty()
+    st_timeline        = st.empty()
 
     #selected_date = st.sidebar.date_input('für den Zeitraum vom', datetime.date(2020,3,24))
     #end_date = st.sidebar.date_input('bis', datetime.date(2020,3,22))
@@ -346,10 +352,10 @@ def dashboard():
     else:
         features = 'counties'
         #filter scores based on selected places
-        if len(countys) > 0:
-            df_scores["filtered_score"] = np.where(df_scores["name"].isin(countys), df_scores[selected_score],[0] * len(df_scores))
-        else:
-            df_scores["filtered_score"] = df_scores[selected_score]
+        #if len(countys) > 0:
+            #df_scores["filtered_score"] = np.where(df_scores["name"].isin(countys), df_scores[selected_score],[0] *# len(df_scores))
+        #else:
+        df_scores["filtered_score"] = df_scores[selected_score]
 
     df_scores["date"] = pd.to_datetime(df_scores["date"])
     df_scores = df_scores.round(1)
@@ -363,6 +369,7 @@ def dashboard():
     # DRAW TIMELINES
     # ==============
     st_timeline_header.subheader("Zeitlicher Verlauf {}".format(selected_score_desc))
+        
     timeline = get_timeline_plots(df_scores, selected_score, selected_score_axis, countys, use_states)
     if timeline is not None:
         timeline2 = timeline.copy() # otherwise streamlit gives a Cached Object Mutated warning
@@ -374,7 +381,7 @@ def dashboard():
         
     # FOOTER
     # ======
-    st_footer_title.subheader("Unsere Datenquellen")
-    st_footer.markdown("""
+    st.subheader("Unsere Datenquellen")
+    st.markdown("""
         ![](https://github.com/socialdistancingdashboard/virushack/raw/master/logo/Datenquellen.PNG)
     """)
