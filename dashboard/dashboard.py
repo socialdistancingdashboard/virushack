@@ -95,17 +95,28 @@ def dashboard():
     st_footer          = st.empty()
     
     # Insert custom CSS
+    # - prevent horizontal scrolling on mobile
+    # - restrict images to container width
+    # - restrict altair plots to container width
+    # - hide hamburger dropdown menu
     st.markdown("""
         <style type='text/css'>
+            .block-container>div {
+                width:100% !important;
+                overflow:hidden !important;
+            }
             .image-container {
-                width: 100%;
+                width: 99%;
             }
             img {
-                max-width: 100%;
+                max-width: 99%;
                 margin:auto;
             }
             div.stVegaLiteChart, fullScreenFrame {
-                width:100%;
+                width:99%;
+            }
+            #MainMenu.dropdown {
+                display: none;
             }
         </style>
     """, unsafe_allow_html=True)
