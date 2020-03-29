@@ -66,3 +66,7 @@ Durch die Auswertung von Sensoren für die Luftqualität lassen sich Rückschlü
 
 ## Aggregation und Datenaufbereitung
 Da jede Datenquelle andere Daten bereitstellt und sich die Granularität unterscheidet, werden die Daten aggregiert in einer Datenbank gespeichert. Dabei werden die Geokoordinaten den Landkreisen und Bundesländern zugewiesen. Als zeitliche Aggregation haben wir uns fürs erste auf eine Tagesbasis festgelegt. So liegen die Daten auch in der Datenbank vor. Die aggregierten Daten werden jeweils gegen Referenzdaten des gleichen Wochentags berechnet. Der Score ergibt sich aus der prozentualen Abweichung des aktuellen Wertes im Vergleich zu einem Referenzpunkt. Dabei entsprechen 100% einem normalen physical Distancing, kleinere Werte stehen für ein gutes Physical Distancing, sprich die Menschen bleiben zu Hause.
+
+## Datenzugriff
+
+Wenn Du als Data Scientist, Datenjournalist oder auch einfach "interessierter Bürger" Zugriff auf die Rohdaten des Dashboards möchtest um Deine eigenen Analysen anzustellen musst Du nicht mal fragen, die Daten kannst Du einfach [hier herunterladen](https://0he6m5aakd.execute-api.eu-central-1.amazonaws.com/prod). Eine API ist in Arbeit.

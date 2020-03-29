@@ -1,4 +1,4 @@
-# Über uns
+# Das Projekt
 ## Was ist die Idee hinter dem Projekt?
 In der Situation mit den weit verbreiteten Regelungen um die Corona Pandemie einzugrenzen, hat sich Philip gefragt, ob man den Erfolg dieser Maßnahmen an öffentlich zugänglichen Daten erkennen kann. Aus dieser Idee und einem eigenen ersten tabellarischen Überblick, auf Basis von Google Places Daten ist das Projekt für den #WirvsVirus - Hackatron entstanden. 
 Die Idee hinter dem Dashboard war, für jeden verständlich darzustellen, ob und wie gut das Physical Distancing klappt. Weiterhin soll die breite Datenbasis aufbereitet zur Verfügung gestellt werden, um anderen Interessierten die Möglichkeit zu geben, eigene Auswertungen anzustellen.
@@ -46,24 +46,10 @@ ie arbeitet momentan im Homeoffice für Ihr Unternehmen und stellt sich die Frag
 - Hat keine Zeit die verschiedenen Quellen selber zu crawlen
 ----
 
-## Unsere Vision:
+## Unsere Vision
 “Unsere Vision ist es, den Erfolg politischer Maßnahmen zur Reduktion zwischenmenschlicher Interaktionen messbar zu machen um damit einen aktiven Beitrag zur Verlangsamung der Ausbreitung von Corona zu leisten!“
 
 Hierzu stellen wir **allen gesellschaftlichen Akteuren** ein **intuitives, datengestütztes Werkzeug** zur Verfügung, mit dem Physical Distancing mess- und anfassbar wird, ohne sich in der Tiefe mit den Daten auseinandersetzen zu müssen. Um das Ganze so leichtverständlich wie möglich zu gestalten verwenden wir einen relativen Score, der das Verhältnis der Aktivitäten an einem bestimmten Wochentag in der Krise zum normalisierten Mittelwert der Aktivitäten an den gleichen Wochentagen vor der Krise, beschreibt. In der aktuellen Implementierung ist der Score ein Wert zwischen 0 und 1, bzw. 0% und 100%. Eine Physical Distance von 0 definieren wir als das komplette Ausbleiben einer zwischenmenschlichen Interaktion im Vergleich zur üblichen Aktivität vor der Krise, während 1 der üblichen Physical Distance an einem Ort entspricht. Die dabei berücksichtigten Datenquellen sind selektierbar.
 
 Um die Wirksamkeit von Maßnahmen zu bewerten, ist es zudem wichtig, den Trend zu sehen. Dazu bietet unsere GUI neben dem tagesaktuellen Score auch die Anzeige historischer Daten an. Für besonders interessierte User können weitere Datenquellen in einem Dropdown Menü ausgewählt werden, um relevante Zusammenhänge selber analysieren zu können. Momentan angedachte und teilweise bereits implementierte Features sind Wetterdaten des jeweiligen Zeitpunktes, sowie die Anzahl der mit Corona infizierten Menschen, wobei hier die zweiwöchige Inkubationszeit als Timelag herausgerechnet wird.
-
-## Wer sind wir
-Wir sind eine Gruppe die sich im Rahmen des #WirVsVirus Hackathon, mit Philip als Ideengeber, zusammengefunden hat. Seit Freitag den 20.03.2020 arbeiten  über 25 Menschen, die sich zuvor noch nicht kannten, und sich immernoch nicht persönlich kennen, an dieser Idee. Dabei passiert alles in ihrer Freizeit und über verschiedene Plattformen im Internet  koordiniert. Konkret aufgeteilt arbeiten die beteiligten an den Bereichen: 
-- Backend
-- Frontend
-- Storytelling 
-- Design
-
-## Pressestimmen über #EveryoneCounts
-[Tagesspiegel](https://www.tagesspiegel.de/wirtschaft/hackathon-im-netz-programmierer-tuefteln-an-loesungen-gegen-die-corona-krise/25670548.html)
-
-[SWR-Online](https://www.swr.de/swraktuell/wie-deutschland-das-coronavirus-hackt-wirvsvirus-hackathon-100.html)
-
-----
 
