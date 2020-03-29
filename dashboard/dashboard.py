@@ -301,19 +301,17 @@ def dashboard():
     if use_states:
         countys = []
     else:
-        #if len(available_countys) > 2:
-            # pick two random counties for inital plotting
-        #    idx = np.random.random_integers(0,len(available_countys),2)
-        #    default = [available_countys[i] for i in idx]
-        #else:
-        #    default = []
-        countys = st_county_select.multiselect('Wähle Landkreise aus:',options = available_countys)#, default=default)
+        if len(available_countys) > 1:
+            default=available_countys[:2]
+        else:
+            default = []
+        countys = st_county_select.multiselect('Wähle Landkreise aus:',options = available_countys, default=default)
 
     #selected_date = st.sidebar.date_input('für den Zeitraum vom', datetime.date(2020,3,24))
     #end_date = st.sidebar.date_input('bis', datetime.date(2020,3,22))
 
     st_info_text.markdown('''
-        In der Karte siehst Du wie sich Social Distancing auf die verschiedenen **{regionen}** in Deutschland auswirkt. Wir nutzen Daten über **{datasource}** (Du kannst die Datenquelle links im Menü ändern) um zu berechnen, wie gut Social Distancing aktuell funktioniert. Ein Wert von **100% entspricht dem Normal-Wert vor der Covid-Pandemie**, also bevor die Bürger zu Social Distancing aufgerufen wurden. Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung des Verkehrsaufkommen gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist. **Weniger ist besser!**
+        In der Karte siehst Du wie sich Social Distancing auf die verschiedenen **{regionen}** in Deutschland auswirkt. Wir nutzen Daten über **{datasource}** (Du kannst die Datenquelle unten im Menü ändern) um zu berechnen, wie gut Social Distancing aktuell funktioniert. Ein Wert von **100% entspricht dem Normal-Wert vor der COVID-Pandemie**, also bevor die Bürger zu Social Distancing aufgerufen wurden. Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung der Aktivität gemessen wurde. was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist. **Weniger ist besser!**
     '''.format(regionen=use_states_select,datasource=selected_score_desc)
     )
 
@@ -355,7 +353,7 @@ def dashboard():
     
     # DRAW TIMELINES
     # ==============
-    st_timeline_header.subheader("Zeitlicher Verlauf")
+    st_timeline_header.subheader("Zeitlicher Verlauf {}".format(selected_score_desc))
     timeline = get_timeline_plots(df_scores, selected_score, selected_score_axis, countys, use_states)
     if timeline is not None:
         timeline2 = timeline.copy() # otherwise streamlit gives a Cached Object Mutated warning
