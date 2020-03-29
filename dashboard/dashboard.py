@@ -9,172 +9,175 @@ import requests
 from PIL import Image
 from io import BytesIO
 
-def dashboard():
+@st.cache(persist=True)
+def load_topojson():
+    url_topojson = 'https://raw.githubusercontent.com/AliceWi/TopoJSON-Germany/master/germany.json'
+    r = requests.get(url_topojson)
+    jsondump = r.json()
+    county_names = []
+    county_ids = []
+    for county in jsondump["objects"]["counties"]["geometries"]:
+        county_names.append(county["properties"]["name"] + " (" + county["properties"]["districtType"]+")")
+        county_ids.append(county["id"])
+    state_names = []
+    state_ids = []
+    for state in jsondump["objects"]["states"]["geometries"]:
+        state_names.append(state["properties"]["name"])
+        state_ids.append(state["id"])
+    return county_names, county_ids, state_names, state_ids
 
-    @st.cache(persist=True)
-    def load_topojson():
-        url_topojson = 'https://raw.githubusercontent.com/AliceWi/TopoJSON-Germany/master/germany.json'
-        r = requests.get(url_topojson)
-        jsondump = r.json()
-        county_names = []
-        county_ids = []
-        for county in jsondump["objects"]["counties"]["geometries"]:
-            county_names.append(county["properties"]["name"] + " (" + county["properties"]["districtType"]+")")
-            county_ids.append(county["id"])
-        state_names = []
-        state_ids = []
-        for state in jsondump["objects"]["states"]["geometries"]:
-            state_names.append(state["properties"]["name"])
-            state_ids.append(state["id"])
-        return county_names, county_ids, state_names, state_ids
+@st.cache(persist=True)
+def load_real_data(id_to_name,dummy_time):
+    # dummy_time parameter changes twice daily. Otherwise, streamlit 
+    # would always return cached data
+    response = requests.get('https://0he6m5aakd.execute-api.eu-central-1.amazonaws.com/prod')
+    jsondump = response.json()["body"]
+    
+    # get names for all scores
+    scorenames = []
+    for (date, row) in list(jsondump.items()):
+        for cid, scores in row.items():
+            for key in scores.keys():
+                if key not in scorenames:
+                    scorenames.append(key)
+    scorenames = [key for key in scorenames if '_score' in key]
+    
+    # prepare lists
+    scorevalues = {scorename:[] for scorename in scorenames}
+    ids = []
+    names = []
+    dates = []
+    
+    # loop over data
+    for (date, row) in list(jsondump.items()):
+        for cid, scores in row.items():
+            ids.append(cid)
+            names.append(id_to_name[cid])
+            dates.append(date)
+            for scorename in scorenames:
+                if scorename in scores:
+                    scorevalue = scores[scorename]*100
+                else:
+                    scorevalue = None
+                scorevalues[scorename].append(scorevalue)
+    
+    # create dataframe
+    df_scores = pd.DataFrame({
+        "id": ids, 
+        "name": names, 
+        "date": dates
+    })
+    
+    # add scores
+    for scorename in scorenames:
+        df_scores[scorename] = scorevalues[scorename]
+    df_scores = df_scores.replace([np.inf, -np.inf], np.nan)
+    
+    return df_scores, scorenames
+    
+@st.cache(persist=True)
+def get_map(df_scores,use_states,selected_score,selected_score_axis,features,latest_date):
+    url_topojson = 'https://raw.githubusercontent.com/AliceWi/TopoJSON-Germany/master/germany.json'
+    data_topojson_remote = alt.topo_feature(url=url_topojson, feature=features)
+    MAPHEIGHT = 600
+    basemap = alt.Chart(data_topojson_remote).mark_geoshape(
+            fill='lightgray',
+            stroke='white',
+            strokeWidth=0.5
+        ).properties(width='container',height = MAPHEIGHT)
+    if use_states:
+        #draw state map
+        layer = alt.Chart(data_topojson_remote).mark_geoshape(
+            stroke='white'
+        ).encode(
+                color=alt.Color(selected_score+':Q', 
+                                title=selected_score_axis, 
+                                scale=alt.Scale(domain=(200, 0),
+                                scheme='redyellowgreen'),
+                legend=None
+            ),
+            tooltip=[alt.Tooltip("state_name:N", title="Bundesland"),
+                     alt.Tooltip(selected_score+":Q", title=selected_score_axis)]
+        ).transform_lookup(
+            lookup='id',
+            from_= alt.LookupData(df_scores[(df_scores["date"] == str(latest_date)) & (df_scores[selected_score] > 0)], 'id', [selected_score])
+        ).transform_lookup(
+            lookup='id',
+            from_= alt.LookupData(df_scores[(df_scores["date"] == str(latest_date)) & (df_scores[selected_score] > 0)], 'id', ['state_name'])
+        ).properties(width='container',height = MAPHEIGHT)
+    else:
+        # draw counties map
+        df_scores_lookup = df_scores[(df_scores["date"] == str(latest_date)) & (df_scores["filtered_score"] > 0)]
+        df_scores_lookup = df_scores_lookup[['id','date','name','filtered_score']]
+        
+        layer = alt.Chart(data_topojson_remote).mark_geoshape(
+            stroke='white'
+        ).encode(
+                color=alt.Color('filtered_score:Q', 
+                                title=selected_score_axis, 
+                                scale=alt.Scale(domain=(200, 0),
+                                scheme='redyellowgreen'),
+                legend=None
+            ),
+            tooltip=[alt.Tooltip("name:N", title="Kreis"),
+                     alt.Tooltip("filtered_score:Q", title=selected_score_axis)]
+        ).transform_lookup(
+            lookup='id',
+            from_= alt.LookupData(df_scores_lookup, 'id', ['filtered_score'])
+        ).transform_lookup(
+            lookup='id',
+            from_= alt.LookupData(df_scores_lookup, 'id', ['name'])
+        ).properties(width='container',height = MAPHEIGHT)
 
-    @st.cache(persist=True)
-    def load_real_data(id_to_name,dummy_time):
-        # dummy_time parameter changes twice daily. Otherwise, streamlit 
-        # would always return cached data
-        response = requests.get('https://0he6m5aakd.execute-api.eu-central-1.amazonaws.com/prod')
-        jsondump = response.json()["body"]
-        
-        # get names for all scores
-        scorenames = []
-        for (date, row) in list(jsondump.items()):
-            for cid, scores in row.items():
-                for key in scores.keys():
-                    if key not in scorenames:
-                        scorenames.append(key)
-        scorenames = [key for key in scorenames if '_score' in key]
-        
-        # prepare lists
-        scorevalues = {scorename:[] for scorename in scorenames}
-        ids = []
-        names = []
-        dates = []
-        
-        # loop over data
-        for (date, row) in list(jsondump.items()):
-            for cid, scores in row.items():
-                ids.append(cid)
-                names.append(id_to_name[cid])
-                dates.append(date)
-                for scorename in scorenames:
-                    if scorename in scores:
-                        scorevalue = scores[scorename]*100
-                    else:
-                        scorevalue = None
-                    scorevalues[scorename].append(scorevalue)
-        
-        # create dataframe
-        df_scores = pd.DataFrame({
-            "id": ids, 
-            "name": names, 
-            "date": dates
-        })
-        
-        # add scores
-        for scorename in scorenames:
-            df_scores[scorename] = scorevalues[scorename]
-        df_scores = df_scores.replace([np.inf, -np.inf], np.nan)
-        
-        return df_scores, scorenames
-        
-    @st.cache(persist=True)
-    def get_map(df_states,use_states,selected_score,selected_score_axis,features):
-        url_topojson = 'https://raw.githubusercontent.com/AliceWi/TopoJSON-Germany/master/germany.json'
-        data_topojson_remote = alt.topo_feature(url=url_topojson, feature=features)
-        MAPHEIGHT = 600
-        basemap = alt.Chart(data_topojson_remote).mark_geoshape(
-                fill='lightgray',
-                stroke='white',
-                strokeWidth=0.5
-            ).properties(width='container',height = MAPHEIGHT)
-        if use_states:
-            #draw state map
-            layer = alt.Chart(data_topojson_remote).mark_geoshape(
-                stroke='white'
-            ).encode(
-                    color=alt.Color(selected_score+':Q', 
-                                    title=selected_score_axis, 
-                                    scale=alt.Scale(domain=(200, 0),
-                                    scheme='redyellowgreen'),
-                    legend=None
-                ),
-                tooltip=[alt.Tooltip("state_name:N", title="Bundesland"),
-                         alt.Tooltip(selected_score+":Q", title=selected_score_axis)]
-            ).transform_lookup(
-                lookup='id',
-                from_= alt.LookupData(df_states[(df_states["date"] == str(latest_date)) & (df_states[selected_score] > 0)], 'id', [selected_score])
-            ).transform_lookup(
-                lookup='id',
-                from_= alt.LookupData(df_states[(df_states["date"] == str(latest_date)) & (df_states[selected_score] > 0)], 'id', ['state_name'])
-            ).properties(width='container',height = MAPHEIGHT)
-        else:
-            # draw counties map
-            df_scores_lookup = df_scores[(df_scores["date"] == str(latest_date)) & (df_scores["filtered_score"] > 0)]
-            df_scores_lookup = df_scores_lookup[['id','date','name','filtered_score']]
-            
-            layer = alt.Chart(data_topojson_remote).mark_geoshape(
-                stroke='white'
-            ).encode(
-                    color=alt.Color('filtered_score:Q', 
-                                    title=selected_score_axis, 
-                                    scale=alt.Scale(domain=(200, 0),
-                                    scheme='redyellowgreen'),
-                    legend=None
-                ),
-                tooltip=[alt.Tooltip("name:N", title="Kreis"),
-                         alt.Tooltip("filtered_score:Q", title=selected_score_axis)]
-            ).transform_lookup(
-                lookup='id',
-                from_= alt.LookupData(df_scores_lookup, 'id', ['filtered_score'])
-            ).transform_lookup(
-                lookup='id',
-                from_= alt.LookupData(df_scores_lookup, 'id', ['name'])
-            ).properties(width='container',height = MAPHEIGHT)
-
-        c = alt.layer(basemap, layer).configure_view(strokeOpacity=0)
-        return c
-        
-    @st.cache(persist=True)
-    def get_timeline_plots(df_scores, selected_score, selected_score_axis, countys, use_states):
-        if len(countys) > 0 and not use_states:
-            # Landkreise
-            df_scores = df_scores[df_scores["name"].isin(countys)].dropna(axis=1, how="all")
-            c = alt.Chart(
-                df_scores[df_scores["name"].isin(countys)][["name", "date", "filtered_score"]].dropna()
-                ).mark_line(point=True).encode(
-                    x=alt.X('date:T', axis=alt.Axis(title='Datum', format=("%d %b"))),
-                    y=alt.Y('filtered_score:Q', title=selected_score_axis),
-                    color=alt.Color('name', title="Landkreis"),
-                    tooltip=[
-                        alt.Tooltip("name:N", title="Landkreis"),
-                        alt.Tooltip('filtered_score:Q', title=selected_score_axis),
-                        alt.Tooltip("date:T", title="Datum"),
-                        ]
-                ).properties(
-                    width='container',
-                    height=400
-            )
-            return c
-        elif use_states:
-            # Bundesländer
-            df_scores=df_scores[["state_name", "date", selected_score]].dropna()
-            c = alt.Chart(df_scores).mark_line(point=True).encode(
+    c = alt.layer(basemap, layer).configure_view(strokeOpacity=0)
+    return c
+    
+@st.cache(persist=True)
+def get_timeline_plots(df_scores, selected_score, selected_score_axis, countys, use_states):
+    if len(countys) > 0 and not use_states:
+        # Landkreise
+        df_scores = df_scores[df_scores["name"].isin(countys)].dropna(axis=1, how="all")
+        c = alt.Chart(
+            df_scores[df_scores["name"].isin(countys)][["name", "date", "filtered_score"]].dropna()
+            ).mark_line(point=True).encode(
                 x=alt.X('date:T', axis=alt.Axis(title='Datum', format=("%d %b"))),
-                y=alt.Y(selected_score+':Q', title=selected_score_axis),
-                color=alt.Color('state_name', title="Bundesland", scale=alt.Scale(scheme='category20')),
+                y=alt.Y('filtered_score:Q', title=selected_score_axis),
+                color=alt.Color('name', title="Landkreis"),
                 tooltip=[
-                    alt.Tooltip("state_name:N", title="Bundesland"),
-                    alt.Tooltip(selected_score+":Q", title=selected_score_axis),
+                    alt.Tooltip("name:N", title="Landkreis"),
+                    alt.Tooltip('filtered_score:Q', title=selected_score_axis),
                     alt.Tooltip("date:T", title="Datum"),
                     ]
             ).properties(
                 width='container',
                 height=400
-            )
-            return c
-        else:
-            return None
-    
+        )
+        return c
+    elif use_states:
+        # Bundesländer
+        df_scores=df_scores[["state_name", "date", selected_score]].dropna()
+        c = alt.Chart(df_scores).mark_line(point=True).encode(
+            x=alt.X('date:T', axis=alt.Axis(title='Datum', format=("%d %b"))),
+            y=alt.Y(selected_score+':Q', title=selected_score_axis),
+            color=alt.Color('state_name', title="Bundesland", scale=alt.Scale(scheme='category20')),
+            tooltip=[
+                alt.Tooltip("state_name:N", title="Bundesland"),
+                alt.Tooltip(selected_score+":Q", title=selected_score_axis),
+                alt.Tooltip("date:T", title="Datum"),
+                ]
+        ).properties(
+            width='container',
+            height=400
+        )
+        return c
+    else:
+        return None
+
+
+
+
+
+def dashboard():
     # make page here with placeholders
     # thus later elements (e.g. county selector) can influence
     # earlier elements (the map) because they can appear earlier in 
@@ -353,7 +356,7 @@ def dashboard():
     
     # DRAW MAP
     # ========
-    map = get_map(df_scores,use_states,selected_score,selected_score_axis,features)
+    map = get_map(df_scores,use_states,selected_score,selected_score_axis,features,latest_date)
     map2 = map.copy() # otherwise streamlit gives a Cached Object Mutated warning
     st_map.altair_chart(map2)
     
