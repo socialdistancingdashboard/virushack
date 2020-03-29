@@ -76,6 +76,63 @@ def dashboard():
         df_scores = df_scores.replace([np.inf, -np.inf], np.nan)
         
         return df_scores, scorenames
+        
+    @st.cache(persist=True)
+    def get_map(df_states,use_states,selected_score,selected_score_axis,features):
+        url_topojson = 'https://raw.githubusercontent.com/AliceWi/TopoJSON-Germany/master/germany.json'
+        data_topojson_remote = alt.topo_feature(url=url_topojson, feature=features)
+        MAPHEIGHT = 600
+        basemap = alt.Chart(data_topojson_remote).mark_geoshape(
+                fill='lightgray',
+                stroke='white',
+                strokeWidth=0.5
+            ).properties(width='container',height = MAPHEIGHT)
+        if use_states:
+            #draw state map
+            layer = alt.Chart(data_topojson_remote).mark_geoshape(
+                stroke='white'
+            ).encode(
+                    color=alt.Color(selected_score+':Q', 
+                                    title=selected_score_axis, 
+                                    scale=alt.Scale(domain=(200, 0),
+                                    scheme='redyellowgreen'),
+                    legend=None
+                ),
+                tooltip=[alt.Tooltip("state_name:N", title="Bundesland"),
+                         alt.Tooltip(selected_score+":Q", title=selected_score_axis)]
+            ).transform_lookup(
+                lookup='id',
+                from_= alt.LookupData(df_states[(df_states["date"] == str(latest_date)) & (df_states[selected_score] > 0)], 'id', [selected_score])
+            ).transform_lookup(
+                lookup='id',
+                from_= alt.LookupData(df_states[(df_states["date"] == str(latest_date)) & (df_states[selected_score] > 0)], 'id', ['state_name'])
+            ).properties(width='container',height = MAPHEIGHT)
+        else:
+            # draw counties map
+            df_scores_lookup = df_scores[(df_scores["date"] == str(latest_date)) & (df_scores["filtered_score"] > 0)]
+            df_scores_lookup = df_scores_lookup[['id','date','name','filtered_score']]
+            
+            layer = alt.Chart(data_topojson_remote).mark_geoshape(
+                stroke='white'
+            ).encode(
+                    color=alt.Color('filtered_score:Q', 
+                                    title=selected_score_axis, 
+                                    scale=alt.Scale(domain=(200, 0),
+                                    scheme='redyellowgreen'),
+                    legend=None
+                ),
+                tooltip=[alt.Tooltip("name:N", title="Kreis"),
+                         alt.Tooltip("filtered_score:Q", title=selected_score_axis)]
+            ).transform_lookup(
+                lookup='id',
+                from_= alt.LookupData(df_scores_lookup, 'id', ['filtered_score'])
+            ).transform_lookup(
+                lookup='id',
+                from_= alt.LookupData(df_scores_lookup, 'id', ['name'])
+            ).properties(width='container',height = MAPHEIGHT)
+
+        c = alt.layer(basemap, layer).configure_view(strokeOpacity=0)
+        return c
     
     # make page here with placeholders
     # thus later elements (e.g. county selector) can influence
@@ -195,16 +252,8 @@ def dashboard():
         index = 1 # default value in sorted list
         )
     selected_score = inverse_scorenames_desc[selected_score_desc]
-    selected_score_axis = scorenames_axis[selected_score]
+    selected_score_axis = scorenames_axis[selected_score] + ' (%)'
     
-    #calculate average score based on selected selected_score
-    #if len(selected_score) == 0:
-    #    df_scores[selected_score] = df_scores[[scorenames]].mean(axis = 1)
-    #elif len(selected_score) == 1:
-    #    df_scores[selected_score] = df_scores[[selected_score]]
-    #else:
-    #    df_scores[selected_score] = df_scores[[selected_score]].mean(axis = 1)
-
     latest_date = pd.Series(df_scores[df_scores[selected_score] > 0]["date"]).values[-1]
 
     available_countys = [value for value in county_names if value in df_scores[df_scores[selected_score] > 0]["name"].values]
@@ -222,22 +271,11 @@ def dashboard():
     #selected_date = st.sidebar.date_input('für den Zeitraum vom', datetime.date(2020,3,24))
     #end_date = st.sidebar.date_input('bis', datetime.date(2020,3,22))
 
-    #filter scores based on selected places
-    if len(countys) > 0:
-        df_scores["filtered_score"] = np.where(df_scores["name"].isin(countys), df_scores[selected_score],[0] * len(df_scores))
-    else:
-        df_scores["filtered_score"] = df_scores[selected_score]
-
-    df_scores["date"] = pd.to_datetime(df_scores["date"])
-    df_scores = df_scores.round(1)
-
-    germany_average = np.mean(df_scores[df_scores["date"] == str(latest_date)][selected_score])
-
     st_info_text.markdown('''
         In der Karte siehst Du wie sich Social Distancing auf die verschiedenen **{regionen}** in Deutschland auswirkt. Wir nutzen Daten über **{datasource}** (Du kannst die Datenquelle links im Menü ändern) um zu berechnen, wie gut Social Distancing aktuell funktioniert. Ein Wert von **100% entspricht dem Normal-Wert vor der Covid-Pandemie**, also bevor die Bürger zu Social Distancing aufgerufen wurden. Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung des Verkehrsaufkommen gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist. **Weniger ist besser!**
     '''.format(regionen=use_states_select,datasource=selected_score_desc)
     )
-    #st.write("Zum Vergleich - die durchschnittliche Soziale Distanz am {} in Deutschland: {:.2f}".format(latest_date,germany_average))
+
     try:
         st_map_header.subheader('Social Distancing Karte vom {}'.format( datetime.datetime.strptime(latest_date,"%Y-%m-%d").strftime("%d.%m.%Y") ))
     except:
@@ -246,83 +284,46 @@ def dashboard():
         ![Legende](https://github.com/socialdistancingdashboard/virushack/raw/master/dashboard/legende.png)
     """)
     st_legend.image("https://github.com/socialdistancingdashboard/virushack/raw/master/dashboard/legende.png") 
+        
+    # Prepare df_scores according to Landkreis/Bundesland selection
     if use_states:
         features = 'states'
+        # aggregate state data
+        df_scores['state_id'] = df_scores.apply(lambda x: str(x['id'])[:2],axis=1) # get state id (first two letters of county id)
+        df_scores['state_name'] = df_scores.apply(lambda x: state_id_to_name[x['state_id']],axis=1) # get state name
+        df_scores = df_scores.groupby(['state_name','date']).mean() # group by state and date, calculate mean scores
+        df_scores = df_scores.round(1) #round
+        df_scores['id'] = df_scores.apply(lambda x: state_name_to_id[x.name[0]],axis=1) # re-add state indices
+        df_scores = df_scores.replace([np.inf, -np.inf], np.nan) # remove infs
+        df_scores = df_scores.reset_index() # make index columns into regular columns
     else:
         features = 'counties'
-    url_topojson = 'https://raw.githubusercontent.com/AliceWi/TopoJSON-Germany/master/germany.json'
-    data_topojson_remote = alt.topo_feature(url=url_topojson, feature=features)
-    MAPHEIGHT = 600
-    basemap = alt.Chart(data_topojson_remote).mark_geoshape(
-            fill='lightgray',
-            stroke='white',
-            strokeWidth=0.5
-        ).properties(width='container',height = MAPHEIGHT)
-    selected_score_axis_percent = selected_score_axis + ' (%)'
-    if use_states:
-        # aggregate state data
-        df_states = df_scores_full.copy()
-        df_states['state_id'] = df_states.apply(lambda x: str(x['id'])[:2],axis=1) # get state id (first two letters of county id)
-        df_states['state_name'] = df_states.apply(lambda x: state_id_to_name[x['state_id']],axis=1) # get state name
-        df_states = df_states.groupby(['state_name','date']).mean() # group by state and date, calculate mean scores
-        df_states = df_states.round(1) #round
-        df_states['id'] = df_states.apply(lambda x: state_name_to_id[x.name[0]],axis=1) # re-add state indices
-        df_states = df_states.replace([np.inf, -np.inf], np.nan) # remove infs
-        df_states = df_states.reset_index() # make index columns into regular columns
-        
-        #draw state map
-        layer = alt.Chart(data_topojson_remote).mark_geoshape(
-            stroke='white'
-        ).encode(
-            color=alt.Color(selected_score+':Q', title=selected_score_axis_percent, scale=alt.Scale(domain=(200, 0),scheme='redyellowgreen'),legend=None),
-            tooltip=[alt.Tooltip("state_name:N", title="Bundesland"),alt.Tooltip(selected_score+":Q", title=selected_score_axis_percent)]
-        ).transform_lookup(
-            lookup='id',
-            from_= alt.LookupData(df_states[(df_states["date"] == str(latest_date)) & (df_states[selected_score] > 0)], 'id', [selected_score])
-        ).transform_lookup(
-            lookup='id',
-            from_= alt.LookupData(df_states[(df_states["date"] == str(latest_date)) & (df_states[selected_score] > 0)], 'id', ['state_name'])
-        ).properties(width='container',height = MAPHEIGHT)
+        #filter scores based on selected places
+        if len(countys) > 0:
+            df_scores["filtered_score"] = np.where(df_scores["name"].isin(countys), df_scores[selected_score],[0] * len(df_scores))
+        else:
+            df_scores["filtered_score"] = df_scores[selected_score]
 
-        c = alt.layer(basemap, layer).configure_view(
-            strokeOpacity=0
-        )
-        st_map.altair_chart(c)
-    else:
-        # draw counties map
-        df_scores_lookup = df_scores[(df_scores["date"] == str(latest_date)) & (df_scores["filtered_score"] > 0)]
-        df_scores_lookup = df_scores_lookup[['id','date','name','filtered_score']]
-        
-        layer = alt.Chart(data_topojson_remote).mark_geoshape(
-            stroke='white'
-        ).encode(
-            color=alt.Color('filtered_score:Q', title=selected_score_axis_percent, scale=alt.Scale(domain=(200, 0),scheme='redyellowgreen'),legend=None),
-            tooltip=[alt.Tooltip("name:N", title="Kreis"),alt.Tooltip("filtered_score:Q", title=selected_score_axis_percent)]
-        ).transform_lookup(
-            lookup='id',
-            from_= alt.LookupData(df_scores_lookup, 'id', ['filtered_score'])
-        ).transform_lookup(
-            lookup='id',
-            from_= alt.LookupData(df_scores_lookup, 'id', ['name'])
-        ).properties(width='container',height = MAPHEIGHT)
-
-        c = alt.layer(basemap, layer).configure_view(
-            strokeOpacity=0
-        )
-        st_map.altair_chart(c)
+    df_scores["date"] = pd.to_datetime(df_scores["date"])
+    df_scores = df_scores.round(1)
+    
+    # DRAW MAP
+    map = get_map(df_scores,use_states,selected_score,selected_score_axis,features)
+    map2 = map.copy() # otherwise streamlit gives a Cached Object Mutated warning
+    st_map.altair_chart(map2)
 
     # draw timelines
     st_timeline_header.subheader("Zeitlicher Verlauf")
     if len(countys) > 0 and not use_states:
-        df_scores[df_scores["name"].isin(countys)][["name", "date", "filtered_score"]].dropna()
+        df_scores = df_scores[df_scores["name"].isin(countys)].dropna(axis=1, how="all")
         st_timeline.altair_chart(alt.Chart(
             df_scores[df_scores["name"].isin(countys)][["name", "date", "filtered_score"]].dropna()).mark_line(point=True).encode(
             x=alt.X('date:T', axis=alt.Axis(title='Datum', format=("%d %b"))),
-            y=alt.Y('filtered_score:Q', title=selected_score_axis_percent),
+            y=alt.Y('filtered_score:Q', title=selected_score_axis),
             color=alt.Color('name', title="Landkreis"),
             tooltip=[
                 alt.Tooltip("name:N", title="Landkreis"),
-                alt.Tooltip('filtered_score:Q', title=selected_score_axis_percent),
+                alt.Tooltip('filtered_score:Q', title=selected_score_axis),
                 alt.Tooltip("date:T", title="Datum"),
                 ]
         ).properties(
@@ -330,16 +331,16 @@ def dashboard():
             height=400
         ))
     elif use_states:
-        df_states=df_states[["state_name", "date", selected_score]].dropna()
+        df_scores=df_scores[["state_name", "date", selected_score]].dropna()
         st_timeline.altair_chart(alt.Chart(
-            df_states).mark_line(point=True).encode(
+            df_scores).mark_line(point=True).encode(
             x=alt.X('date:T', axis=alt.Axis(title='Datum', format=("%d %b"))),
-            y=alt.Y(selected_score+':Q', title=selected_score_axis_percent),
+            y=alt.Y(selected_score+':Q', title=selected_score_axis),
             color=alt.Color('state_name', title="Bundesland", scale=alt.Scale(scheme='category20')),
             
             tooltip=[
                 alt.Tooltip("state_name:N", title="Bundesland"),
-                alt.Tooltip(selected_score+":Q", title=selected_score_axis_percent),
+                alt.Tooltip(selected_score+":Q", title=selected_score_axis),
                 alt.Tooltip("date:T", title="Datum"),
                 ]
         ).properties(
