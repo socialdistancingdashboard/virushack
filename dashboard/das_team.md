@@ -35,18 +35,18 @@ div.team>div:hover {
     <div>Cornelius Römer</div>
     <div>Fabian Daugs</div>
     <div>Florian Jungbluth</div>
-    <div>Gabriel</div>
+    <div>Gabriel Jäger</div>
     <div>Jochen Schäfer</div>
     <div>Julius Bihler</div>
     <div>Jürgen Jasperneite</div>
-    <div>Leo</div>
+    <div>Leonard Eckert</div>
     <div>Luca Koroll</div>
     <div>Luke Bölling</div>
     <div>Marcus Aßhauer</div>
     <div>Matthias Rudolph</div>
     <div>Michael Adams</div>
     <div>Mischa Gutknecht </div>
-    <div>Nico Röck </div>
+    <div>Nico Röck</div>
     <div>Parzival Borlinghaus</div>
     <div>Philip Kreißel</div>
     <div>Sebastian Schellhammer</div>
