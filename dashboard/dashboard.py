@@ -133,6 +133,47 @@ def dashboard():
 
         c = alt.layer(basemap, layer).configure_view(strokeOpacity=0)
         return c
+        
+    @st.cache(persist=True)
+    def get_timeline_plots(df_scores, selected_score, selected_score_axis, countys, use_states):
+        if len(countys) > 0 and not use_states:
+            # Landkreise
+            df_scores = df_scores[df_scores["name"].isin(countys)].dropna(axis=1, how="all")
+            c = alt.Chart(
+                df_scores[df_scores["name"].isin(countys)][["name", "date", "filtered_score"]].dropna()
+                ).mark_line(point=True).encode(
+                    x=alt.X('date:T', axis=alt.Axis(title='Datum', format=("%d %b"))),
+                    y=alt.Y('filtered_score:Q', title=selected_score_axis),
+                    color=alt.Color('name', title="Landkreis"),
+                    tooltip=[
+                        alt.Tooltip("name:N", title="Landkreis"),
+                        alt.Tooltip('filtered_score:Q', title=selected_score_axis),
+                        alt.Tooltip("date:T", title="Datum"),
+                        ]
+                ).properties(
+                    width='container',
+                    height=400
+            )
+            return c
+        elif use_states:
+            # Bundesländer
+            df_scores=df_scores[["state_name", "date", selected_score]].dropna()
+            c = alt.Chart(df_scores).mark_line(point=True).encode(
+                x=alt.X('date:T', axis=alt.Axis(title='Datum', format=("%d %b"))),
+                y=alt.Y(selected_score+':Q', title=selected_score_axis),
+                color=alt.Color('state_name', title="Bundesland", scale=alt.Scale(scheme='category20')),
+                tooltip=[
+                    alt.Tooltip("state_name:N", title="Bundesland"),
+                    alt.Tooltip(selected_score+":Q", title=selected_score_axis),
+                    alt.Tooltip("date:T", title="Datum"),
+                    ]
+            ).properties(
+                width='container',
+                height=400
+            )
+            return c
+        else:
+            return None
     
     # make page here with placeholders
     # thus later elements (e.g. county selector) can influence
@@ -280,12 +321,11 @@ def dashboard():
         st_map_header.subheader('Social Distancing Karte vom {}'.format( datetime.datetime.strptime(latest_date,"%Y-%m-%d").strftime("%d.%m.%Y") ))
     except:
         st_map_header.subheader('Social Distancing Karte vom {}'.format(latest_date))
-    st_legend.markdown("""
-        ![Legende](https://github.com/socialdistancingdashboard/virushack/raw/master/dashboard/legende.png)
-    """)
     st_legend.image("https://github.com/socialdistancingdashboard/virushack/raw/master/dashboard/legende.png") 
-        
+     
+
     # Prepare df_scores according to Landkreis/Bundesland selection
+    # =============================================================
     if use_states:
         features = 'states'
         # aggregate state data
@@ -308,50 +348,25 @@ def dashboard():
     df_scores = df_scores.round(1)
     
     # DRAW MAP
+    # ========
     map = get_map(df_scores,use_states,selected_score,selected_score_axis,features)
     map2 = map.copy() # otherwise streamlit gives a Cached Object Mutated warning
     st_map.altair_chart(map2)
-
-    # draw timelines
+    
+    # DRAW TIMELINES
+    # ==============
     st_timeline_header.subheader("Zeitlicher Verlauf")
-    if len(countys) > 0 and not use_states:
-        df_scores = df_scores[df_scores["name"].isin(countys)].dropna(axis=1, how="all")
-        st_timeline.altair_chart(alt.Chart(
-            df_scores[df_scores["name"].isin(countys)][["name", "date", "filtered_score"]].dropna()).mark_line(point=True).encode(
-            x=alt.X('date:T', axis=alt.Axis(title='Datum', format=("%d %b"))),
-            y=alt.Y('filtered_score:Q', title=selected_score_axis),
-            color=alt.Color('name', title="Landkreis"),
-            tooltip=[
-                alt.Tooltip("name:N", title="Landkreis"),
-                alt.Tooltip('filtered_score:Q', title=selected_score_axis),
-                alt.Tooltip("date:T", title="Datum"),
-                ]
-        ).properties(
-            width='container',
-            height=400
-        ))
-    elif use_states:
-        df_scores=df_scores[["state_name", "date", selected_score]].dropna()
-        st_timeline.altair_chart(alt.Chart(
-            df_scores).mark_line(point=True).encode(
-            x=alt.X('date:T', axis=alt.Axis(title='Datum', format=("%d %b"))),
-            y=alt.Y(selected_score+':Q', title=selected_score_axis),
-            color=alt.Color('state_name', title="Bundesland", scale=alt.Scale(scheme='category20')),
-            
-            tooltip=[
-                alt.Tooltip("state_name:N", title="Bundesland"),
-                alt.Tooltip(selected_score+":Q", title=selected_score_axis),
-                alt.Tooltip("date:T", title="Datum"),
-                ]
-        ).properties(
-            width='container',
-            height=400
-        ))
+    timeline = get_timeline_plots(df_scores, selected_score, selected_score_axis, countys, use_states)
+    if timeline is not None:
+        timeline2 = timeline.copy() # otherwise streamlit gives a Cached Object Mutated warning
+        st_timeline.altair_chart(timeline2)
     else:
         st_timeline_desc.markdown('''
             Wähle einen oder mehrere Landkreise aus um hier die zeitliche Entwicklung der Daten für {datasource} zu sehen.
         '''.format(datasource=selected_score_desc))
-    
+        
+    # FOOTER
+    # ======
     st_footer_title.subheader("Unsere Datenquellen")
     st_footer.markdown("""
         ![](https://github.com/socialdistancingdashboard/virushack/raw/master/logo/Datenquellen.PNG)
