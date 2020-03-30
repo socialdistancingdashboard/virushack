@@ -66,6 +66,9 @@ st.markdown("""
             div.row-widget.stRadio div[role='radiogroup']>label>div:first-child{{
             display:none;
         }}
+        #MainMenu.dropdown {{
+            display: none;
+        }}
     </style>
     """.format(selected=menuitems[menu]), unsafe_allow_html=True)
 
