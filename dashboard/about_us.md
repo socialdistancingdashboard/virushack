@@ -36,7 +36,7 @@ In diesen Tagen hat er viele Krisensitzungen zu leiten und sorgt sich um die Ges
 ----
 ### Franziska Bartels - engagierte Data Scientistin
 ![Fanzsika Bartels](https://res.cloudinary.com/devpost/image/fetch/s--8GuvK94n--/c_limit,f_auto,fl_lossy,q_auto:eco,w_900/https://i.imgur.com/Qblf0mY.png)
-ie arbeitet momentan im Homeoffice für Ihr Unternehmen und stellt sich die Frage, ob sie neben #wirbleibenzuhause nicht auch noch einen aktiven Beitrag gegen die Ausbreitung von Corona leisten kann. Direkt stellt sich ihr die Frage:
+Sie arbeitet momentan im Homeoffice für ihr Unternehmen und stellt sich die Frage, ob sie neben #wirbleibenzuhause nicht auch noch einen aktiven Beitrag gegen die Ausbreitung von Corona leisten kann. Direkt stellt sich ihr die Frage:
 
 #### Fragestellungen:
 - "Woher bekomme ich die nötigen Daten, um Analysen zu machen oder eine sinnvolle Anwendung zu entwickeln?"
