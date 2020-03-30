@@ -1,4 +1,4 @@
-# Database und (GET) API Spezifikation
+# Database und API Spezifikation
 Immer auf dem aktuellen Stand unter
 - https://hackmd.okfn.de/ujyaOP2UScWe2isgUe9pYA?both#
 
