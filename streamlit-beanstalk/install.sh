@@ -1,5 +1,6 @@
 #!/bin/bash
 sudo yum -y -q update
+sudo yum install -y git
 sudo yum install -y python3
 sudo pip3 install pandas
 sudo pip3 install streamlit
