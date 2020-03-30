@@ -180,7 +180,7 @@ def get_timeline_plots(df_scores, selected_score, selected_score_axis, use_state
     else:
         return None
 
-def detail_score_selector(df_scores_in, scorenames_desc, scorenames_axis, allow_county_select, key, default_detail_index):
+def detail_score_selector(df_scores_in, scorenames_desc, scorenames_axis, allow_county_select, key, default_detail_index=0, default_score="hystreet_score"):
 
     df_scores = df_scores_in.copy()
     
@@ -202,7 +202,7 @@ def detail_score_selector(df_scores_in, scorenames_desc, scorenames_axis, allow_
     sorted_desc = sorted(list(scorenames_desc.values()))
     selected_score_desc = st.selectbox(
         'Datenquelle:', sorted_desc, 
-        index = sorted_desc.index(scorenames_desc['hystreet_score']), # default value in sorted list
+        index = sorted_desc.index(scorenames_desc[default_score]), # default value in sorted list
         key = key
     )
     inverse_scorenames_desc = {scorenames_desc[key]:key for key in scorenames_desc.keys()}
@@ -348,7 +348,8 @@ def dashboard():
                                         scorenames_axis, 
                                         allow_county_select=False,
                                         key='map',
-                                        default_detail_index=0
+                                        default_detail_index=0,
+                                        default_score="gmap_score"
                                         )
     st_map             = st.empty()
     st_legend          = st.empty()
@@ -361,7 +362,8 @@ def dashboard():
                                         scorenames_axis, 
                                         allow_county_select=True,
                                         key='timeline',
-                                        default_detail_index=1
+                                        default_detail_index=1,
+                                        default_score="hystreet_score"
                                         )
 
     
@@ -374,22 +376,26 @@ def dashboard():
     # WRITE DESCRIPTION TEXTS
     if selected_score == "bike_score"   :
         st_info_text.markdown('''
-        In der Karte siehst Du wie sich Social Distancing auf die verschiedenen **{regionen}** in Deutschland auswirkt. Wir nutzen Daten über **{datasource}** (Du kannst die Datenquelle weiter unten im Menü ändern) um zu berechnen, wie gut Social Distancing aktuell funktioniert. Ein Wert von **100% entspricht dem Normal-Wert vor der COVID-Pandemie**, also bevor die Bürger zu Social Distancing aufgerufen wurden. Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung der Aktivität gemessen wurde. **Im Fall von Radfahrern ist ein erhöhtes Verkehrsaufkommen ein positiver Indikator für Social Distancing!** Mehr Menschen sind mit dem Fahrrad unterwegs anstatt mit anderen Verkehrsmitteln, bei denen Social Distancing schwierieger einzuhalten ist.
+        In der Karte siehst Du wie sich Social Distancing auf die verschiedenen **{regionen}** in Deutschland auswirkt. Wir nutzen Daten über **{datasource}** um zu berechnen, wie gut Social Distancing aktuell funktioniert. Du kannst die Datenauswahl weiter unten im Menü ändern. Ein Wert von **100% entspricht dem Normal-Wert vor der COVID-Pandemie**, also bevor die Bürger zu Social Distancing aufgerufen wurden. Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung der Aktivität gemessen wurde. **Im Fall von Radfahrern ist ein erhöhtes Verkehrsaufkommen ein positiver Indikator für Social Distancing!** Mehr Menschen sind mit dem Fahrrad unterwegs anstatt mit anderen Verkehrsmitteln, bei denen Social Distancing schwierieger einzuhalten ist.
         '''.format(regionen=use_states_select,datasource=selected_score_desc)
     )
     else:
         st_info_text.markdown('''
-        In der Karte siehst Du wie sich Social Distancing auf die verschiedenen **{regionen}** in Deutschland auswirkt. Wir nutzen Daten über **{datasource}** (Du kannst die Datenquelle weiter unten im Menü ändern) um zu berechnen, wie gut Social Distancing aktuell funktioniert. Ein Wert von **100% entspricht dem Normal-Wert vor der COVID-Pandemie**, also bevor die Bürger zu Social Distancing aufgerufen wurden. Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung der Aktivität gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist. **Weniger ist besser!**
+        In der Karte siehst Du wie sich Social Distancing auf die verschiedenen **{regionen}** in Deutschland auswirkt. Wir nutzen Daten über **{datasource}** um zu berechnen, wie gut Social Distancing aktuell funktioniert. Du kannst die Datenauswahl weiter unten im Menü ändern. Ein Wert von **100% entspricht dem Normal-Wert vor der COVID-Pandemie**, also bevor die Bürger zu Social Distancing aufgerufen wurden. Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung der Aktivität gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist. **Weniger ist besser!**
         '''.format(regionen=use_states_select,datasource=selected_score_desc)
     )
     if selected_score2 == "bike_score"   :
         st_timeline_desc.markdown('''
-        Hier kannst du den zeitlichen Verlauf der gewählten Datenquelle für verschiedene **{regionen}** in Deutschland vergleichen. Wir nutzen Daten über **{datasource}** (Du kannst die Datenquelle weiter unten im Menü ändern) um zu berechnen, wie gut Social Distancing aktuell funktioniert. **Ein Wert von 100% entspricht dem Normal-Wert vor der COVID-Pandemie, also bevor die Bürger zu Social Distancing aufgerufen wurden.** Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung der Aktivität gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist. **Im Fall von Radfahrern ist ein erhöhtes Verkehrsaufkommen ein positiver Indikator für Social Distancing!** Mehr Menschen sind mit dem Fahrrad unterwegs anstatt mit anderen Verkehrsmitteln, bei denen Social Distancing schwierieger einzuhalten ist.
+        Hier kannst du den zeitlichen Verlauf der gewählten Datenquelle für verschiedene **{regionen}** in Deutschland vergleichen. Wir nutzen Daten über **{datasource}** um zu berechnen, wie gut Social Distancing aktuell funktioniert. Du kannst die Datenauswahl weiter unten im Menü ändern. **Ein Wert von 100% entspricht dem Normal-Wert vor der COVID-Pandemie, also bevor die Bürger zu Social Distancing aufgerufen wurden.** Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung der Aktivität gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist. **Im Fall von Radfahrern ist ein erhöhtes Verkehrsaufkommen ein positiver Indikator für Social Distancing!** Mehr Menschen sind mit dem Fahrrad unterwegs anstatt mit anderen Verkehrsmitteln, bei denen Social Distancing schwierieger einzuhalten ist.
+        
+        **Sieh doch mal nach wie die Lage in Deiner Region ist!**
         '''.format(regionen=use_states_select2,datasource=selected_score_desc2)
     )
     else:
         st_timeline_desc.markdown('''
-        Hier kannst du den zeitlichen Verlauf der gewählten Datenquelle für verschiedene **{regionen}** in Deutschland vergleichen. Wir nutzen Daten über **{datasource}** (Du kannst die Datenquelle weiter unten im Menü ändern) um zu berechnen, wie gut Social Distancing aktuell funktioniert. **Ein Wert von 100% entspricht dem Normal-Wert vor der COVID-Pandemie, also bevor die Bürger zu Social Distancing aufgerufen wurden.** Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung der Aktivität gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist. 
+        Hier kannst du den zeitlichen Verlauf der gewählten Datenquelle für verschiedene **{regionen}** in Deutschland vergleichen. Wir nutzen Daten über **{datasource}** um zu berechnen, wie gut Social Distancing aktuell funktioniert. Du kannst die Datenauswahl weiter unten im Menü ändern. **Ein Wert von 100% entspricht dem Normal-Wert vor der COVID-Pandemie, also bevor die Bürger zu Social Distancing aufgerufen wurden.** Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung der Aktivität gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist. 
+        
+        **Sieh doch mal nach wie die Lage in Deiner Region ist!**
         '''.format(regionen=use_states_select2,datasource=selected_score_desc2)
     )
 
