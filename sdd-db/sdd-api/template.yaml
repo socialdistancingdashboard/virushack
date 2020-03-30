@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  basic-aws-apigateway-demo
+  Sample SAM Template for basic-aws-apigateway-demo
+  
+Globals:
+  Function:
+    Timeout: 60
+  
+Resources:
+  SddDbApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: Sdd Db Api Gateway
+      StageName: Prod
+      Cors: "'*'"
+
+  GetSourcesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: 
+      Handler: lambda_function.get_sources
+      Runtime: python3.7
+      Events:
+        GetSources:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SddDbApiGateway
+            Path: /get-sources
+            Method: GET
+          cors: true
+
+  GetLocationsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: 
+      Handler: lambda_function.get_locations
+      Runtime: python3.7
+      Events:
+        GetCategories:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SddDbApiGateway
+            Path: /get-locations
+            Method: GET
+          cors: true
+    
+  GetStationsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: 
+      Handler: lambda_function.get_stations
+      Runtime: python3.7
+      Events:
+        GetCategories:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SddDbApiGateway
+            Path: /get-stations
+            Method: GET
+          cors: true
+   
+ 
+  GetStationDataFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: 
+      Handler: lambda_function.get_station_data
+      Runtime: python3.7
+      Events:
+        GetStationData:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            RestApiId: !Ref SddDbApiGateway
+            Path: /get-station-data/{source_id}
+            Method: GET
+          cors: true
+Outputs:
+  SddDbApiGateway:
+    Description: "API Gateway endpoint URL for Prod stage for Sdd Api"
+    Value: !Sub "https://${SddDbApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/SddDbApiGateway/"
+
+  GetSourcesFunction:
+    Description: "Retrieves Sources"
+    Value: !GetAtt GetSourcesFunction.Arn
+
+  GetLocationsFunction:
+    Description: "Retrieves Locations"
+    Value: !GetAtt GetLocationsFunction.Arn
+
+  GetStationDataFunction:
+    Description: "Retrieves Data from One Station"
+    Value: !GetAtt GetStationDataFunction.Arn
+  
+  GetStationsFunction:
+    Description: "Retrieves Data from One Station"
+    Value: !GetAtt GetStationsFunction.Arn
+
+    
