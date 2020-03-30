@@ -80,22 +80,33 @@ def load_real_data(dummy_time):
     
 @st.cache(persist=True)
 def get_map(df_scores,selected_score,selected_score_axis,use_states,latest_date):
+    url_topojson = 'https://raw.githubusercontent.com/AliceWi/TopoJSON-Germany/master/germany.json'
+    MAPHEIGHT = 600
     if use_states:
         features = 'states'
+        sw = 1
     else:
         features = 'counties'
-    url_topojson = 'https://raw.githubusercontent.com/AliceWi/TopoJSON-Germany/master/germany.json'
+        sw = 0.2
+        # overlay state boundaries with thicker lines
+        data_topojson_remote_states = alt.topo_feature(url=url_topojson, feature='states')
+        overlaymap = alt.Chart(data_topojson_remote_states).mark_geoshape(
+            fill=None,
+            stroke='white',
+            strokeWidth=1.5
+        ).properties(width='container',height = MAPHEIGHT)
     data_topojson_remote = alt.topo_feature(url=url_topojson, feature=features)
-    MAPHEIGHT = 600
+   
     basemap = alt.Chart(data_topojson_remote).mark_geoshape(
             fill='lightgray',
             stroke='white',
-            strokeWidth=0.5
+            strokeWidth=sw
         ).properties(width='container',height = MAPHEIGHT)
     if use_states:
         #draw state map
         layer = alt.Chart(data_topojson_remote).mark_geoshape(
-            stroke='white'
+            stroke='white',
+            strokeWidth=sw
         ).encode(
                 color=alt.Color(selected_score+':Q', 
                                 title=selected_score_axis, 
@@ -118,7 +129,8 @@ def get_map(df_scores,selected_score,selected_score_axis,use_states,latest_date)
         df_scores_lookup = df_scores_lookup[['id','date','name','filtered_score']]
         
         layer = alt.Chart(data_topojson_remote).mark_geoshape(
-            stroke='white'
+            stroke='white',
+            strokeWidth=sw
         ).encode(
                 color=alt.Color('filtered_score:Q', 
                                 title=selected_score_axis, 
@@ -135,8 +147,10 @@ def get_map(df_scores,selected_score,selected_score_axis,use_states,latest_date)
             lookup='id',
             from_= alt.LookupData(df_scores_lookup, 'id', ['name'])
         ).properties(width='container',height = MAPHEIGHT)
-
-    c = alt.layer(basemap, layer).configure_view(strokeOpacity=0)
+    if use_states:
+        c = alt.layer(basemap, layer).configure_view(strokeOpacity=0)
+    else:
+        c = alt.layer(basemap, layer, overlaymap).configure_view(strokeOpacity=0)
     return c
     
 @st.cache(persist=True)
