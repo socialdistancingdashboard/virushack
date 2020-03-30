@@ -11,6 +11,7 @@ sudo curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virusha
 sudo chmod 644 /etc/systemd/system/rundashboard.service
 sudo systemctl enable rundashboard.service
 cd /home/ec2-user
+git clone https://github.com/socialdistancingdashboard/frontend.git
 curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virushack/master/streamlit-beanstalk/update.sh
 sudo chmod u+x update.sh
 sudo ./update.sh
