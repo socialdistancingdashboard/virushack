@@ -15,6 +15,7 @@ Google bietet über seinen Dienst Google Maps Transit die Funktion an, zu zeigen
 **Basis:** [hystreet.com](https://hystreet.com)
 
 hystreet.com misst die Passantenfrequenz innerstädtischer Einzelhandelslagen mit Hilfe von Laserscannern an 117 Standorten in 57 Städten. Hystreet hat uns API-Zugriff gewährt und wir können daher sowohl auf stündlich aktualisierte Zahlen, als auch auf mehrere Jahre zurückliegende Daten zugreifen.
+![Hystreet Aufbau](https://i.imgur.com/tasxjUt.jpg)
 
 ### Fußgänger auf öffentlichen Webcams
 Es gibt viele öffentliche Webcams, die belebte und beliebte Orte in unseren Städten zeigen. Durch Bilderkennungsprozesse werden Menschen auf den Bildern als solche erkannt und gezählt. Die Webcams werden zur Zeit stündlich abgefragt.
