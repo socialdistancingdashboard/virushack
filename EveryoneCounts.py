@@ -101,4 +101,5 @@ st.sidebar.subheader("Pressestimmen")
 st.sidebar.markdown('''
 - [Tagesspiegel](https://www.tagesspiegel.de/wirtschaft/hackathon-im-netz-programmierer-tuefteln-an-loesungen-gegen-die-corona-krise/25670548.html)
 - [SWR-Online](https://www.swr.de/swraktuell/wie-deutschland-das-coronavirus-hackt-wirvsvirus-hackathon-100.html)
+- [WDR](https://www1.wdr.de/nachrichten/themen/coronavirus/verkehr-innenstadt-corona-100.html)
 ''')
