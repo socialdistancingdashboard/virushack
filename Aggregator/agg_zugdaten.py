@@ -32,7 +32,7 @@ def aggregate(date):
       for product in lineProducts:
         df_filtered = df[ (df.district == r) & (df.lineProduct==product) ]
         # add scores to dictionary
-        scores.update({product + "_score": df_filtered.cancelled_stops.sum()})
+        scores.update({"score_public_transportation_" + product: df_filtered.cancelled_stops.sum()})
       # add to result
       result.append(scores)
     # return result as list
