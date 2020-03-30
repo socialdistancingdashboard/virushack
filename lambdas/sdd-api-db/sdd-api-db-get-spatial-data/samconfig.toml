@@ -1,7 +1,0 @@
-version = 0.1
-[default]
-[default.deploy]
-[default.deploy.parameters]
-region = "eu-central-1"
-capabilities = "CAPABILITY_IAM"
-
