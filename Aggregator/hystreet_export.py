@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from datetime import date as dt
 from coords_to_kreis import coords_convert
 from tqdm import tqdm
+import settings
 
 result_df = pd.DataFrame()
 for x in tqdm(range(700)):
@@ -14,7 +15,7 @@ for x in tqdm(range(700)):
     clientFirehose = boto3.client('firehose')
 
     try:
-        response = s3_client.get_object(Bucket='sdd-s3-basebucket', Key='hystreet/{}/{}/{}'.format(
+        response = s3_client.get_object(Bucket=settings.BUCKET, Key='hystreet/{}/{}/{}'.format(
         str(date.year).zfill(4), str(date.month).zfill(2), str(date.day-3).zfill(2)))
     except:
         continue

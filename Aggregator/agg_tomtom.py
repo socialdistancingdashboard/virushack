@@ -4,6 +4,7 @@ from coords_to_kreis import coords_convert
 import datetime
 import pandas as pd
 import numpy as np
+import settings
 
 def aggregate(date):
     s3_client = boto3.client('s3')

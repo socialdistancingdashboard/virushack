@@ -6,13 +6,14 @@ import json
 import boto3
 from coords_to_kreis import coords_convert
 import re
+import settings
 
 def aggregate(date):
     s3_client = boto3.client('s3')
     data = pd.DataFrame()
     for x in range(0,20):
         try:
-            response = s3_client.get_object(Bucket='sdd-s3-basebucket', Key='webcamdaten/{}/{}/{}/{}webcamdaten.json'.format(str(date.year).zfill(4), str(date.month).zfill(2), str(date.day).zfill(2), str(x).zfill(2)))
+            response = s3_client.get_object(Bucket=settings.BUCKET, Key='webcamdaten/{}/{}/{}/{}webcamdaten.json'.format(str(date.year).zfill(4), str(date.month).zfill(2), str(date.day).zfill(2), str(x).zfill(2)))
             result = pd.DataFrame(json.loads(response["Body"].read()))
             result["date"] = date
             result["hour"] = x

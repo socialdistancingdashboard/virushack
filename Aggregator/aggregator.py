@@ -11,9 +11,10 @@ from agg_airquality import aggregate as agg_airquality
 from agg_lemgo_digital import aggregate as agg_lemgo_digital
 from agg_tomtom import aggregate as agg_tomtom
 import json
+import settings
 
 #How far back do you want to aggregate data?
-days = 10
+days = 1
 
 s3_client = boto3.client('s3')
 for x in range(0,days):
@@ -38,13 +39,13 @@ for x in range(0,days):
         print("Error GMAP:")
         print(e)
 
-    try:
-        gmapscore_supermarket_list = pd.DataFrame(agg_gmap_supermarket_score(date))
-        gmapscore_supermarket_list = gmapscore_supermarket_list.set_index('landkreis')
-        list_result = list_result.join(gmapscore_supermarket_list, how = "outer")
-    except Exception as e:
-        print("Error GMAP Super")
-        print(e)
+    # try:
+    #     gmapscore_supermarket_list = pd.DataFrame(agg_gmap_supermarket_score(date))
+    #     gmapscore_supermarket_list = gmapscore_supermarket_list.set_index('landkreis')
+    #     list_result = list_result.join(gmapscore_supermarket_list, how = "outer")
+    # except Exception as e:
+    #     print("Error GMAP Super")
+    #     print(e)
     try:
         webcam_list = pd.DataFrame(agg_webcam(date))
         webcam_list = webcam_list.set_index('landkreis')
@@ -100,6 +101,6 @@ for x in range(0,days):
     dict = list_result.T.to_dict()
     dict
     # s3_client.put_object(Bucket='sdd-s3-basebucket', Key="aggdata/live", Body=json.dumps(dict))
-    response = s3_client.put_object(Bucket='sdd-s3-basebucket', Key='aggdata/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2),
+    response = s3_client.put_object(Bucket=settings.BUCKET, Key='aggdata/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2),
                                                                   str(date.day).zfill(2)), Body=json.dumps(dict))
     print(response)

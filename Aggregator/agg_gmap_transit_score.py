@@ -6,6 +6,7 @@ from datetime import date, timedelta
 import pandas as pd
 import csv
 import numpy as np
+import settings
 
 def aggregate(date):
     s3_client = boto3.client('s3')
@@ -16,7 +17,7 @@ def aggregate(date):
 
     for x in range(9,19):
         try:
-            response = s3_client.get_object(Bucket='sdd-s3-basebucket', Key='googleplaces/{}/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2), str(date.day).zfill(2), str(x).zfill(2)))
+            response = s3_client.get_object(Bucket=settings.BUCKET, Key='googleplaces/{}/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2), str(date.day).zfill(2), str(x).zfill(2)))
             result = pd.DataFrame(json.loads(response["Body"].read()))
             result["date"] = date
             result["hour"] = x

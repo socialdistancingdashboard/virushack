@@ -9,10 +9,11 @@ from datetime import datetime
 import boto3
 import json
 import csv
+import settings
 
 def aggregate(date):
     s3_client = boto3.client('s3')
-    response = s3_client.get_object(Bucket='sdd-s3-basebucket', Key='parkhaeuser/{}/{}/{}/{}'.format(
+    response = s3_client.get_object(Bucket=settings.BUCKET, Key='parkhaeuser/{}/{}/{}/{}'.format(
         str(date.year).zfill(4), str(date.month).zfill(2), str(date.day).zfill(2), str(date.hour).zfill(2)))
     json.loads(response["Body"].read())
     results = []
@@ -29,4 +30,3 @@ def aggregate(date):
                 }
             results.append(data)
     return results
-

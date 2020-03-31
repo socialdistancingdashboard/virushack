@@ -2,6 +2,7 @@ import json
 from datetime import date, timedelta
 import boto3
 import pandas as pd
+import settings
 
 date = date.today()
 
@@ -32,7 +33,7 @@ def get_relative_passerby(object_body_json):
 def aggregate(date):
     s3_client = boto3.client('s3')
 
-    s3_objects = s3_client.list_objects_v2(Bucket='sdd-s3-basebucket',
+    s3_objects = s3_client.list_objects_v2(Bucket=settings.BUCKET,
                                            Prefix='lemgo-digital/{}/{}/{}/'.format(str(date.year).zfill(4),
                                                                                    str(date.month).zfill(2),
                                                                                    str(date.day).zfill(2)))
@@ -42,7 +43,7 @@ def aggregate(date):
     print("Found " + str(len(s3_objects['Contents'])) + " elements")
     dict_s3_objects = {}
     for key in s3_objects['Contents']:
-        dict_s3_objects[path_to_hour_of_day(key['Key'])] = s3_client.get_object(Bucket='sdd-s3-basebucket',
+        dict_s3_objects[path_to_hour_of_day(key['Key'])] = s3_client.get_object(Bucket=settings.BUCKET,
                                                                                 Key=key['Key'])
 
     latest_lemgo_digital_object = dict_s3_objects[sorted(dict_s3_objects.keys(), reverse=False)[0]]
@@ -69,7 +70,6 @@ def aggregate(date):
     #print(aggregated_value_for_day)
     data_index = {
         'landkreis': '05766',
-        #'timestamp': aggregated_value['timestamp'],
         'lemgoDigital': aggregated_value_for_day['lemgoDigitalAggregated'].iloc[0]
     }
     list_results.append(data_index)

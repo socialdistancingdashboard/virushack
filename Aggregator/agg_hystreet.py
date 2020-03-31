@@ -3,6 +3,7 @@ import pandas as pd
 import json
 from datetime import datetime, timedelta, date
 from coords_to_kreis import coords_convert
+import settings
 
   # - timedelta(days=10)  # only for test purposes
 def aggregate(date):
@@ -10,7 +11,7 @@ def aggregate(date):
     data = pd.DataFrame()
     clientFirehose = boto3.client('firehose')
 
-    response = s3_client.get_object(Bucket='sdd-s3-basebucket', Key='hystreet/{}/{}/{}'.format(
+    response = s3_client.get_object(Bucket=settings.BUCKET, Key='hystreet/{}/{}/{}'.format(
         str(date.year).zfill(4), str(date.month).zfill(2), str(date.day-3).zfill(2)))
     result = pd.DataFrame(json.loads(response["Body"].read()))
     data = data.append(result.loc[result["pedestrians_count"] > 0])
@@ -50,12 +51,9 @@ def aggregate(date):
 
     for index, row in grouped.iterrows():
         data_dict = {
-            #'name': row['city'],
             'hystreet_score': row['relative_pedestrians_count'],
             'landkreis': row['landkreis']
-            #'lat': row['lat'],
-            #'lon': row['lon'],
-            #'date': row['date']
+
         }
         list_results.append(data_dict)
 
