@@ -63,6 +63,7 @@ Infos und Quellen zu den Daten der einzelnen Städte/Landkreise:
 -Wiesbaden: https://www.planetradio.de/service/parkhaeuser/  
 -Kassel: https://www.planetradio.de/service/parkhaeuser/  
 -Hochtaunuskreis: https://www.planetradio.de/service/parkhaeuser/ (Es werden nur die Daten für Bad Homburg erhoben)  
+-Freiburg: https://www.freiburg.de/pb/,Lde/231355.html#plsmaplink (Die Anzahl der Gesamtplätze wurde händisch in ein dict eingetragen, wird nicht gescrapet. Für das Parkhaus Volksbank ist die Anzahl 0, da das Parkhaus momentan repariert wird. Muss beizeiten angepasst werden. Alternativ ist es auch möglich, die Gesamtzahl zu scrapen, indem nacheinander die Websites für alle Parkhäuser aufgerufen werden. Dafür müsste das Skript angepasst werden)
 
 Bisher noch nicht in den Scraper integriert:  
 -Stuttgart: Für Stuttgart sind Daten erst wieder ab Mitte 2020 verfügbar (https://www.stuttgart.de/verkehrslage)  
