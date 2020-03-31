@@ -51,9 +51,8 @@ JSON-Schema:
 
 TODO:    
 -weitere Städte hinzufügen  
--evtl alte Daten (vor Corona) finden
+-evtl alte Daten (vor Corona) finden  
 -Scraper von regex auf html-parser umbasteln
-
 
 Infos und Quellen zu den Daten der einzelnen Städte/Landkreise:  
 -Köln:  
