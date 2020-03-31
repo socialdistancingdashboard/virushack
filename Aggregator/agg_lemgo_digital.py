@@ -63,12 +63,17 @@ def aggregate(date):
     aggregated_value['lemgoDigitalAggregated']
     list_results = []
     date_minus_one = date - timedelta(days=1)
-    aggregated_value_for_day = aggregated_value.loc[aggregated_value['timestamp'] == str(date)]
+    #print(aggregated_value["timestamp"])
+    #print(str(date))
+    aggregated_value_for_day = aggregated_value.loc[aggregated_value['timestamp'] == str(date_minus_one)]
+    #print(aggregated_value_for_day)
     data_index = {
         'landkreis': '05766',
         #'timestamp': aggregated_value['timestamp'],
-        'lemgoDigitalAggregated': aggregated_value_for_day['lemgoDigitalAggregated'].iloc[0]
+        'lemgoDigital': aggregated_value_for_day['lemgoDigitalAggregated'].iloc[0]
     }
     list_results.append(data_index)
 
     return list_results
+
+#aggregate(date.today() - timedelta(days = 4))

@@ -13,7 +13,7 @@ from agg_tomtom import aggregate as agg_tomtom
 import json
 
 #How far back do you want to aggregate data?
-days = 4
+days = 10
 
 s3_client = boto3.client('s3')
 for x in range(0,days):
@@ -27,6 +27,7 @@ for x in range(0,days):
         lemgo_digital_list = lemgo_digital_list.set_index('landkreis')
         list_result = list_result.join(lemgo_digital_list, how="outer")
     except Exception as e:
+        print("Error Lemgo:")
         print(e)
 
     try:

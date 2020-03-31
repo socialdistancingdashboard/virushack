@@ -5,6 +5,7 @@ from datetime import datetime, date, timedelta
 import json
 import boto3
 from coords_to_kreis import coords_convert
+import re
 
 def aggregate(date):
     s3_client = boto3.client('s3')
@@ -18,7 +19,13 @@ def aggregate(date):
             data = data.append(result)
         except:
             pass
+    #print(data)
     data.columns = [col.lower() for col in data.columns]
+    def extract_float(string):
+        return re.findall("\d+\.\d+", str(string))[0]
+    data["lon"] = data["lon"].apply(extract_float)
+    data["lat"] = data["lat"].apply(extract_float)
+    #print(data.columns)
     #names(df)[names(df) == 'Lat'] <- 'lat'
     data["ags"] = coords_convert(data)
     #return data
@@ -37,3 +44,4 @@ def aggregate(date):
         }
         list_results.append(data_index)
     return list_results
+#aggregate(date.today() - timedelta(days = 2))

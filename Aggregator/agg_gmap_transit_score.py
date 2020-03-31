@@ -2,14 +2,15 @@ from coords_to_kreis import coords_convert
 import boto3
 import json
 import time
-from datetime import date
+from datetime import date, timedelta
 import pandas as pd
 import csv
-
+import numpy as np
 
 def aggregate(date):
     s3_client = boto3.client('s3')
-
+    #date = date.today() - timedelta(days = 1)
+    #print(date)
     data = pd.DataFrame()
     #clientFirehose = boto3.client('firehose')
 
@@ -21,7 +22,7 @@ def aggregate(date):
             result["hour"] = x
             data = data.append(result)
         except Exception as e:
-            print("No gmap data for " + str(date) + " " + e)
+            print("No gmap data for " + str(date) + " " + str(e))
             return
 
     def normal_popularity(row):
@@ -55,39 +56,23 @@ def aggregate(date):
     data["lon"] = lon
     #print(data)
     data["ags"] = coords_convert(data)
+    data
     data2 = data.loc[data["ags"].notna()]
 
 
-    result = pd.DataFrame(data2.groupby("ags")[["relative_popularity","lat", "lon"]].mean())
-
+    result = data2.groupby("ags").apply(lambda x: np.average(x.relative_popularity, weights=x.normal_popularity))
+    result = pd.DataFrame(result)
     result = result.reset_index()
+    result.columns = ["ags", "relative_popularity"]
     list_results = []
     for index, row in result.iterrows():
         landkreis = row['ags']
         relative_popularity = row['relative_popularity']
-        try:
-            lat = row["lat"]
-            lon = row["lon"]
-        except:
-            lat = None
-            lon = None#
-            continue
         data_index = {
             "landkreis": landkreis,
             # todo time from request
             #'date': str(date),
             'gmap_score' : relative_popularity
-             #"airquality_score" : airquality_score
-             #'hystreet_score' : hystreet_score
-             # 'cycle_score' : cycle_score
-        }
-        data_index2 = {
-            'landkreis': landkreis,
-            "lon" : lon,
-            "lat" : lat,
-            # todo time from request
-            'date': str(date),
-            'gmap_transit_score' : relative_popularity
              #"airquality_score" : airquality_score
              #'hystreet_score' : hystreet_score
              # 'cycle_score' : cycle_score

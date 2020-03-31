@@ -2,9 +2,10 @@ from coords_to_kreis import coords_convert
 import boto3
 import json
 import time
-from datetime import date
+from datetime import date, timedelta
 import pandas as pd
 import csv
+import ast
 
 
 def aggregate(date):
@@ -12,6 +13,7 @@ def aggregate(date):
 
     data = pd.DataFrame()
     #clientFirehose = boto3.client('firehose')
+    #date = date.today() - timedelta(days = 1)
 
     for x in range(9,19):
         try:
@@ -40,7 +42,6 @@ def aggregate(date):
         }
 
 
-    import ast
     data["normal_popularity"] = data.apply(normal_popularity, axis = 1, result_type = "reduce")
     data["relative_popularity"] = data["current_popularity"] / data["normal_popularity"]
     data["coordinates"] = data["coordinates"].astype(str)
@@ -54,11 +55,15 @@ def aggregate(date):
     data["lon"] = lon
     #print(data)
     data["ags"] = coords_convert(data)
+    data["ags"].unique()
+    data.loc[data["ags"] == "05315"]
+    data.loc[data["address"].str.contains("Köln")]
+
     data2 = data.loc[data["ags"].notna()]
 
 
-    result = pd.DataFrame(data2.groupby("ags")[["relative_popularity","lat", "lon"]].mean())
-
+    result = data2.groupby("ags").apply(lambda x: np.average(x.relative_popularity, weights=x.normal_popularity))
+    result = pd.DataFrame(result)
     result = result.reset_index()
     list_results = []
     for index, row in result.iterrows():
@@ -85,5 +90,5 @@ def aggregate(date):
         # clientFirehose.put_record(DeliveryStreamName='sdd-kinese-aggregator',  Record={'Data':data_index })
 
 
-        #print(input)
+    #print(input)
     return list_results

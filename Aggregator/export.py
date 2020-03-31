@@ -30,7 +30,8 @@ data.columns
 # 'webcam_score': How many people are visible on webcams in public places divided by 2.4 (->we dont have a "normal" value here so we use 1/highscore median)
 
 data.replace(np.inf, np.nan, inplace=True)
-data.loc[data["hystreet_score"].notna()]["date"].value_counts()
+data["gmap_score"].max()
+data.loc[data["date"]=="2020-03-28"][["gmap_score", "index"]]
 aggregate = data.groupby("date")[['bike_score', 'bus_score', 'gmap_score', 'hystreet_score', 'nationalExpress_score', 'national_score', 'regional_score','suburban_score', 'webcam_score', 'zug_score']].mean()
 pd.DataFrame(aggregate).to_csv("aggregate.csv")
 data.to_csv("export.csv")
