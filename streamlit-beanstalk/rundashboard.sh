@@ -1,3 +1,3 @@
 #!/bin/bash
-cd /home/ec2-user
-nohup /usr/local/bin/streamlit run /home/ec2-user/frontend/EveryoneCounts.py
+cd /home/ec2-user/frontend
+nohup /usr/local/bin/streamlit run EveryoneCounts.py

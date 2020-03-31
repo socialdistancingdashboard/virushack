@@ -1,20 +1,27 @@
 import boto3
 import pandas as pd
 import json
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
+from datetime import date as dt
 from coords_to_kreis import coords_convert
+from tqdm import tqdm
 import settings
 
-  # - timedelta(days=10)  # only for test purposes
-def aggregate(date):
+result_df = pd.DataFrame()
+for x in tqdm(range(700)):
+    date = dt.today() - timedelta(days=x)
     s3_client = boto3.client('s3')
     data = pd.DataFrame()
     clientFirehose = boto3.client('firehose')
 
-    response = s3_client.get_object(Bucket=settings.BUCKET, Key='hystreet/{}/{}/{}'.format(
+    try:
+        response = s3_client.get_object(Bucket=settings.BUCKET, Key='hystreet/{}/{}/{}'.format(
         str(date.year).zfill(4), str(date.month).zfill(2), str(date.day-3).zfill(2)))
+    except:
+        continue
     result = pd.DataFrame(json.loads(response["Body"].read()))
-    data = data.append(result.loc[result["pedestrians_count"] > 0])
+    data = data.append(result)
+
 
     def compute_weekday(timestamp):
         date_str = timestamp.split('+')[0]
@@ -41,20 +48,26 @@ def aggregate(date):
     data_with_ags = pd.merge(data, stations_with_ags, left_on='station_id',
                              right_on='stationid', how='left').drop('stationid', axis=1)
     data_with_ags['landkreis'] = coords_convert(data_with_ags)
+    result_df = result_df.append(data_with_ags, sort = True)
+
+result_df.columns
+
+def compute_weekday(timestamp):
+    date_str = timestamp.split('+')[0]
+    date = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S.%f')
+    return date.weekday()
 
 
-    # compute mean for each ags (if multiple stations are in the same landkreis)
-    grouped = data_with_ags.groupby(['ags', 'date'], sort=False).agg(
-        {'pedestrians_count': 'mean', 'min_temperature': 'mean', 'temperature': 'mean', 'weather_condition': lambda x: x.iloc[0], 'relative_pedestrians_count': 'mean', 'city': lambda x: x.iloc[0], 'lat': lambda x: x.iloc[0], 'lon': lambda x: x.iloc[0], 'landkreis': lambda x: x.iloc[0]}).reset_index()
+result_df["city"].unique()
+result_df = result_df.loc[(result_df["pedestrians_count"] > 0)]
+result_df["weekday"] = result_df["timestamp"].apply(compute_weekday)
+temp = pd.DataFrame(result_df.groupby(["station_id", "weekday"])["pedestrians_count"].mean())
+temp = temp.reset_index()
+temp.columns = ["station_id_mean","weekday_mean","mean_pedestrians_count_weekday"]
+temp.to_csv("station_means.csv")
 
-    list_results = []
-
-    for index, row in grouped.iterrows():
-        data_dict = {
-            'hystreet_score': row['relative_pedestrians_count'],
-            'landkreis': row['landkreis']
-
-        }
-        list_results.append(data_dict)
-
-    return list_results
+temp = result_df.loc[(result_df["city"] == "Berlin") & result_df["pedestrians_count"].notna() & (result_df["pedestrians_count"] > 0)]
+temp.loc[temp["pedestrians_count"] > 0]["station_id"].value_counts()
+temp.loc[temp["station_id"] == 94].plot("date", "pedestrians_count")
+temp = temp["date"].value_counts()
+temp.sort_index().to_csv("hystreet_export.csv")

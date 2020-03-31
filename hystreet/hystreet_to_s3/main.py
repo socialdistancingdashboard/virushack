@@ -18,7 +18,7 @@ locations = res.json()
 # Crawl data
 for location in locations:
     current_date = datetime.now()
-    form_date = (current_date - timedelta(days=4)).strftime("%Y-%m-%d")
+    form_date = (current_date - timedelta(days=10)).strftime("%Y-%m-%d")
     to_date = current_date.strftime("%Y-%m-%d")
     res = requests.get('https://hystreet.com/api/locations/' +
                        str(location['id'])+'?resolution=day&from='+form_date+'&to='+to_date, headers=headers)
