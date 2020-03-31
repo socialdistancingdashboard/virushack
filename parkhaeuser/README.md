@@ -61,7 +61,7 @@ Infos und Quellen zu den Daten der einzelnen Städte/Landkreise:
 -  
 -Frankfurt: https://www.planetradio.de/service/parkhaeuser/  
 -Mannheim: https://www.planetradio.de/service/parkhaeuser/ 
--Wiesbaden: https://www.planetradio.de/service/parkhaeuser/ 
+-Wiesbaden: https://www.planetradio.de/service/parkhaeuser/  
 -Kassel: https://www.planetradio.de/service/parkhaeuser/  
 -Hochtaunuskreis: https://www.planetradio.de/service/parkhaeuser/ (Es werden nur die Daten für Bad Homburg erhoben)  
 
