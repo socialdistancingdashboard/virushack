@@ -74,6 +74,7 @@ def lambda_handler(event, context):
   except Exception as e:
     return on_error(e)
 
+  df_categories = pd.read_sql("SELECT * FROM categories", aws_engine)
 
   q_categories = ",".join(["'" + c + "'" for c in  param_categories])
 
@@ -112,9 +113,13 @@ def lambda_handler(event, context):
   }
 
   for category in param_categories:
+    category_desc_short = df_categories[df_categories.name==category].desc_short.values[0],
+    category_desc_long = df_categories[df_categories.name==category].desc_long.values[0],
     df_filtered = df[df.category == category]
     result["data"].append({
       "category": category,
+      "desc_short": category_desc_short,
+      "desc_long": category_desc_long,
       "values": json.loads(df_filtered[["score", "spatial_id", "prediction"]].to_json(orient="records"))
     })
 

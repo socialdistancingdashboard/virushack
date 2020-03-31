@@ -161,3 +161,4 @@ dmypy.json
 credentials-*.json
 
 # End of https://www.gitignore.io/api/r,python
+**/debugging-dashboard/**

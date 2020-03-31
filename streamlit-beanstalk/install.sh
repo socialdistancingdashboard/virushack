@@ -1,5 +1,6 @@
 #!/bin/bash
 sudo yum -y -q update
+sudo yum install -y git
 sudo yum install -y python3
 sudo pip3 install pandas
 sudo pip3 install streamlit
@@ -10,7 +11,7 @@ sudo curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virusha
 sudo chmod 644 /etc/systemd/system/rundashboard.service
 sudo systemctl enable rundashboard.service
 cd /home/ec2-user
-mkdir dashboard
+git clone https://github.com/socialdistancingdashboard/frontend.git
 curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virushack/master/streamlit-beanstalk/update.sh
 sudo chmod u+x update.sh
 sudo ./update.sh

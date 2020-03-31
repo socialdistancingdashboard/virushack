@@ -2,7 +2,7 @@
 import os
 import re
 import pandas as pd
-from datetime import datetime, date, timedelta
+from datetime import datetime, timedelta
 # compatibility with ipython
 #os.chdir(os.path.dirname(__file__))
 import json
@@ -11,6 +11,7 @@ from pathlib import Path
 from coords_to_kreis import coords_convert
 
 def aggregate(date):
+  try:
     # connect to aws
     client_s3 = boto3.client("s3")
     s3 = boto3.resource('s3')
@@ -19,30 +20,23 @@ def aggregate(date):
     json_content = json.loads(file_content)
 
     df = pd.DataFrame(json_content)
-    df["landkreis"] = coords_convert(df)
-    #print(df.columns)
-    df.drop(["lon", "lat", 'geometry', "name", "date"], inplace = True, axis = 1)
+    df["district"] = coords_convert(df)
     # aggregate by region
-    return df.to_dict()
-    #df.rename(columns={"name": "landkreis"})
+    regions = df["district"].unique()
     # pass several scores in one file
-    #lineProducts = ['nationalExpress', 'regional', 'suburban', 'national', 'bus']
-    # print(df)
-    # result = []
-    # for r in regions:
-    #     df_filtered_by_region = df[df.name==r]
-    #     scores = {"zug_score": 1 - df_filtered_by_region.cancelled_stops.mean() / df_filtered_by_region.planned_stops.mean()}
-    #     for product in lineProducts:
-    #       df_filtered_by_region_and_product = df_filtered_by_region[df_filtered_by_region.lineProduct==product]
-    #       scores.update({product + "_score": (
-    #         1 - df_filtered_by_region_and_product.cancelled_stops.mean() / df_filtered_by_region_and_product.planned_stops.mean())})
-    #     if len(df_filtered_by_region["name"].values) < 1:
-    #         break
-    #     scores.update({
-    #       "landkreis": df_filtered_by_region["name"].values[0]
-    #     })
-    #     result.append(scores)
-    #     #break
-    # return result
-
-#pd.DataFrame(aggregate(date.today() - timedelta(days = 3)))
+    lineProducts = ['nationalExpress', 'regional']
+    result = []
+    for r in regions:
+      # add entry for district
+      scores = {"landkreis": r}
+      for product in lineProducts:
+        df_filtered = df[ (df.district == r) & (df.lineProduct==product) ]
+        # add scores to dictionary
+        scores.update({"score_public_transportation_" + product: df_filtered.cancelled_stops.sum()})
+      # add to result
+      result.append(scores)
+    # return result as list
+    return result
+  except Exception as e:
+    print("Datum evt nicht vorhanden? Fehler:", str(e))
+    return []

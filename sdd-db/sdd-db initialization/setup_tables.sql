@@ -2,6 +2,17 @@ DROP DATABASE IF EXISTS sdd;
 CREATE DATABASE sdd;
 USE sdd;
 
+/* SELECT @@global.time_zone, @@session.time_zone; */
+/* timezones memory hook
+
+mysql TIMESTAMP: with timezone
+An international video-conference wants to start at 2pm UTC. Everyone needs to adapt according to local time.
+
+mysql DATETIME: detached from timezones
+I want to get up at 2014/03/31 9:00AM no matters if I'm in New York or Paris.
+*/
+
+
 /* contains holidays for each state */
 DROP TABLE IF EXISTS holidays;
 CREATE TABLE holidays (
@@ -95,8 +106,6 @@ CREATE TABLE  scores (
   INDEX(district_id)
 ) CHARACTER SET utf8;
 
-
-
 DROP TABLE IF EXISTS measures;
 CREATE TABLE measures (
   id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY, /* no meaning */
@@ -105,12 +114,12 @@ CREATE TABLE measures (
   dt_end_action DATETIME NULL, /* Datetime when action is supposed to end */
   desc_short TEXT NOT NULL, /* Short description. */
   desc_long TEXT NOT NULL, /* Long description */
-  level1_id_announced VARCHAR(32) NOT NULL, /* country code of place where measure was announced*/
-  level2_id_announced VARCHAR(32) NOT NULL, /* county code of place where measure was announced*/
-  level3_id_announced VARCHAR(32) NOT NULL, /* district code of place where measure was announced*/
-  level1_id_action VARCHAR(32) NULL, /* country code if action is applicable */
-  level2_id_action VARCHAR(32) NULL, /* county code if action is applicable */
-  level3_id_action VARCHAR(32) NULL, /* district code if action is applicable */
+  country_id_announced VARCHAR(32) NOT NULL, /* country code of place where measure was announced*/
+  state_id_announced VARCHAR(32) NULL, /* county code of place where measure was announced*/
+  district_id_announced VARCHAR(32) NULL, /* district code of place where measure was announced*/
+  country_id_action VARCHAR(32) NULL, /* country code if action is applicable */
+  state_id_action VARCHAR(32) NULL, /* county code if action is applicable */
+  district_id_action VARCHAR(32) NULL, /* district code if action is applicable */
   ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8;
 

@@ -36,7 +36,11 @@ st.sidebar.image(img, use_column_width=True)
 st.sidebar.markdown("<br>", unsafe_allow_html=True)
 
 # sidebar menu
-menuitems = {'Dashboard':1,'Über das Dashboard':2}#,'Impressum':3}
+menuitems = {'Dashboard':1,
+             'Die Daten':2,
+             'Das Projekt':3,
+             'Das Team':4
+            }
 menu = st.sidebar.radio('',list(menuitems.keys()), index=0)
 
 # hack in some css to style the menu
@@ -62,16 +66,24 @@ st.markdown("""
             div.row-widget.stRadio div[role='radiogroup']>label>div:first-child{{
             display:none;
         }}
+        #MainMenu.dropdown {{
+            display: none;
+        }}
     </style>
     """.format(selected=menuitems[menu]), unsafe_allow_html=True)
 
 
 
 # main content
-if menu=='Dashboard':
+if menuitems[menu]==1:
     dashboard.dashboard()
-elif menu=='Über das Dashboard':
-    dashboard_pages.about()
+elif menuitems[menu]==2:
+    dashboard_pages.about_our_data()
+elif menuitems[menu]==3:
+    dashboard_pages.about_us()
+elif menuitems[menu]==4:
+    dashboard_pages.about_team()
+    pass
 #elif menu=='Impressum':
 #    dashboard_pages.impressum()
 
@@ -83,4 +95,14 @@ st.sidebar.markdown('''
 - [@DistancingDash](https://twitter.com/distancingdash/)
 - [Youtube](https://www.youtube.com/watch?v=pDgcbE-c31c&feature=youtu.be)
 - [Devpost](https://devpost.com/software/12-social-distancing-dashboard)
+- [Github](https://github.com/socialdistancingdashboard)
+''')
+
+
+
+st.sidebar.subheader("Pressestimmen")
+st.sidebar.markdown('''
+- [Tagesspiegel](https://www.tagesspiegel.de/wirtschaft/hackathon-im-netz-programmierer-tuefteln-an-loesungen-gegen-die-corona-krise/25670548.html)
+- [SWR-Online](https://www.swr.de/swraktuell/wie-deutschland-das-coronavirus-hackt-wirvsvirus-hackathon-100.html)
+- [WDR](https://www1.wdr.de/nachrichten/themen/coronavirus/verkehr-innenstadt-corona-100.html)
 ''')

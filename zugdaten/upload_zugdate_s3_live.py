@@ -26,7 +26,12 @@ s3 = boto3.resource('s3')
 
 _, folders, _ = next(os.walk(os.path.join(os.getcwd(), "..", "zugdaten", "summaries", "data")))
 for date_string in folders:
+  date = datetime.fromisoformat(date_string)
   print("processing", date_string)
+  
+  if date <= datetime(2020,3,21) or date_string == "2020-03-24":
+    print("skip", date_string)
+    continue
   # use this date
   #date_string = "2020-03-21"
 

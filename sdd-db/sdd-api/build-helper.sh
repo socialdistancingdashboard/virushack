@@ -1,6 +1,5 @@
-#!/bin/bash
-RESSOURCE="SddApiDbGetLocations"
-STACK="sdd-get-locations"
+RESSOURCE="GetSourcesFunction"
+STACK="sdd-api-gateway-stack"
 
 # build 
 sam build --use-container

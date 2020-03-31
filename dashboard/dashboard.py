@@ -27,11 +27,14 @@ def load_topojson():
     return county_names, county_ids, state_names, state_ids
 
 @st.cache(persist=True)
-def load_real_data(id_to_name,dummy_time):
+def load_real_data(dummy_time):
     # dummy_time parameter changes twice daily. Otherwise, streamlit 
     # would always return cached data
     response = requests.get('https://0he6m5aakd.execute-api.eu-central-1.amazonaws.com/prod')
     jsondump = response.json()["body"]
+    
+    county_names, county_ids, state_names, state_ids = load_topojson()
+    id_to_name = {cid:county_names[idx] for idx,cid in enumerate(county_ids)}
     
     # get names for all scores
     scorenames = []
@@ -76,19 +79,34 @@ def load_real_data(id_to_name,dummy_time):
     return df_scores, scorenames
     
 @st.cache(persist=True)
-def get_map(df_scores,use_states,selected_score,selected_score_axis,features,latest_date):
+def get_map(df_scores,selected_score,selected_score_axis,use_states,latest_date):
     url_topojson = 'https://raw.githubusercontent.com/AliceWi/TopoJSON-Germany/master/germany.json'
-    data_topojson_remote = alt.topo_feature(url=url_topojson, feature=features)
     MAPHEIGHT = 600
+    if use_states:
+        features = 'states'
+        sw = 1
+    else:
+        features = 'counties'
+        sw = 0.2
+        # overlay state boundaries with thicker lines
+        data_topojson_remote_states = alt.topo_feature(url=url_topojson, feature='states')
+        overlaymap = alt.Chart(data_topojson_remote_states).mark_geoshape(
+            fill=None,
+            stroke='white',
+            strokeWidth=1.5
+        ).properties(width='container',height = MAPHEIGHT)
+    data_topojson_remote = alt.topo_feature(url=url_topojson, feature=features)
+   
     basemap = alt.Chart(data_topojson_remote).mark_geoshape(
             fill='lightgray',
             stroke='white',
-            strokeWidth=0.5
+            strokeWidth=sw
         ).properties(width='container',height = MAPHEIGHT)
     if use_states:
         #draw state map
         layer = alt.Chart(data_topojson_remote).mark_geoshape(
-            stroke='white'
+            stroke='white',
+            strokeWidth=sw
         ).encode(
                 color=alt.Color(selected_score+':Q', 
                                 title=selected_score_axis, 
@@ -111,7 +129,8 @@ def get_map(df_scores,use_states,selected_score,selected_score_axis,features,lat
         df_scores_lookup = df_scores_lookup[['id','date','name','filtered_score']]
         
         layer = alt.Chart(data_topojson_remote).mark_geoshape(
-            stroke='white'
+            stroke='white',
+            strokeWidth=sw
         ).encode(
                 color=alt.Color('filtered_score:Q', 
                                 title=selected_score_axis, 
@@ -128,12 +147,14 @@ def get_map(df_scores,use_states,selected_score,selected_score_axis,features,lat
             lookup='id',
             from_= alt.LookupData(df_scores_lookup, 'id', ['name'])
         ).properties(width='container',height = MAPHEIGHT)
-
-    c = alt.layer(basemap, layer).configure_view(strokeOpacity=0)
+    if use_states:
+        c = alt.layer(basemap, layer).configure_view(strokeOpacity=0)
+    else:
+        c = alt.layer(basemap, layer, overlaymap).configure_view(strokeOpacity=0)
     return c
     
 @st.cache(persist=True)
-def get_timeline_plots(df_scores, selected_score, selected_score_axis, countys, use_states):
+def get_timeline_plots(df_scores, selected_score, selected_score_axis, use_states, countys):
     if len(countys) > 0 and not use_states:
         # Landkreise
         df_scores = df_scores[df_scores["name"].isin(countys)].dropna(axis=1, how="all")
@@ -173,7 +194,73 @@ def get_timeline_plots(df_scores, selected_score, selected_score_axis, countys, 
     else:
         return None
 
+def detail_score_selector(df_scores_in, scorenames_desc, scorenames_axis, allow_county_select, key, default_detail_index=0, default_score="hystreet_score"):
 
+    df_scores = df_scores_in.copy()
+    
+    # get counties
+    county_names, county_ids, state_names, state_ids = load_topojson()
+    id_to_name = {cid:county_names[idx] for idx,cid in enumerate(county_ids)}
+    state_id_to_name = {cid:state_names[idx] for idx,cid in enumerate(state_ids)}
+    state_name_to_id = {state_names[idx]:cid for idx,cid in enumerate(state_ids)}
+
+    # LEVEL OF DETAIL SELECT
+    use_states_select  = st.selectbox('Detailgrad:', 
+                                    ('Bundesländer', 'Landkreise'), 
+                                    index =default_detail_index,
+                                    key = key
+                                    )
+    use_states = use_states_select == 'Bundesländer'
+    
+    # SCORE SELECT
+    sorted_desc = sorted(list(scorenames_desc.values()))
+    selected_score_desc = st.selectbox(
+        'Datenquelle:', sorted_desc, 
+        index = sorted_desc.index(scorenames_desc[default_score]), # default value in sorted list
+        key = key
+    )
+    inverse_scorenames_desc = {scorenames_desc[key]:key for key in scorenames_desc.keys()}
+    selected_score = inverse_scorenames_desc[selected_score_desc]
+    selected_score_axis = scorenames_axis[selected_score] + ' (%)'
+    
+    latest_date = pd.Series(df_scores[df_scores[selected_score] > 0]["date"]).values[-1]
+    
+    # COUNTY SELECT
+    if (not use_states) and allow_county_select:
+        available_countys = [value for value in county_names if value in df_scores[df_scores[selected_score] > 0]["name"].values]
+        if len(available_countys) > 1:
+            default=available_countys[:2]
+        else:
+            default = []
+        countys = st.multiselect('Wähle Landkreise aus:',
+                                    options = available_countys, 
+                                    default=default,
+                                    key = key
+                                )
+    else:
+        countys = []
+        
+     # Prepare df_scores according to Landkreis/Bundesland selection
+    if use_states:
+        # aggregate state data
+        df_scores['state_id'] = df_scores.apply(lambda x: str(x['id'])[:2],axis=1) # get state id (first two letters of county id)
+        df_scores['state_name'] = df_scores.apply(lambda x: state_id_to_name[x['state_id']],axis=1) # get state name
+        df_scores = df_scores.groupby(['state_name','date']).mean() # group by state and date, calculate mean scores
+        df_scores = df_scores.round(1) #round
+        df_scores['id'] = df_scores.apply(lambda x: state_name_to_id[x.name[0]],axis=1) # re-add state indices
+        df_scores = df_scores.replace([np.inf, -np.inf], np.nan) # remove infs
+        df_scores = df_scores.reset_index() # make index columns into regular columns
+    else:
+        #filter scores based on selected places
+        #if len(countys) > 0:
+            #df_scores["filtered_score"] = np.where(df_scores["name"].isin(countys), df_scores[selected_score],[0] *# len(df_scores))
+        #else:
+        df_scores["filtered_score"] = df_scores[selected_score]
+
+    df_scores["date"] = pd.to_datetime(df_scores["date"])
+    df_scores = df_scores.round(1)
+    
+    return (df_scores,selected_score, selected_score_desc, selected_score_axis, use_states, use_states_select, countys, latest_date)
 
 
 
@@ -184,17 +271,15 @@ def dashboard():
     # the code without appearing earlier in the webpage
     st.title("EveryoneCounts")
     st.header("Das Social Distancing Dashboard")
-    st_info_text       = st.empty()
     st_map_header      = st.empty()
+    st_info_text       = st.empty()
    
-    use_states_select  = st.selectbox('Detailgrad:', ('Bundesländer', 'Landkreise'))
-    
+
     
     # Insert custom CSS
     # - prevent horizontal scrolling on mobile
     # - restrict images to container width
     # - restrict altair plots to container width
-    # - hide hamburger dropdown menu
     # - make inputs better visible
     st.markdown("""
         <style type='text/css'>
@@ -212,9 +297,6 @@ def dashboard():
             div.stVegaLiteChart, fullScreenFrame {
                 width:99%;
             }
-            #MainMenu.dropdown {
-                display: none;
-            }
             .stSelectbox div[data-baseweb="select"]>div,
             .stMultiSelect div[data-baseweb="select"]>div{
                 border:1px solid #fcbfcf;
@@ -222,24 +304,16 @@ def dashboard():
         </style>
     """, unsafe_allow_html=True)
     
-    # get counties
-    county_names, county_ids, state_names, state_ids = load_topojson()
-    id_to_name = {cid:county_names[idx] for idx,cid in enumerate(county_ids)}
-    state_id_to_name = {cid:state_names[idx] for idx,cid in enumerate(state_ids)}
-    state_name_to_id = {state_names[idx]:cid for idx,cid in enumerate(state_ids)}
     
     # get score data
     dummy_time = datetime.datetime.now().strftime("%Y-%m-%d-%p") # 2020-03-28-PM, changes twice daily
-    df_scores_full, scorenames = load_real_data(id_to_name,dummy_time)
-    df_scores = df_scores_full.copy()
+    df_scores_full, scorenames = load_real_data(dummy_time)
+    #df_scores = df_scores_full.copy()
     
-    # build sidebar
-    
-    use_states = use_states_select == 'Bundesländer'
-    
+   
     # descriptive names for each score
     scorenames_desc_manual = {
-        "gmap_score":"Besucher an öffentlichen Orten",
+        "gmap_score":"Menschen an Haltestellen des ÖPNV",
         "gmap_supermarket_score":"Besucher in Supermärkten",
         "hystreet_score":"Fußgänger in Innenstädten (Laserscanner-Messung)",
         "zug_score":"DB Züge",
@@ -254,7 +328,7 @@ def dashboard():
         }
     # very short axis labels for each score
     scorenames_axis_manual = {
-        "gmap_score":"Besucher",
+        "gmap_score":"Menschen",
         "gmap_supermarket_score":"Besucher",
         "hystreet_score":"Fußgänger",
         "zug_score":"Züge",
@@ -281,54 +355,64 @@ def dashboard():
             scorenames_axis[scorename] = scorenames_axis_manual[scorename]
         else:
             scorenames_axis[scorename] = scorename
-    inverse_scorenames_desc = {scorenames_desc[key]:key for key in scorenames_desc.keys()}
     
-    # data source selector
-    
-    selected_score_desc = st.selectbox(
-        'Datenquelle:', sorted(list(scorenames_desc.values())), 
-        index = 1 # default value in sorted list
-        )
-
+    # Selection box for the map
+    df_scores, selected_score, selected_score_desc, selected_score_axis, use_states, use_states_select, countys, latest_date = detail_score_selector(df_scores_full, 
+                                        scorenames_desc, 
+                                        scorenames_axis, 
+                                        allow_county_select=False,
+                                        key='map',
+                                        default_detail_index=0,
+                                        default_score="gmap_score"
+                                        )
     st_map             = st.empty()
     st_legend          = st.empty()
     st_timeline_header = st.empty()
-    
-    
-    
-    selected_score = inverse_scorenames_desc[selected_score_desc]
-    selected_score_axis = scorenames_axis[selected_score] + ' (%)'
-    
-    latest_date = pd.Series(df_scores[df_scores[selected_score] > 0]["date"]).values[-1]
-
-    available_countys = [value for value in county_names if value in df_scores[df_scores[selected_score] > 0]["name"].values]
-    
-    
-    if use_states:
-        countys = []
-    else:
-        if len(available_countys) > 1:
-            default=available_countys[:2]
-        else:
-            default = []
-        countys = st.multiselect('Wähle Landkreise aus:',options = available_countys, default=default)
-    
     st_timeline_desc   = st.empty()
+    
+    # Selection box for the timeline
+    df_scores2, selected_score2, selected_score_desc2, selected_score_axis2, use_states2, use_states_select2, countys2, latest_date2 = detail_score_selector(df_scores_full, 
+                                        scorenames_desc, 
+                                        scorenames_axis, 
+                                        allow_county_select=True,
+                                        key='timeline',
+                                        default_detail_index=1,
+                                        default_score="hystreet_score"
+                                        )
+
+    
     st_timeline        = st.empty()
 
     #selected_date = st.sidebar.date_input('für den Zeitraum vom', datetime.date(2020,3,24))
     #end_date = st.sidebar.date_input('bis', datetime.date(2020,3,22))
 
+
+    # WRITE DESCRIPTION TEXTS
     if selected_score == "bike_score"   :
         st_info_text.markdown('''
-        In der Karte siehst Du wie sich Social Distancing auf die verschiedenen **{regionen}** in Deutschland auswirkt. Wir nutzen Daten über **{datasource}** (Du kannst die Datenquelle weiter unten im Menü ändern) um zu berechnen, wie gut Social Distancing aktuell funktioniert. Ein Wert von **100% entspricht dem Normal-Wert vor der COVID-Pandemie**, also bevor die Bürger zu Social Distancing aufgerufen wurden. Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung der Aktivität gemessen wurde. **Im Fall von Radfahrern ist ein erhöhtes Verkehrsaufkommen ein positiver Indikator für Social Distancing!** Mehr Menschen sind mit dem Fahrrad unterwegs anstatt mit anderen Verkehrsmitteln, bei denen Social Distancing schwierieger einzuhalten ist.
-    '''.format(regionen=use_states_select,datasource=selected_score_desc)
+        In der Karte siehst Du wie sich Social Distancing auf die verschiedenen **{regionen}** in Deutschland auswirkt. Wir nutzen Daten über **{datasource}** um zu berechnen, wie gut Social Distancing aktuell funktioniert. Du kannst die Datenauswahl weiter unten im Menü ändern. Ein Wert von **100% entspricht dem Normal-Wert vor der COVID-Pandemie**, also bevor die Bürger zu Social Distancing aufgerufen wurden. Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung der Aktivität gemessen wurde. **Im Fall von Radfahrern ist ein erhöhtes Verkehrsaufkommen ein positiver Indikator für Social Distancing!** Mehr Menschen sind mit dem Fahrrad unterwegs anstatt mit anderen Verkehrsmitteln, bei denen Social Distancing schwierieger einzuhalten ist.
+        '''.format(regionen=use_states_select,datasource=selected_score_desc)
     )
     else:
         st_info_text.markdown('''
-            In der Karte siehst Du wie sich Social Distancing auf die verschiedenen **{regionen}** in Deutschland auswirkt. Wir nutzen Daten über **{datasource}** (Du kannst die Datenquelle weiter unten im Menü ändern) um zu berechnen, wie gut Social Distancing aktuell funktioniert. Ein Wert von **100% entspricht dem Normal-Wert vor der COVID-Pandemie**, also bevor die Bürger zu Social Distancing aufgerufen wurden. Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung der Aktivität gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist. **Weniger ist besser!**
+        In der Karte siehst Du wie sich Social Distancing auf die verschiedenen **{regionen}** in Deutschland auswirkt. Wir nutzen Daten über **{datasource}** um zu berechnen, wie gut Social Distancing aktuell funktioniert. Du kannst die Datenauswahl weiter unten im Menü ändern. Ein Wert von **100% entspricht dem Normal-Wert vor der COVID-Pandemie**, also bevor die Bürger zu Social Distancing aufgerufen wurden. Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung der Aktivität gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist. **Weniger ist besser!**
         '''.format(regionen=use_states_select,datasource=selected_score_desc)
-        )
+    )
+    if selected_score2 == "bike_score"   :
+        st_timeline_desc.markdown('''
+        Hier kannst du den zeitlichen Verlauf der gewählten Datenquelle für verschiedene **{regionen}** in Deutschland vergleichen. Wir nutzen Daten über **{datasource}** um zu berechnen, wie gut Social Distancing aktuell funktioniert. Du kannst die Datenauswahl weiter unten im Menü ändern. **Ein Wert von 100% entspricht dem Normal-Wert vor der COVID-Pandemie, also bevor die Bürger zu Social Distancing aufgerufen wurden.** Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung der Aktivität gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist. **Im Fall von Radfahrern ist ein erhöhtes Verkehrsaufkommen ein positiver Indikator für Social Distancing!** Mehr Menschen sind mit dem Fahrrad unterwegs anstatt mit anderen Verkehrsmitteln, bei denen Social Distancing schwierieger einzuhalten ist.
+        
+        **Sieh doch mal nach wie die Lage in Deiner Region ist!**
+        '''.format(regionen=use_states_select2,datasource=selected_score_desc2)
+    )
+    else:
+        st_timeline_desc.markdown('''
+        Hier kannst du den zeitlichen Verlauf der gewählten Datenquelle für verschiedene **{regionen}** in Deutschland vergleichen. Wir nutzen Daten über **{datasource}** um zu berechnen, wie gut Social Distancing aktuell funktioniert. Du kannst die Datenauswahl weiter unten im Menü ändern. **Ein Wert von 100% entspricht dem Normal-Wert vor der COVID-Pandemie, also bevor die Bürger zu Social Distancing aufgerufen wurden.** Ein kleiner Wert weist darauf hin, dass in unserer Datenquelle eine Verringerung der Aktivität gemessen wurde, was ein guter Indikator für erfolgreich umgesetztes Social Distancing ist. 
+        
+        **Sieh doch mal nach wie die Lage in Deiner Region ist!**
+        '''.format(regionen=use_states_select2,datasource=selected_score_desc2)
+    )
+
 
     try:
         st_map_header.subheader('Social Distancing Karte vom {}'.format( datetime.datetime.strptime(latest_date,"%Y-%m-%d").strftime("%d.%m.%Y") ))
@@ -337,47 +421,22 @@ def dashboard():
     st_legend.image("https://github.com/socialdistancingdashboard/virushack/raw/master/dashboard/legende.png") 
      
 
-    # Prepare df_scores according to Landkreis/Bundesland selection
-    # =============================================================
-    if use_states:
-        features = 'states'
-        # aggregate state data
-        df_scores['state_id'] = df_scores.apply(lambda x: str(x['id'])[:2],axis=1) # get state id (first two letters of county id)
-        df_scores['state_name'] = df_scores.apply(lambda x: state_id_to_name[x['state_id']],axis=1) # get state name
-        df_scores = df_scores.groupby(['state_name','date']).mean() # group by state and date, calculate mean scores
-        df_scores = df_scores.round(1) #round
-        df_scores['id'] = df_scores.apply(lambda x: state_name_to_id[x.name[0]],axis=1) # re-add state indices
-        df_scores = df_scores.replace([np.inf, -np.inf], np.nan) # remove infs
-        df_scores = df_scores.reset_index() # make index columns into regular columns
-    else:
-        features = 'counties'
-        #filter scores based on selected places
-        #if len(countys) > 0:
-            #df_scores["filtered_score"] = np.where(df_scores["name"].isin(countys), df_scores[selected_score],[0] *# len(df_scores))
-        #else:
-        df_scores["filtered_score"] = df_scores[selected_score]
-
-    df_scores["date"] = pd.to_datetime(df_scores["date"])
-    df_scores = df_scores.round(1)
-    
+   
     # DRAW MAP
     # ========
-    map = get_map(df_scores,use_states,selected_score,selected_score_axis,features,latest_date)
+    map = get_map(df_scores, selected_score, selected_score_axis, use_states, latest_date)
     map2 = map.copy() # otherwise streamlit gives a Cached Object Mutated warning
     st_map.altair_chart(map2)
     
     # DRAW TIMELINES
     # ==============
-    st_timeline_header.subheader("Zeitlicher Verlauf {}".format(selected_score_desc))
+    st_timeline_header.subheader("Zeitlicher Verlauf")
         
-    timeline = get_timeline_plots(df_scores, selected_score, selected_score_axis, countys, use_states)
+    timeline = get_timeline_plots(df_scores2, selected_score2, selected_score_axis2, use_states2, countys2)
     if timeline is not None:
         timeline2 = timeline.copy() # otherwise streamlit gives a Cached Object Mutated warning
         st_timeline.altair_chart(timeline2)
-    else:
-        st_timeline_desc.markdown('''
-            Wähle einen oder mehrere Landkreise aus um hier die zeitliche Entwicklung der Daten für {datasource} zu sehen.
-        '''.format(datasource=selected_score_desc))
+
         
     # FOOTER
     # ======
