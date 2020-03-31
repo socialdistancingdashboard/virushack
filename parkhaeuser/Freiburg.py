@@ -38,7 +38,7 @@ def scrape():
     Returns
     -------
     data : dict
-        Dictionary mit einem Eintrag der Form:
+        Dictionary der Form:
            {'Landkreis': 'Landkreis',
             'Gesamt': 3655,
             'Frei': 3194,
@@ -104,5 +104,3 @@ def scrape():
     else:
         print(f'Auslastung für {landkreis} kann nicht berechnet werden')
         return None
-
-

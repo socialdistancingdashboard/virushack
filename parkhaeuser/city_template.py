@@ -26,7 +26,7 @@ def scrape():
     Returns
     -------
     data : dict
-        Dictionary mit einem Eintrag der Form:
+        Dictionary der Form:
            {'Landkreis': 'Landkreis',
             'Gesamt': 3655,
             'Frei': 3194,
@@ -43,6 +43,9 @@ def scrape():
     try:
         driver = webdriver.Chrome()
         driver.get(url)
+        """Zeit bis alle relevanten Elemente geladen sind, muss je nach Website geändert werden.
+        Schöner wäre eine Lösung bei der explizit gewartet wird, bis die Elemente geladen wurden.
+        """
         time.sleep(sek)
         response = BeautifulSoup(driver.page_source, 'html.parser')
         driver.quit()
