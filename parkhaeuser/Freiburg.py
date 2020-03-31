@@ -105,7 +105,4 @@ def scrape():
         print(f'Auslastung für {landkreis} kann nicht berechnet werden')
         return None
 
-data = scrape()
-
-
 
