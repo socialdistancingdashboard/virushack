@@ -52,7 +52,8 @@ JSON-Schema:
 TODO:    
 -weitere Städte hinzufügen  
 -evtl alte Daten (vor Corona) finden  
--Scraper von regex auf html-parser umbasteln
+-Scraper von regex auf html-parser umbasteln  
+-momentan wartet webdriver einfach eine bestimmte Zeit. Das muss umgestellt werden auf warten bis alle relevanten Elemente geladen wurden.
 
 Infos und Quellen zu den Daten der einzelnen Städte/Landkreise:  
 -Köln:  
