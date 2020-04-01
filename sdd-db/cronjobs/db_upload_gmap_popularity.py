@@ -7,7 +7,6 @@ try:  # allows to import local modules
   __IPYTHON__ 
   os.chdir(os.path.dirname(__file__))
 except: pass
-from coords_to_kreis import coords_convert
 import boto3
 import json
 from datetime import datetime, timedelta
@@ -16,8 +15,10 @@ import pymysql
 from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
 import dateutil.parser
+from shapely.geometry import Point, Polygon
+from shapely import wkt
 
-# ask parzi for credentials
+# ask for credentials
 config = json.load(open("../../credentials/credentials-aws-db.json", "r"))
 
 aws_engine = create_engine(
@@ -34,8 +35,20 @@ aws_engine = create_engine(
 source_id = "score_google_places"
 s3_client = boto3.client('s3')
 
-q = """ SELECT * from locations """
+# load locations
+q = """ SELECT district_id, ASWKT(geometry) AS geometry from locations """
 locations = pd.read_sql(q, aws_engine)
+locations["geometry"] = locations["geometry"].apply(wkt.loads)
+
+def coords_to_district_id(lat, lon):
+  """ transforms lat lon to district id without(!) geopandas """
+  point = Point(float(lon), float(lat))
+  for i, district in locations.iterrows():
+    shape = district["geometry"]
+    if point.within(shape):
+      return district["district_id"]
+  return None
+
 
 def custom_index(x):
   """ used to merge foreign station keys on scores """
@@ -72,7 +85,7 @@ def upload_date(date):
 
       coordinates = pd.DataFrame([station["coordinates"]])
       coordinates.rename(columns={"lng": "lon"}, inplace=True)
-      district_id = coords_convert(coordinates).values[0]
+      district_id = coords_to_district_id(coordinates["lat"], coordinates["lon"])
 
       other = {
         "googleplaces_id": station["id"],
@@ -179,5 +192,8 @@ def upload_all():
     upload_date(d)
     d = d + timedelta(days=1)
     
+# upload all
+#upload_all()
 
-upload_all()
+# upload yesterday (cron job)
+upload_date(datetime.now() - timedelta(days=1))
