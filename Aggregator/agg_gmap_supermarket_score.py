@@ -7,6 +7,7 @@ import pandas as pd
 import csv
 import ast
 import settings
+import numpy as np
 
 
 def aggregate(date):
