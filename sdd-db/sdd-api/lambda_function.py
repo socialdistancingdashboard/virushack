@@ -77,6 +77,7 @@ def get_station_data(event, context):
         FROM scores AS T1
         JOIN stations AS T2 ON T2.id = T1.station_id
         WHERE T1.station_id = '%s'
+        ORDER BY T1.dt ASC
     """ % (source_id)
 
     df = pd.read_sql(query, aws_engine ) #,  params=(start_date, end_date))

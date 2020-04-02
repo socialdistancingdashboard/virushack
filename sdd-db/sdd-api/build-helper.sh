@@ -11,7 +11,7 @@ rm -r .aws-sam/build/$RESSOURCE/*.dist-info
 sam package \
   --template-file .aws-sam/build/$RESSOURCE/template.yaml \
   --s3-prefix $STACK \
-  --s3-bucket sdd-s3-basebucket \
+  --s3-bucket sdd-s3-bucket \
   --output-template-file .aws-sam/build/$RESSOURCE/packaged.yaml
 
 # deploy
