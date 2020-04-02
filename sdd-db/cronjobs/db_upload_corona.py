@@ -76,7 +76,7 @@ q = """
   VALUES (%s, %s )
   """
 
-df_stations = pd.DataFrame(corona_infected_stations)
+df_stations = pd.DataFrame(stations)
 # perform the upload task
 with aws_engine.connect() as cnx:
   cnx.execute(q, df_stations.values.tolist() , multi=True)
