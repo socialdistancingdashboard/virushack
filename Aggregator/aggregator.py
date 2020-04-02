@@ -14,7 +14,7 @@ import json
 import settings
 
 #How far back do you want to aggregate data?
-days = 1
+days = 7
 
 s3_client = boto3.client('s3')
 for x in range(0,days):
@@ -39,13 +39,13 @@ for x in range(0,days):
         print("Error GMAP:")
         print(e)
 
-    # try:
-    #     gmapscore_supermarket_list = pd.DataFrame(agg_gmap_supermarket_score(date))
-    #     gmapscore_supermarket_list = gmapscore_supermarket_list.set_index('landkreis')
-    #     list_result = list_result.join(gmapscore_supermarket_list, how = "outer")
-    # except Exception as e:
-    #     print("Error GMAP Super")
-    #     print(e)
+    try:
+        gmapscore_supermarket_list = pd.DataFrame(agg_gmap_supermarket_score(date))
+        gmapscore_supermarket_list = gmapscore_supermarket_list.set_index('landkreis')
+        list_result = list_result.join(gmapscore_supermarket_list, how = "outer")
+    except Exception as e:
+        print("Error GMAP Super")
+        print(e)
     try:
         webcam_list = pd.DataFrame(agg_webcam(date))
         webcam_list = webcam_list.set_index('landkreis')

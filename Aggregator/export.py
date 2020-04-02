@@ -32,6 +32,9 @@ data.columns
 data.replace(np.inf, np.nan, inplace=True)
 data["gmap_score"].max()
 data.loc[data["date"]=="2020-03-28"][["gmap_score", "index"]]
+
+data.loc[data["index"] == "03241"]
+
 aggregate = data.groupby("date")[['bike_score', 'bus_score', 'gmap_score', 'hystreet_score', 'nationalExpress_score', 'national_score', 'regional_score','suburban_score', 'webcam_score', 'zug_score']].mean()
 pd.DataFrame(aggregate).to_csv("aggregate.csv")
 data.to_csv("export.csv")
