@@ -37,7 +37,7 @@ data = r.json()
 
 # name the new sources
 source_id_corona_dead = "corona_dead"
-source_id_corona_recovered = "corona_recovered"
+source_id_corona_recovered = "corona_recovered" # (!) if you change this, you need to make manual changes below
 source_id_corona_infected = "corona_infected"
 
 # the beginning of the data
@@ -59,7 +59,6 @@ for district in data["kreise"]["items"]:
     "source_id": source_id_corona_infected
   })
   for i, number_infected in enumerate(history):
-    print(current_date)
     scores.append({
       "dt": current_date,
       "score_value": number_infected,
@@ -120,7 +119,6 @@ with aws_engine.connect() as cnx:
   # makes sure the columns' order match the query
   cnx.execute(q, df_scores[["dt", "score_value", "source_id", "district_id", "station_id"]].values.tolist() , multi=True)
 
-
 ## upload data for recovered and dead corona patients
 for category in ["recovered", "dead"]:
   scores = [] # rows to add in table scores
@@ -132,7 +130,7 @@ for category in ["recovered", "dead"]:
 
     stations.append({
       "district_id": district_id,
-      "source_id": source_id_corona_recovered
+      "source_id": "corona_" + category,
     })
     scores.append({
       "dt": history_end,
@@ -191,3 +189,5 @@ for category in ["recovered", "dead"]:
   with aws_engine.connect() as cnx:
     # makes sure the columns' order match the query
     cnx.execute(q, df_scores[["dt", "score_value", "source_id", "district_id", "station_id"]].values.tolist() , multi=True)
+
+print("uploaded finished (%s)" % str(datetime.now()))
