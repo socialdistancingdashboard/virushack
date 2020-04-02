@@ -28,7 +28,6 @@ engine = create_engine(
   pool_recycle=3600 # handles timeouts better, I think...
 )
   
-aws_connection = engine.raw_connection()
 
 # download shapefiles
 locations = pd.read_pickle("locations.pickle")
