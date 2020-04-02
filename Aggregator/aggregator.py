@@ -62,13 +62,14 @@ for x in range(0,days):
         print("Error Hystreet")
         print(e)
 
-    try:
-        zugdaten_list = pd.DataFrame(agg_zugdaten(date))
-        zugdaten_list = zugdaten_list.set_index('landkreis')
-        list_result = list_result.join(zugdaten_list, how="outer")
-    except Exception as e:
-        print("Error Zugdaten")
-        print(e)
+    # no official permission
+    # try:
+    #     zugdaten_list = pd.DataFrame(agg_zugdaten(date))
+    #     zugdaten_list = zugdaten_list.set_index('landkreis')
+    #     list_result = list_result.join(zugdaten_list, how="outer")
+    # except Exception as e:
+    #     print("Error Zugdaten")
+    #     print(e)
 
     try:
         fahrrad_list = pd.DataFrame(agg_fahrrad(date))

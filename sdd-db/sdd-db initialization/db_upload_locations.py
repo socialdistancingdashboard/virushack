@@ -12,7 +12,6 @@ except: pass
 import json
 import boto3
 from pathlib import Path
-import geopandas.tools
 from shapely.geometry import Point
 import pymysql 
 from sqlalchemy import create_engine
@@ -29,20 +28,14 @@ engine = create_engine(
   pool_recycle=3600 # handles timeouts better, I think...
 )
   
-aws_connection = engine.raw_connection()
 
 # download shapefiles
-countries = geopandas.GeoDataFrame.from_file(
-  "https://raw.githubusercontent.com/AliceWi/TopoJSON-Germany/master/germany.json", 
-  layer=1, 
-  driver="TopoJSON")
-# clean unnecessary columns
-countries = countries[["id", "name", "districtType", "state", "geometry"]]
-countries.columns = ["district_id", "district", "district_type", "state", "geometry"]
+locations = pd.read_pickle("locations.pickle")
+locations = locations[["id", "name", "districtType", "state", "geometry"]]
+locations.columns = ["district_id", "district", "district_type", "state", "geometry"]
 
-countries["lat"] = countries.geometry.apply(lambda x: x.centroid.y)
-countries["lon"] = countries.geometry.apply(lambda x: x.centroid.x)
-del countries["geometry"]
+locations["lat"] = locations.geometry.apply(lambda x: x.centroid.y)
+locations["lon"] = locations.geometry.apply(lambda x: x.centroid.x)
 
 df_state_ids = pd.DataFrame([
   ["Brandenburg", "BB"],
@@ -63,21 +56,34 @@ df_state_ids = pd.DataFrame([
   ["Thüringen", "TH"]
 ], columns=["state", "state_id"])
 
-countries["country_id"] = "DE"
-countries["country"] = "Deutschland"
+locations["country_id"] = "DE"
+locations["country"] = "Deutschland"
 
-countries = countries.merge(
+locations = locations.merge(
   df_state_ids,
   on="state",
   how="left",
   suffixes=(False, False))
 
+locations["geometry"] = locations.geometry.astype(str)
 
-countries.to_sql(
-  con=engine,
-  name="locations",
-  index=False,
-  #schema=config["database"], # optional
-  if_exists="append",
-  chunksize=500, # rows at once
-)
+query = """
+  INSERT INTO locations
+  (
+    district_id, 
+    district, 
+    district_type, 
+    state, 
+    geometry,
+    lat,
+    lon,
+    country_id, 
+    country,
+    state_id
+  )
+  VALUES (%s, %s, %s, %s, polygonfromtext(%s), %s, %s, %s, %s, %s)
+"""
+
+with engine.connect() as cnx:
+  cnx.execute(query, locations.values.tolist() , multi=True)
+

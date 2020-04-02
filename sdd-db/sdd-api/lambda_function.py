@@ -75,12 +75,12 @@ def get_station_data(event, context):
           T1.station_id, 
           T2.source_station_id
         FROM scores AS T1
-        JOIN stations AS T2 ON stations.id = T1.station_id
+        JOIN stations AS T2 ON T2.id = T1.station_id
         WHERE T1.station_id = '%s'
     """ % (source_id)
 
     df = pd.read_sql(query, aws_engine ) #,  params=(start_date, end_date))
-    
+    df["dt"] = df["dt"].astype(str) # transform to datestring to avoid any timezone information when exporting to json
     return {
       'statusCode': 200,
       'headers': {
