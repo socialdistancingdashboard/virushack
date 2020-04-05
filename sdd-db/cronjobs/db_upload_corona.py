@@ -16,7 +16,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
 import urllib.request
 
-# connect to aws database
+# connect to aws database with sqlalchemy (used for pandas connections)
 config = json.load(open("../../credentials/credentials-aws-db.json", "r"))
 aws_engine = create_engine(
   ("mysql+pymysql://" +
@@ -28,6 +28,14 @@ aws_engine = create_engine(
   poolclass=NullPool, # dont maintain a pool of connections
   pool_recycle=3600 # handles timeouts better, I think...
 )
+
+# aws database connection used for normal queries because sqlalchemy doesnt support on duplicate key queries
+pymysql_con = pymysql.connect(
+  config["host"], 
+  config["user"], 
+  config["password"], 
+  config["database"])
+
 
 # retrieve data from zeit interactive
 url_corona = "https://interactive.zeit.de/cronjobs/2020/corona/germany.json"
@@ -50,7 +58,7 @@ scores = [] # rows to add in table scores
 stations = [] # rows to add in table stations
 # add infected by iterating over history from zeit data
 for district in data["kreise"]["items"]:
-  district_id = district["ags"]
+  district_id = district["ags"].zfill(5)
   history = district["historicalStats"]["count"]
   # copy start date
   current_date = datetime.fromtimestamp(history_start.timestamp())
@@ -67,18 +75,21 @@ for district in data["kreise"]["items"]:
     })
     current_date = current_date + timedelta(days=1)
 
-
 ## upload stations (ignore duplicates)
 q = """
-  INSERT IGNORE INTO stations 
+  INSERT INTO stations 
     ( district_id, source_id )
   VALUES (%s, %s )
+  ON DUPLICATE KEY UPDATE
+  id = id
   """
 
 df_stations = pd.DataFrame(stations)
-# perform the upload task
-with aws_engine.connect() as cnx:
-  cnx.execute(q, df_stations.values.tolist() , multi=True)
+
+with pymysql_con.cursor() as cur:
+  cur.executemany(q, df_stations.values.tolist()) 
+pymysql_con.commit()
+  
 
 ## upload scores
 # first retrieve the foreign keys
@@ -104,7 +115,7 @@ df_scores.dropna(how='any', inplace=True)
 # dont upload dt as such because this is treated as timestamp. We want to have a german date without timezone information
 df_scores['dt'] = df_scores['dt'].astype(str)
 q = """
-  INSERT IGNORE INTO scores 
+  INSERT INTO scores 
   (
     dt,
     score_value,
@@ -113,11 +124,16 @@ q = """
     station_id
   )
   VALUES (%s, %s, %s, %s, %s)
+  ON DUPLICATE KEY UPDATE
+  score_value = VALUES(score_value)
 """
+
 #df_scores = df_scores.drop_duplicates()
-with aws_engine.connect() as cnx:
-  # makes sure the columns' order match the query
-  cnx.execute(q, df_scores[["dt", "score_value", "source_id", "district_id", "station_id"]].values.tolist() , multi=True)
+for i in range(0,len(df_scores), 1000):
+  with pymysql_con.cursor() as cur:
+    cur.executemany(q, df_scores.values.tolist()[i:i+1000]) 
+  pymysql_con.commit()
+
 
 ## upload data for recovered and dead corona patients
 for category in ["recovered", "dead"]:
@@ -125,7 +141,7 @@ for category in ["recovered", "dead"]:
   stations = [] # rows to add in table stations
   # add infected by iterating over history from zeit data
   for district in data["kreise"]["items"]:
-    district_id = district["ags"]
+    district_id = district["ags"].zfill(5)
     score = district["currentStats"][category]
 
     stations.append({
@@ -141,15 +157,17 @@ for category in ["recovered", "dead"]:
 
   ## upload stations (ignore duplicates)
   q = """
-    INSERT IGNORE INTO stations 
+    INSERT INTO stations 
       ( district_id, source_id )
     VALUES (%s, %s )
+    ON DUPLICATE KEY UPDATE
+    id = id
     """
-
   df_stations = pd.DataFrame(stations)
-  # perform the upload task
-  with aws_engine.connect() as cnx:
-    cnx.execute(q, df_stations.values.tolist() , multi=True)
+  
+  with pymysql_con.cursor() as cur:
+    cur.executemany(q, df_stations[["district_id", "source_id"]].values.tolist()) 
+  pymysql_con.commit()
 
   ## upload scores
   # first retrieve the foreign keys
@@ -184,10 +202,15 @@ for category in ["recovered", "dead"]:
       station_id
     )
     VALUES (%s, %s, %s, %s, %s)
+    ON DUPLICATE KEY UPDATE
+    score_value = VALUES(score_value)
   """
-  #df_scores = df_scores.drop_duplicates()
-  with aws_engine.connect() as cnx:
-    # makes sure the columns' order match the query
-    cnx.execute(q, df_scores[["dt", "score_value", "source_id", "district_id", "station_id"]].values.tolist() , multi=True)
+
+  with pymysql_con.cursor() as cur:
+    cur.executemany(q, df_scores[["dt", "score_value", "source_id", "district_id", "station_id"]].values.tolist()) 
+  pymysql_con.commit()
+  
 
 print("uploaded finished (%s)" % str(datetime.now()))
+
+pymysql_con.close()
