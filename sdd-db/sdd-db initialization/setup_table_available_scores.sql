@@ -1,29 +1,64 @@
 TRUNCATE TABLE sdd.sources;
 
-INSERT INTO sdd.sources (id, desc_short, desc_long, contributors) 
+INSERT INTO sdd.sources (id, desc_short, desc_long, contributors, unit, mode) 
 VALUES(
   "score_lemgodigital_passerby",
   "Passantenfrequenz in Lemgo",
   "Entspricht der Anzahl an Passanten",
-  "Fraunhofer IOSB-INA"
+  "Fraunhofer IOSB-INA",
+  "Anzahl Personen",
+  "daily"
 );
 
-INSERT INTO sdd.sources (id, desc_short, desc_long, contributors) 
+INSERT INTO sdd.sources (id, desc_short, desc_long, contributors, unit, mode) 
 VALUES(
   "score_lemgodigital_traffic",
   "Verkehrsaufkommen in Lemgo",
   "Entspricht der Anzahl an Fahrzeugen",
-  "Fraunhofer IOSB-INA"
+  "Fraunhofer IOSB-INA",
+  "Anzahl Fahrzeuge",
+  "daily"
 );
 
-INSERT INTO sdd.sources (id, desc_short, desc_long, contributors) 
+INSERT INTO sdd.sources (id, desc_short, desc_long, contributors, unit, mode) 
 VALUES(
   "score_google_places",
   "Beliebtheit öffentlicher Orte",
   "Entspricht der Auslastung öffentlicher Orte im Vergleich zur gewöhnlichen Auslastung",
-  "Google Places"
+  "Google Places",
+  "Auslastung (in Prozent?)",
+  "hourly"
 );
 
+INSERT INTO sdd.sources (id, desc_short, desc_long, contributors, unit, mode) 
+VALUES(
+  "corona_infected",
+  "Corona-Infektionen",
+  "Entspricht der Anzahl der gemeldeten Corona-Infektionen",
+  "Zeit Online",
+  "Anzahl Personen",
+  "daily"
+);
+
+INSERT INTO sdd.sources (id, desc_short, desc_long, contributors, unit, mode) 
+VALUES(
+  "corona_dead",
+  "Corona-Tote",
+  "Entspricht der Anzahl der gemeldeten Corona-Toten",
+  "Zeit Online",
+  "Anzahl Personen",
+  "daily"
+);
+
+INSERT INTO sdd.sources (id, desc_short, desc_long, contributors, unit, mode) 
+VALUES(
+  "corona_recovered",
+  "Gesundete Patienten",
+  "Entspricht der (gemeldeten) Anzahl der Patienten, die wieder als gesund entlassen wurden",
+  "Zeit Online",
+  "Anzahl Personen",
+  "daily"
+);
 
 
 /*

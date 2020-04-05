@@ -73,8 +73,23 @@ Resources:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             RestApiId: !Ref SddDbApiGateway
-            Path: /get-station-data/{source_id}
-            Method: GET
+            Path: /get-station-data
+            Method: POST
+          cors: true
+
+  PostTestFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: 
+      Handler: lambda_function.post_test
+      Runtime: python3.7
+      Events:
+        PostTest:
+          Type: Api 
+          Properties:
+            RestApiId: !Ref SddDbApiGateway
+            Path: /post-test
+            Method: POST
           cors: true
 Outputs:
   SddDbApiGateway:
@@ -97,4 +112,8 @@ Outputs:
     Description: "Retrieves Data from One Station"
     Value: !GetAtt GetStationsFunction.Arn
 
-    
+  PostTestFunction:
+    Description: "Retrieves Data from One Station"
+    Value: !GetAtt GetStationsFunction.Arn
+  
+        
