@@ -32,10 +32,17 @@ aws_engine = create_engine(
   pool_recycle=3600 # handles timeouts better, I think...
 )
 
+# pymysql connection for queries outside of pandas (easier to use in that case)
+pymysql_con = pymysql.connect(
+  config["host"], 
+  config["user"], 
+  config["password"], 
+  config["database"])
+
 source_id = "score_google_places"
 s3_client = boto3.client('s3')
 
-# load locations
+# load locations (the geometry is saved in db and transforemd to WKT format for mapping of coords to district)
 q = """ SELECT district_id, ASWKT(geometry) AS geometry from locations """
 locations = pd.read_sql(q, aws_engine)
 locations["geometry"] = locations["geometry"].apply(wkt.loads)
@@ -52,7 +59,7 @@ def coords_to_district_id(lat, lon):
 
 def custom_index(x):
   """ used to merge foreign station keys on scores """
-  return str(x["district_id"]) + str(x["description"]) + str(x["source_station_id"])
+  return (str(x["district_id"]) + str(x["description"]) + str(x["source_station_id"]))
 
 
 def upload_date(date):
@@ -64,7 +71,7 @@ def upload_date(date):
   for hour in range(0,24):
     try:
       response = s3_client.get_object(
-        Bucket='sdd-s3-basebucket', 
+        Bucket='sdd-s3-bucket', 
         Key='googleplaces/{}/{}/{}/{}'.format(
           str(date.year).zfill(4),
           str(date.month).zfill(2),
@@ -76,8 +83,9 @@ def upload_date(date):
       continue
 
     for station in result:
-      
       score_value = station["current_popularity"]
+      if score_value == 0:
+        score_value = 0.000001 # prevent divide by zero 
       try:
         score_reference = station["populartimes"][date.weekday()]["data"][hour]
       except:
@@ -102,7 +110,7 @@ def upload_date(date):
         "district_id": district_id,
         "source_id": source_id,
         "other": json.dumps(other),
-        "description": station["name"],
+        "description": station["name"][0:128],
         "source_station_id": station["id"],
       })
 
@@ -122,11 +130,10 @@ def upload_date(date):
         "other": json.dumps(other)
       })
 
-
   # upload stations. handles duplicates so dont worry
   if len(stations) > 0:
     q = """
-      INSERT IGNORE INTO stations 
+      INSERT INTO stations 
       (
         district_id,
         source_id,
@@ -135,10 +142,16 @@ def upload_date(date):
         source_station_id
       )
       VALUES (%s, %s, %s, %s, %s )
+      ON DUPLICATE KEY UPDATE
+      other = VALUES(other),
+      description = VALUES(description)
     """
     df_stations = pd.DataFrame(stations).drop_duplicates()
-    with aws_engine.connect() as cnx:
-      cnx.execute(q, df_stations.values.tolist() , multi=True)
+
+    with pymysql_con.cursor() as cur:
+      cur.executemany(
+        q, df_stations[["district_id", "source_id", "other", "description", "source_station_id" ]].values.tolist()) 
+    pymysql_con.commit()
 
   # upload scores
   if len(scores) > 0:
@@ -174,26 +187,47 @@ def upload_date(date):
         other
       )
       VALUES (%s, %s, %s, %s, %s, %s, %s)
+      ON DUPLICATE KEY UPDATE
+      score_value = VALUES(score_value),
+      reference_value = VALUES(reference_value),
+      other = VALUES(other)
+
     """
     df_scores = df_scores.drop_duplicates()
-    with aws_engine.connect() as cnx:
-      # makes sure the columns' order match the query
-      cnx.execute(q, df_scores[["dt", "score_value", "reference_value", "source_id", "district_id", "station_id", "other"]].values.tolist() , multi=True)
+
+    with pymysql_con.cursor() as cur:
+      cur.executemany(q, df_scores[["dt", "score_value", "reference_value", "source_id", "district_id", "station_id", "other"]].values.tolist()) 
+    pymysql_con.commit()
 
     print("upload completed")
 
 def upload_all():
+  """ drops all existent data and replaces it by s3 bucket content """
+  # delete all 
   first_date_available = datetime(2020, 3, 22) # used in get-all-data mode  
   now = datetime.now()
   d = first_date_available
+
+  # delete all before uploading all
+  for table in ["scores", "stations"]:
+    q = """
+      DELETE FROM %s WHERE source_id = '%s';
+    """ % (table, source_id )
+    with pymysql_con.cursor() as cur:
+      cur.execute(q) 
+    pymysql_con.commit()
+  print("all existing data dropped")
 
   # upload until yesterday (including)
   while d < datetime(now.year, now.month, now.day):
     upload_date(d)
     d = d + timedelta(days=1)
-    
+  
 # upload all
-#upload_all()
+
+upload_all()
 
 # upload yesterday (cron job)
-upload_date(datetime.now() - timedelta(days=1))
+# upload_date(datetime.now() - timedelta(days=1))
+
+pymysql_con.close()
