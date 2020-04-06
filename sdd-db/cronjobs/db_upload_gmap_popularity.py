@@ -225,9 +225,9 @@ def upload_all():
   
 # upload all
 
-upload_all()
+# upload_all()
 
 # upload yesterday (cron job)
-# upload_date(datetime.now() - timedelta(days=1))
+upload_date(datetime.now() - timedelta(days=1))
 
 pymysql_con.close()
