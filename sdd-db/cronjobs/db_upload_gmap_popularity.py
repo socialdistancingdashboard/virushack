@@ -17,6 +17,7 @@ from sqlalchemy.pool import NullPool
 import dateutil.parser
 from shapely.geometry import Point, Polygon
 from shapely import wkt
+import traceback
 
 # ask for credentials
 config = json.load(open("../../credentials/credentials-aws-db.json", "r"))
@@ -83,7 +84,9 @@ def upload_date(date):
           str(hour).zfill(2)))
       
       result = json.loads(response["Body"].read())
-    except:
+    except Exception as e:
+      print(e)
+      traceback.print_exc()
       continue
 
 
