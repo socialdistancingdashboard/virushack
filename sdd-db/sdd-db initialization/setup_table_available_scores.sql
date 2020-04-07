@@ -1,63 +1,87 @@
 TRUNCATE TABLE sdd.sources;
 
-INSERT INTO sdd.sources (id, desc_short, desc_long, contributors, unit, mode) 
+INSERT INTO sdd.sources (id, desc_short, desc_long, contributors, unit, unit_long, unit_agg_long, sample_interval, agg_mode, has_reference_values) 
 VALUES(
   "score_lemgodigital_passerby",
   "Passantenfrequenz in Lemgo",
-  "Entspricht der Anzahl an Passanten",
+  "Entspricht der Anzahl an Passanten in Lemgo",
   "Fraunhofer IOSB-INA",
-  "Anzahl Personen",
-  "daily"
+  "Anzahl",
+  "Anzahl Passanten",
+  "Prozent vom Normalwert",
+  "daily",
+  "avg-percentage-of-normal",
+  1
 );
 
-INSERT INTO sdd.sources (id, desc_short, desc_long, contributors, unit, mode) 
+INSERT INTO sdd.sources (id, desc_short, desc_long, contributors, unit, unit_long, unit_agg_long, sample_interval, agg_mode, has_reference_values) 
 VALUES(
   "score_lemgodigital_traffic",
   "Verkehrsaufkommen in Lemgo",
-  "Entspricht der Anzahl an Fahrzeugen",
+  "Entspricht der Anzahl an Fahrzeugen in Lemgo",
   "Fraunhofer IOSB-INA",
+  "Anzahl",
   "Anzahl Fahrzeuge",
-  "daily"
+  "Prozent vom Normalwert",
+  "daily",
+  "avg-percentage-of-normal",
+  1
 );
 
-INSERT INTO sdd.sources (id, desc_short, desc_long, contributors, unit, mode) 
+INSERT INTO sdd.sources (id, desc_short, desc_long, contributors, unit, unit_long, unit_agg_long, sample_interval, agg_mode, has_reference_values) 
 VALUES(
   "score_google_places",
-  "Beliebtheit öffentlicher Orte",
-  "Entspricht der Auslastung öffentlicher Orte im Vergleich zur gewöhnlichen Auslastung",
+  "Auslastung von ÖPV-Haltestellen",
+  "Entspricht der Auslastung von ÖPV-Haltestellen",
   "Google Places",
-  "Auslastung (in Prozent?)",
-  "hourly"
+  "Prozent",
+  "Prozent vom Normalwert",
+  "Prozent vom Normalwert",
+  "hourly",
+  "avg-percentage-of-normal",
+  1
 );
 
-INSERT INTO sdd.sources (id, desc_short, desc_long, contributors, unit, mode) 
+INSERT INTO sdd.sources (id, desc_short, desc_long, contributors, unit, unit_long, unit_agg_long, sample_interval, agg_mode, has_reference_values) 
 VALUES(
   "corona_infected",
   "Corona-Infektionen",
   "Entspricht der Anzahl der gemeldeten Corona-Infektionen",
   "Zeit Online",
-  "Anzahl Personen",
-  "daily"
+  "Anzahl",
+  "Anzahl Infizierter",
+  "Anzahl Infizierter",
+  "daily",
+  "sum",
+  1
 );
 
-INSERT INTO sdd.sources (id, desc_short, desc_long, contributors, unit, mode) 
+INSERT INTO sdd.sources (id, desc_short, desc_long, contributors, unit, unit_long, unit_agg_long, sample_interval, agg_mode, has_reference_values) 
 VALUES(
   "corona_dead",
   "Corona-Tote",
   "Entspricht der Anzahl der gemeldeten Corona-Toten",
   "Zeit Online",
-  "Anzahl Personen",
-  "daily"
+  "Anzahl",
+  "Anzahl Toter",
+  "Anzahl Toter",
+  "daily",
+  "sum",
+  1
 );
 
-INSERT INTO sdd.sources (id, desc_short, desc_long, contributors, unit, mode) 
+INSERT INTO sdd.sources (id, desc_short, desc_long, contributors, unit, unit_long, unit_agg_long, sample_interval, agg_mode, has_reference_values) 
 VALUES(
   "corona_recovered",
   "Gesundete Patienten",
   "Entspricht der (gemeldeten) Anzahl der Patienten, die wieder als gesund entlassen wurden",
   "Zeit Online",
-  "Anzahl Personen",
-  "daily"
+  "Anzahl",
+  "Anzahl Gesundeter",
+  "Anzahl Gesundeter",
+  "daily",
+  "sum",
+  1
 );
 
 
