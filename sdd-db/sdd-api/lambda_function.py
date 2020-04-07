@@ -77,20 +77,22 @@ def post_test(event, context):
     "body": json.dumps(result)
   }   
 
+
 def get_station_data(event, context):
   try:
     assert event['httpMethod'] == 'POST', "Use POST for this request"
     assert event["body"], "Please provide body with parameters."
     params = json.loads(event["body"])
-
-    #params = {"source_id": "score_google_places"}
-    
+    # params = {"source_id": "score_google_places"}
 
     assert "source_id" in params, "please provide a source_id"
     source_id = params["source_id"] if "source_id" in params else None
     state_id = params["state_id"] if "state_id" in params else None
     district_id = params["district_id"] if "district_id" in params else None
     station_id = params["station_id"] if "station_id" in params else None
+    start = params["start"] if "start" in params else None
+    end = params["end"] if "end" in params else None
+
     params["country_id"] = "DE"
 
     agg_level = "station"
@@ -101,87 +103,106 @@ def get_station_data(event, context):
     if not state_id:
       agg_level = "country"
     
-    
     # load all information for the requested source
     source = pd.read_sql("SELECT * FROM sources WHERE id = '%s'" % source_id, aws_engine ) 
     assert len(source) == 1, "Please provide correct source_id."
-    source_corona = pd.read_sql("SELECT * FROM sources WHERE id = 'corona_infected'", aws_engine ) 
 
-    meta = {
-      "yaxis0": {
-        "ylabel": source.unit.iloc[0],
+    # used to aggregate hours to days
+    sample_interval = params["sample_interval"] if "sample_interval" in params else "daily" # source["sample_interval"].iloc[0]
+    assert sample_interval in ["daily", source["sample_interval"].iloc[0]], "Sample interval '%s' is not available for source '%s'" % (sample_interval, source.id.iloc[0])
+    
+    def generate_query(source, sample_interval):
+      # used to autogenerate mysql-query
+      spatial_filters = [
+        ("T3.state_id", state_id),
+        ("T3.district_id", district_id),
+        ("T1.station_id", station_id)
+      ]
+
+      if sample_interval == "hourly":
+        q_sample_interval = "T1.dt AS dt_new"
+      elif sample_interval == "daily":
+        q_sample_interval = " STR_TO_DATE(CONCAT(YEAR(dt),'-', MONTH(dt),'-', DAY(dt)), '%%Y-%%m-%%d') AS dt_new "
+      else:
+        raise "sample interval not valid. Found '%s'" % sample_interval
+
+      # used to auto-generate WHERE clause in mysql-query
+      q_spatial_filter = " AND ".join([ "%s='%s'" % (name, val) for name, val in spatial_filters  if val])
+      q_spatial_filter = " AND " + q_spatial_filter if q_spatial_filter else ""
+
+      if source.unit.iloc[0] == "Anzahl" and agg_level == "station" and sample_interval == source.sample_interval.iloc[0]:
+        # we are allowed to sum up values
+        raw = True
+        q_aggregation = " SUM(T1.score_value) AS score "
+      else:
+        raw = False
+        if source.agg_mode.iloc[0] == "avg-percentage-of-normal":
+          assert source.has_reference_values.iloc[0] == True, "Source says there are no reference values but you want to use 'avg-percentage-of-normal'. That does not work."
+          q_aggregation = " AVG(T1.score_value / T1.reference_value) AS score "
+        if source.agg_mode.iloc[0] == "sum":
+          q_aggregation = " SUM(T1.score_value) AS score "
+      
+      q_temporal_filter_start = " AND dt >= '%s' " % start if start else ""
+      q_temporal_filter_end = " AND dt <= '%s' " % end if end else ""
+
+      query = """
+        SELECT 
+          %s, %s
+        FROM scores AS T1
+        JOIN locations AS T3 ON T1.district_id = T3.district_id
+        WHERE T1.source_id = '%s'
+          %s  \n %s \n %s
+        GROUP BY dt_new
+        ORDER BY T1.dt ASC
+      """ % (q_sample_interval, q_aggregation, source.id.iloc[0], q_spatial_filter, q_temporal_filter_start, q_temporal_filter_end)
+
+      def get_output_unit():
+        if raw or source.agg_mode.iloc[0] == "sum":
+         return source.unit.iloc[0]
+        elif source.agg_mode.iloc[0] == "avg-percentage-of-normal":
+          return "Prozent"
+        else:
+          raise "Your agg_mode ('%s')is not supported when infering output unit" % source.agg_mode.iloc[0]
+
+      meta = {
+        "ylabel": source.desc_short.iloc[0] + " (%s)" % (source.unit_long.iloc[0] if raw else source.unit_agg_long.iloc[0]),
         "desc_short": source.desc_short.iloc[0],
         "desc_long": source.desc_long.iloc[0],
-        "mode": source["mode"].iloc[0],
+        "sample_interval": sample_interval,
         "agg_level": agg_level,
         "agg_level_id": params[agg_level + "_id"],
-        "agg_mode": "avg-percentage-of-normal"
+        "agg_mode": source.agg_mode.iloc[0],
+        "available_intervals": list(set([source.sample_interval.iloc[0], "daily"])),
+        "unit": get_output_unit()
       }
-    }
+      return query, meta
 
-    # used to autogenerate mysql-query
-    filters = [
-      # ("T3.country_id", "DE"),
-      ("T3.state_id", state_id),
-      ("T3.district_id", district_id),
-      ("T1.station_id", station_id)
-    ]
-
-    # used to auto-generate mysql-query
-    q_filter = " AND ".join([ "%s='%s'" % (name, val) for name, val in filters  if val])
-    q_filter = " AND " + q_filter if q_filter else ""
-
-    query = """
-      SELECT 
-        T1.dt, 
-        AVG(T1.score_value / T1.reference_value) AS score
-      FROM scores AS T1
-      JOIN locations AS T3 ON T1.district_id = T3.district_id
-      WHERE T1.source_id = '%s'
-        %s
-      GROUP BY dt
-      ORDER BY T1.dt ASC
-    """ % (source_id, q_filter)
-
-    #print('(pymysql.err.ProgrammingError) (1064, \"You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near \'FROM scores AS T1\\n        JOIN stations AS T2 ON T2.id = T1.station_id\\n        J\' at line 4\")\n[SQL: \n        SELECT \n          T1.dt, \n          AVG(T1.reference_value / T1.score_value),\n        FROM scores AS T1\n        JOIN stations AS T2 ON T2.id = T1.station_id\n        JOIN locations AS T3 ON T2.district_id = T3.district_id\n        WHERE T2.source_id = \'score_google_places\'\n         \n          GROUP BY dt \n        ORDER BY T1.dt ASC\n        \n    ]\n(Background on this error at: http://sqlalche.me/e/f405)')
-    print(query)
-    
-    # retrieve data
+    # retrieve requested timeseries
+    query, meta = generate_query(source, sample_interval)
     df = pd.read_sql(query, aws_engine )
+    df.rename(columns={"dt_new": "dt"}, inplace=True)
+    if "prozent" in meta["ylabel"].lower():
+      df.score = df.score * 100
+      
+    # fill with nan
+    earliest_date = start if start else df.dt.min()
+    latest_date = end if end else df.dt.max()
+    all_dates = [earliest_date]
+    while all_dates[-1] < latest_date:
+      if sample_interval == "hourly":
+        all_dates.append(all_dates[-1] + timedelta(hours=1))
+      elif sample_interval == "daily":
+        all_dates.append(all_dates[-1] + timedelta(days=1))
+      else: raise ValueError("You chose '%s' as an sample interval which is not supported." % sample_interval)
+    df_all_dates = pd.DataFrame(all_dates, columns=["dt"])
+    df = df.merge(df_all_dates, how="outer", on="dt")
+    df.sort_values(by=["dt"], inplace=True)
 
-    query = """
-      SELECT 
-        T1.dt, 
-        SUM(T1.score_value) AS score
-      FROM scores AS T1
-      JOIN locations AS T3 ON T1.district_id = T3.district_id
-      WHERE T1.source_id = 'corona_infected'
-        %s
-      GROUP BY dt
-      ORDER BY T1.dt ASC
-    """ % (q_filter,)
-    
-    # retrieve corona data
-    df_corona = pd.read_sql(query, aws_engine)
-
-    meta["yaxis1"] = {
-      "ylabel": source_corona.unit.iloc[0],
-      "desc_short": source_corona.desc_short.iloc[0],
-      "desc_long": source_corona.desc_long.iloc[0],
-      "mode": source_corona["mode"].iloc[0],
-      "agg_level": agg_level,
-      "agg_level_id": params[agg_level + "_id"],
-      "agg_mode": "sum"
-    }
-
-    # transform to datestring to avoid any timezone information when exporting to json
-    df["dt"] = df["dt"].astype(str) 
-    df_corona["dt"] = df_corona["dt"].astype(str)
+    df["dt"] = df["dt"].astype(str) # to avoid timezone information
 
     result = {
       "meta": meta,
       "data": json.loads(df.to_json(force_ascii=False, orient="records",  date_format = "iso")),
-      "corona": json.loads(df_corona.to_json(force_ascii=False, orient="records",  date_format = "iso")),
     }
 
     return {
