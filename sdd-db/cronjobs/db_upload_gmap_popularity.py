@@ -85,8 +85,9 @@ def upload_date(date):
       
       result = json.loads(response["Body"].read())
     except Exception as e:
-      print(e)
-      traceback.print_exc()
+      if not "NoSuchKey" in str(e):
+        print(e)
+        traceback.print_exc()
       continue
 
 
