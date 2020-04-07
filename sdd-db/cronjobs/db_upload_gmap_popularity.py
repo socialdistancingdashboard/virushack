@@ -39,6 +39,7 @@ pymysql_con = pymysql.connect(
   config["password"], 
   config["database"])
 
+## SOURCE_ID ANPASSEN!
 source_id = "score_google_places"
 s3_client = boto3.client('s3')
 
@@ -68,9 +69,12 @@ def upload_date(date):
 
   stations = []
   scores = []
+
+  ## ANPASSEN WENN NUR TAGEWEISE
   for hour in range(0,24):
     try:
       response = s3_client.get_object(
+        ## BUCKET NAMEN ANPASSEN AUCH: PFAD ANPASSEN
         Bucket='sdd-s3-bucket', 
         Key='googleplaces/{}/{}/{}/{}'.format(
           str(date.year).zfill(4),
@@ -82,19 +86,26 @@ def upload_date(date):
     except:
       continue
 
+
+    ## CHECKEN OB DIE JSON EINE LISTE AUS STATIONEN IST
     for station in result:
       score_value = station["current_popularity"]
-      if score_value == 0:
-        score_value = 0.000001 # prevent divide by zero 
+  
       try:
         score_reference = station["populartimes"][date.weekday()]["data"][hour]
       except:
+        ## REFERENCE VALUE NONE WENN NICHT MITGELIEFERT
         score_reference = None
 
+
       coordinates = pd.DataFrame([station["coordinates"]])
+
+      ## CHECKEN OB LON LAT SO HEISSEN
       coordinates.rename(columns={"lng": "lon"}, inplace=True)
       district_id = coords_to_district_id(coordinates["lat"], coordinates["lon"])
 
+
+      ## ANPASSEN, DASS FÜR JEDE STATION DIE ZUSATZINFOS ABGESPEICHERT WERDEN
       other = {
         "googleplaces_id": station["id"],
         "station_name": station["name"],
@@ -106,6 +117,7 @@ def upload_date(date):
         "station_rating_n": station["rating_n"]
       }
 
+      ## ANPASSEN
       stations.append({
         "district_id": district_id,
         "source_id": source_id,
@@ -119,6 +131,7 @@ def upload_date(date):
         "populartimes": station["populartimes"]
       }
 
+      ## ANPASSEN, DASS FÜR JEDEN DATENPUNKT DIE ZUSATZINFOS ABGESPEICHERT WERDEN
       scores.append({
         "dt": datetime(date.year, date.month, date.day, hour),
         "score_value": score_value,
@@ -130,6 +143,7 @@ def upload_date(date):
         "other": json.dumps(other)
       })
 
+  
   # upload stations. handles duplicates so dont worry
   if len(stations) > 0:
     q = """
@@ -150,6 +164,7 @@ def upload_date(date):
 
     with pymysql_con.cursor() as cur:
       cur.executemany(
+        ## DARAUF ACHTEN, DASS DIE SPALTEN IM DATAFRAME GENAU DER REIHENFOLGE DES INSERTS ENTSPRECHEN
         q, df_stations[["district_id", "source_id", "other", "description", "source_station_id" ]].values.tolist()) 
     pymysql_con.commit()
 
@@ -176,7 +191,7 @@ def upload_date(date):
     df_scores.drop(["description", "source_station_id", "custom_index"], axis=1, inplace=True)
     df_scores['dt'] = df_scores['dt'].astype(str)
     q = """
-      INSERT IGNORE INTO scores 
+      INSERT INTO scores 
       (
         dt,
         score_value,
@@ -196,6 +211,7 @@ def upload_date(date):
     df_scores = df_scores.drop_duplicates()
 
     with pymysql_con.cursor() as cur:
+      ## DARAUF ACHTEN, DASS DIE SPALTEN IM DATAFRAME DER REIHENFOLGE DES INSERTS ENTSPRECHEN
       cur.executemany(q, df_scores[["dt", "score_value", "reference_value", "source_id", "district_id", "station_id", "other"]].values.tolist()) 
     pymysql_con.commit()
 
@@ -216,6 +232,39 @@ def upload_all():
     with pymysql_con.cursor() as cur:
       cur.execute(q) 
     pymysql_con.commit()
+
+  # delete source
+  with pymysql_con.cursor() as cur:
+    cur.execute("DELETE FROM sources WHERE id = '%s'" % source_id) 
+  pymysql_con.commit()
+
+  ## DIE ERSTELLUNG DER QUELLE ANPASSEN!
+  # recreate source
+  q = """
+  INSERT INTO sdd.sources (
+    id, /* frei wählbar: 'score_xy', siehe VALUES */
+    desc_short, /* siehe VALUES */
+    desc_long, contributors, /* siehe VALUES */
+    unit, /* 'Anzahl' oder 'Prozent', nichts anderes(!) */
+    unit_long, /* Einheit für Frontend, frei wählbar */
+    unit_agg_long, /* Einheit nach aggregation, 'Anzahl' oder 'Prozent' */
+    sample_interval, /* 'hourly' oder 'daily' */
+    agg_mode, /* wie soll aggregiert werde? 'sum', 'avg-percentage-of-normal' */
+    has_reference_values /* '0' für nicht vorhanden, '1' für vorhanden */
+  ) VALUES (
+    '%s',
+    "Passantenfrequenz in Lemgo",
+    "Entspricht der Anzahl an Passanten in Lemgo",
+    "Fraunhofer IOSB-INA",
+    "Anzahl",
+    "Anzahl Passanten",
+    "Prozent vom Normalwert",
+    "daily",
+    "avg-percentage-of-normal",
+    1
+  )
+  """ % source_id
+
   print("all existing data dropped")
 
   # upload until yesterday (including)
@@ -223,11 +272,12 @@ def upload_all():
     upload_date(d)
     d = d + timedelta(days=1)
   
-# upload all
 
+# use this for intial upload
 # upload_all()
 
-# upload yesterday (cron job)
+# upload this for timed upload (e.g. cronjob)
 upload_date(datetime.now() - timedelta(days=1))
 
+# free connection
 pymysql_con.close()
