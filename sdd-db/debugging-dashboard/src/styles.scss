@@ -1,0 +1,17 @@
+/* You can add global styles to this file, and also import other style files */
+
+// @import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+@import '~material-design-icons/iconfont/material-icons.css';
+//indigo-pink.css
+//pink-bluegrey
+//purple-green
+
+@import '~@angular/material/theming';
+@include mat-core();
+
+  $primary: mat-palette($mat-pink,500);
+  $accent: mat-palette($mat-pink, 500);
+
+  $theme: mat-light-theme($primary, $accent);
+
+@include angular-material-theme($theme);
