@@ -59,6 +59,7 @@ export interface ISource {
   id: string, 
   desc_short: string, 
   desc_long: string,
+  spatial_level: string;
 }
 
 export interface Country {

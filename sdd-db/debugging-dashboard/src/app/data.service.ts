@@ -12,6 +12,7 @@ import { Observable } from "rxjs"
 import { filter, map, combineAll, withLatestFrom, finalize } from 'rxjs/operators';
 import { of } from 'rxjs'
 import { ChartComponent } from 'angular2-chartjs';
+import { share } from 'rxjs/operators';
 
 //import { BaseChartDirective } from 'ng2-charts';
 
@@ -24,6 +25,7 @@ import { ChartComponent } from 'angular2-chartjs';
 export class DataService {
   stations$: Observable<IStation[]>
   sources$: Observable<ISource[]>
+  source_spatial_level_lookup: any;
 
   color_palette = ["#d9046777", "#05aff277", "#f2bc1b77", "#f2440577","#7c05f277", "#04652a77"]
   chart_colors = { "0": "#04652a77", "1": "#f6336677"}
@@ -126,7 +128,6 @@ export class DataService {
     // }
   }
 
-  promises: Promise<any>[] = []
   blink_status: boolean = true;
 
   add_chart(){
@@ -315,6 +316,7 @@ export class DataService {
 
     req = this.stations$
     .pipe( finalize(() => this.req_list.splice(this.req_list.indexOf(req),1)))
+    .pipe(share())
     .subscribe( (data) => {
       console.log("stations", data)
     })
@@ -325,25 +327,32 @@ export class DataService {
       "corona_dead",
       /* "corona_infected", */
       "corona_recovered",
-      "score_fraunhofer_day_ahead_auction",
-      "score_fraunhofer_import_balance",
-      "score_fraunhofer_intraday_continuous_average_price",
-      "score_fraunhofer_intraday_continuous_id1_price",
-      "score_fraunhofer_intraday_continuous_id3_price",
-      "score_fraunhofer_load"
+      // "score_fraunhofer_day_ahead_auction",
+      // "score_fraunhofer_import_balance",
+      // "score_fraunhofer_intraday_continuous_average_price",
+      // "score_fraunhofer_intraday_continuous_id1_price",
+      // "score_fraunhofer_intraday_continuous_id3_price",
+      // "score_fraunhofer_load"
       ]
     request_url = "https://yrxhzhs22a.execute-api.eu-central-1.amazonaws.com/Prod/get-sources"
     req = this.sources$ = this.http.get<ISource[]>(request_url, {})
     .pipe( finalize(() => this.req_list.splice(this.req_list.indexOf(req),1)))
-    .pipe(
-      map( source => {
-        return source.filter( source => source_blacklist.indexOf(source.id) === -1 )
-      })
-    )
+    .pipe( map( source => {
+        return source.filter( source => source_blacklist.indexOf(source.id) === -1 )}))
+    .pipe(share())
+
+
     this.req_list.push(req)
 
     this.sources$.subscribe((data)=>{
       console.log("sources", data)
+      let source_spatial_level_lookup = []
+      data.forEach( val => {
+        source_spatial_level_lookup[val.id] = val.spatial_level
+      })
+
+      this.source_spatial_level_lookup = source_spatial_level_lookup
+      console.log("LOOKUP", this.source_spatial_level_lookup)
     })
 
     /* handles the rockets animation while app is loading stuff */

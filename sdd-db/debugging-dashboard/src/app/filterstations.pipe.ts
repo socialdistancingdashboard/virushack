@@ -5,19 +5,19 @@ import { IStation, ISource } from './interfaces';
   name: 'filterstations'
 })
 export class FilterstationsPipe implements PipeTransform {
-  
+
   transform(value: IStation[], return_type, selected_source_id, selected_state_id, selected_district_id) {
     /* returns the stations filtered and uniquified by given return type (e.g state_id) */
-    
+
     if(!value){
       return []
     }
-    
+
     let filtered = [];
 
     if (return_type == "state_id"){
       if (selected_source_id){
-        filtered = value.filter(s => 
+        filtered = value.filter(s =>
           s.source_id === selected_source_id
         )
       }
@@ -25,15 +25,15 @@ export class FilterstationsPipe implements PipeTransform {
 
     if (return_type == "district_id"){
       if (selected_source_id && selected_state_id){
-        filtered = value.filter(s => 
-          s.source_id === selected_source_id && s.state_id === selected_state_id 
+        filtered = value.filter(s =>
+          s.source_id === selected_source_id && s.state_id === selected_state_id && s.district_id
         );
       }
     }
 
     if (return_type == "station_id"){
       if (selected_source_id && selected_state_id && selected_district_id){
-        filtered = value.filter(s => 
+        filtered = value.filter(s =>
           s.source_id === selected_source_id && s.state_id === selected_state_id && s.district_id === selected_district_id
         );
         console.log("filtered stations", filtered)

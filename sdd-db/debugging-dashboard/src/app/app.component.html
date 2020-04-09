@@ -31,7 +31,7 @@
     <ng-container *ngIf="ds.req_list.length != 0">
       <span> loading!</span>
     </ng-container>
-  
+
     <svg id="rocket-smoke" alt="Rocket Ship Smoke" xmlns="http://www.w3.org/2000/svg" width="516.119" height="1083.632" viewBox="0 0 516.119 1083.632">
       <path id="Path_40" data-name="Path 40" d="M644.6,141S143.02,215.537,147.049,870.207s342.774,201.755,342.774,201.755S404.659,847.213,388.815,762.2c-27.116-145.51-11.551-384.124,271.9-609.1C671.15,139.365,644.6,141,644.6,141Z" transform="translate(-147.025 -140.939)" fill="#f5f5f5"/>
     </svg>
@@ -52,15 +52,18 @@
     </mat-card-header>
   </mat-card> -->
 
+  
+
+
   <mat-card *ngFor="let id of ds.id; let i = index" class="input-container">
     <mat-card-header>
       <div mat-card-avatar><i class="material-icons">insert_chart</i></div>
       <mat-card-title style="width: 100% !important;">
         <div style="width:100%">
           <span class="right">
-            <button 
-              mat-icon-button aria-label="delete chart" 
-              class="remove-chart" 
+            <button
+              mat-icon-button aria-label="delete chart"
+              class="remove-chart"
               [disabled]="ds.id?.length == 1"
               (click)="ds.remove_chart(i)">
               <mat-icon>clear</mat-icon>
@@ -74,50 +77,50 @@
       <div id="filter-container">
         <mat-form-field >
           <mat-label>Kategorie</mat-label>
-          <mat-select  
+          <mat-select
           [disabled]="!(ds.sources$ | async)?.length"
-          [(value)]="id.selected_source_id" 
+          [(value)]="id.selected_source_id"
           (selectionChange)="ds.new_source($event, i)">
-            <mat-option *ngFor="let source of ds.sources$ | async" 
+            <mat-option *ngFor="let source of ds.sources$ | async"
             [(value)]="source.id" >
             {{source.desc_short}}
           </mat-option>
           </mat-select>
-        </mat-form-field> 
-    
-        <mat-form-field *ngIf="id.selected_source_id" >
+        </mat-form-field>
+
+        <mat-form-field *ngIf="id.selected_source_id && (ds.source_spatial_level_lookup[id.selected_source_id] == 'state' || ds.source_spatial_level_lookup[id.selected_source_id] == 'district' )" >
           <mat-label>Bundesland</mat-label>
-          <mat-select  
+          <mat-select
           [disabled]="!id.selected_source_id"
-          [(value)]="id.selected_state_id" 
+          [(value)]="id.selected_state_id"
           (selectionChange)="ds.new_state($event, i)">
-            <mat-option *ngFor="let station of ds.stations$ | async | filterstations:'state_id':id.selected_source_id:id.selected_state_id:id.selected_district_id" 
+            <mat-option *ngFor="let station of ds.stations$ | async | filterstations:'state_id':id.selected_source_id:id.selected_state_id:id.selected_district_id"
               [(value)]="station.state_id" >
               {{station.state}}
             </mat-option>
           </mat-select>
-        </mat-form-field> 
-  
-        <mat-form-field *ngIf="id.selected_state_id">
+        </mat-form-field>
+
+        <mat-form-field *ngIf="id.selected_state_id  && ( ds.source_spatial_level_lookup[id.selected_source_id] == 'district' )" >
           <mat-label>Kreis</mat-label>
-          <mat-select  
+          <mat-select
           [disabled]="!id.selected_state_id"
           [(value)]="id.selected_district_id"
           (selectionChange)="ds.new_district($event, i)">
-            <mat-option *ngFor="let station of ds.stations$ | async | filterstations:'district_id':id.selected_source_id:id.selected_state_id:id.selected_district_id" 
+            <mat-option *ngFor="let station of ds.stations$ | async | filterstations:'district_id':id.selected_source_id:id.selected_state_id:id.selected_district_id"
             [(value)]="station.district_id" >
             {{station.district}} ({{station.district_type}})
           </mat-option>
           </mat-select>
-        </mat-form-field> 
-        
+        </mat-form-field>
+
         <mat-form-field *ngIf="id.selected_district_id">
           <mat-label>Messstation</mat-label>
-          <mat-select  
+          <mat-select
           [disabled]="!id.selected_district_id"
           [(value)]="id.selected_station_id"
           (selectionChange)="ds.new_station($event,i, null)">
-            <mat-option *ngFor="let station of ds.stations$ | async | filterstations:'station_id':id.selected_source_id:id.selected_state_id:id.selected_district_id" 
+            <mat-option *ngFor="let station of ds.stations$ | async | filterstations:'station_id':id.selected_source_id:id.selected_state_id:id.selected_district_id"
             [(value)]="station.id" >
             {{station.description}}
           </mat-option>
@@ -148,24 +151,24 @@
         {{error}}
       </div>
     </mat-card-content>
-    
+
   </mat-card>
-  
+
   <!-- <p>Here are some links to help you get started:</p> -->
   <!-- *ngIf="ds.data?.datasets?.length > 0" -->
   <div  class="chart-container">
-    <chart 
+    <chart
       #chartcanvas baseChart
-      [type]="'line'" 
-      [data]="ds.data" 
-      [options]="ds.options" 
+      [type]="'line'"
+      [data]="ds.data"
+      [options]="ds.options"
       class="chart-container">
     </chart>
   </div>
 
 
 
-  
+
 
   <!--
   <app-dash></app-dash>
