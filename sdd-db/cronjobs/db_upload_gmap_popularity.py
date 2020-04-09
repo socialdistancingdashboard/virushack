@@ -4,14 +4,14 @@ This should be run daily on any machine that meets the python dependencies.
 """
 
 try:  # allows to import local modules
-  __IPYTHON__ 
+  __IPYTHON__
   os.chdir(os.path.dirname(__file__))
 except: pass
 import boto3
 import json
 from datetime import datetime, timedelta
 import pandas as pd
-import pymysql 
+import pymysql
 from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
 import dateutil.parser
@@ -26,7 +26,7 @@ aws_engine = create_engine(
   ("mysql+pymysql://" +
   config["user"] + ":" +
   config["password"] + "@" +
-  config["host"] + ":" + 
+  config["host"] + ":" +
   str(config["port"]) + "/" +
   config["database"]),
   poolclass=NullPool, # dont maintain a pool of connections
@@ -35,9 +35,9 @@ aws_engine = create_engine(
 
 # pymysql connection for queries outside of pandas (easier to use in that case)
 pymysql_con = pymysql.connect(
-  config["host"], 
-  config["user"], 
-  config["password"], 
+  config["host"],
+  config["user"],
+  config["password"],
   config["database"])
 
 ## SOURCE_ID ANPASSEN!
@@ -76,13 +76,13 @@ def upload_date(date):
     try:
       response = s3_client.get_object(
         ## BUCKET NAMEN ANPASSEN AUCH: PFAD ANPASSEN
-        Bucket='sdd-s3-bucket', 
+        Bucket='sdd-s3-bucket',
         Key='googleplaces/{}/{}/{}/{}'.format(
           str(date.year).zfill(4),
           str(date.month).zfill(2),
           str(date.day).zfill(2),
           str(hour).zfill(2)))
-      
+
       result = json.loads(response["Body"].read())
     except Exception as e:
       if not "NoSuchKey" in str(e):
@@ -94,7 +94,7 @@ def upload_date(date):
     ## CHECKEN OB DIE JSON EINE LISTE AUS STATIONEN IST
     for station in result:
       score_value = station["current_popularity"]
-  
+
       try:
         score_reference = station["populartimes"][date.weekday()]["data"][hour]
       except:
@@ -147,11 +147,11 @@ def upload_date(date):
         "other": json.dumps(other)
       })
 
-  
+
   # upload stations. handles duplicates so dont worry
   if len(stations) > 0:
     q = """
-      INSERT INTO stations 
+      INSERT INTO stations
       (
         district_id,
         source_id,
@@ -169,23 +169,23 @@ def upload_date(date):
     with pymysql_con.cursor() as cur:
       cur.executemany(
         ## DARAUF ACHTEN, DASS DIE SPALTEN IM DATAFRAME GENAU DER REIHENFOLGE DES INSERTS ENTSPRECHEN
-        q, df_stations[["district_id", "source_id", "other", "description", "source_station_id" ]].values.tolist()) 
+        q, df_stations[["district_id", "source_id", "other", "description", "source_station_id" ]].values.tolist())
     pymysql_con.commit()
 
   # upload scores
   if len(scores) > 0:
     q = """
-      SELECT id AS station_id, district_id, description, source_station_id FROM stations 
-      WHERE source_id = '%s' 
+      SELECT id AS station_id, district_id, description, source_station_id FROM stations
+      WHERE source_id = '%s'
     """ % source_id
-    
-    scores_stations_foreign_keys = pd.read_sql(q, aws_engine) 
+
+    scores_stations_foreign_keys = pd.read_sql(q, aws_engine)
     scores_stations_foreign_keys["custom_index"] = scores_stations_foreign_keys.apply(custom_index, axis=1)
     scores_stations_foreign_keys.drop(["district_id", "description", "source_station_id"], axis=1, inplace=True)
-    
+
     df_scores = pd.DataFrame(scores)
     df_scores["custom_index"] = df_scores.apply(custom_index, axis=1)
-    
+
     df_scores = df_scores.merge(
       scores_stations_foreign_keys,
       on="custom_index",
@@ -195,7 +195,7 @@ def upload_date(date):
     df_scores.drop(["description", "source_station_id", "custom_index"], axis=1, inplace=True)
     df_scores['dt'] = df_scores['dt'].astype(str)
     q = """
-      INSERT INTO scores 
+      INSERT INTO scores
       (
         dt,
         score_value,
@@ -216,15 +216,15 @@ def upload_date(date):
 
     with pymysql_con.cursor() as cur:
       ## DARAUF ACHTEN, DASS DIE SPALTEN IM DATAFRAME DER REIHENFOLGE DES INSERTS ENTSPRECHEN
-      cur.executemany(q, df_scores[["dt", "score_value", "reference_value", "source_id", "district_id", "station_id", "other"]].values.tolist()) 
+      cur.executemany(q, df_scores[["dt", "score_value", "reference_value", "source_id", "district_id", "station_id", "other"]].values.tolist())
     pymysql_con.commit()
 
     print("upload completed")
 
 def upload_all():
   """ drops all existent data and replaces it by s3 bucket content """
-  # delete all 
-  first_date_available = datetime(2020, 3, 22) # used in get-all-data mode  
+  # delete all
+  first_date_available = datetime(2020, 3, 22) # used in get-all-data mode
   now = datetime.now()
   d = first_date_available
 
@@ -234,39 +234,31 @@ def upload_all():
       DELETE FROM %s WHERE source_id = '%s';
     """ % (table, source_id )
     with pymysql_con.cursor() as cur:
-      cur.execute(q) 
+      cur.execute(q)
     pymysql_con.commit()
 
   # delete source
   with pymysql_con.cursor() as cur:
-    cur.execute("DELETE FROM sources WHERE id = '%s'" % source_id) 
+    cur.execute("DELETE FROM sources WHERE id = '%s'" % source_id)
   pymysql_con.commit()
 
   ## DIE ERSTELLUNG DER QUELLE ANPASSEN!
   # recreate source
   q = """
-  INSERT INTO sdd.sources (
-    id, /* frei wählbar: 'score_xy', siehe VALUES */
-    desc_short, /* siehe VALUES */
-    desc_long, contributors, /* siehe VALUES */
-    unit, /* 'Anzahl' oder 'Prozent', nichts anderes(!) */
-    unit_long, /* Einheit für Frontend, frei wählbar */
-    unit_agg_long, /* Einheit nach aggregation, 'Anzahl' oder 'Prozent' */
-    sample_interval, /* 'hourly' oder 'daily' */
-    agg_mode, /* wie soll aggregiert werde? 'sum', 'avg-percentage-of-normal' */
-    has_reference_values /* '0' für nicht vorhanden, '1' für vorhanden */
-  ) VALUES (
-    '%s',
-    "Passantenfrequenz in Lemgo",
-    "Entspricht der Anzahl an Passanten in Lemgo",
-    "Fraunhofer IOSB-INA",
-    "Anzahl",
-    "Anzahl Passanten",
-    "Prozent vom Normalwert",
-    "daily",
-    "avg-percentage-of-normal",
-    1
-  )
+    INSERT INTO sources (id, desc_short, desc_long, contributors, unit, unit_long, unit_agg_long, sample_interval, agg_mode, has_reference_values, spatial_level) 
+    VALUES(
+      "score_google_places",
+      "Auslastung von ÖPV-Haltestellen",
+      "Entspricht der Auslastung von ÖPV-Haltestellen",
+      "Google Places",
+      "Prozent",
+      "Prozent vom Normalwert",
+      "Prozent vom Normalwert",
+      "hourly",
+      "avg-percentage-of-normal",
+      1,
+      "district"
+    )
   """ % source_id
 
   print("all existing data dropped")
@@ -275,7 +267,7 @@ def upload_all():
   while d < datetime(now.year, now.month, now.day):
     upload_date(d)
     d = d + timedelta(days=1)
-  
+
 
 # use this for intial upload
 # upload_all()
