@@ -91,7 +91,8 @@ def get_station_data(event, context):
     district_id = params["district_id"] if "district_id" in params else None
     station_id = params["station_id"] if "station_id" in params else None
     start = params["start"] if "start" in params else None
-    end = params["end"] if "end" in params else None
+    end = datetime.fromisoformat(params["end"]) if "end" in params else datetime.now() - timedelta(hours=2)
+    end = min(end, datetime(datetime.now().year, datetime.now().month, datetime.now().day))
 
     params["country_id"] = "DE"
 
