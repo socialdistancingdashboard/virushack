@@ -15,7 +15,7 @@ import { ChartComponent } from 'angular2-chartjs';
 
 //import { BaseChartDirective } from 'ng2-charts';
 
-//@ViewChild('chart1') chart1: ChartComponent; 
+//@ViewChild('chart1') chart1: ChartComponent;
 
 
 @Injectable({
@@ -46,7 +46,7 @@ export class DataService {
   data = {
     datasets: []
   }
-  
+
   yAxes = [{
     id: '0',
     type: 'linear',
@@ -98,7 +98,7 @@ export class DataService {
           mode: 'x'
         }
       }
-    }, 
+    },
     // annotation: {
     //   events: ["click"],
     //   annotations: [
@@ -153,9 +153,9 @@ export class DataService {
     this.id[i].selected_station_id = null;
 
     this.get_station_data(
-      selected_source_id, 
-      this.id[i].selected_state_id, 
-      this.id[i].selected_district_id, 
+      selected_source_id,
+      this.id[i].selected_state_id,
+      this.id[i].selected_district_id,
       this.id[i].selected_station_id,
       i, null)
   }
@@ -167,9 +167,9 @@ export class DataService {
     this.id[i].selected_station_id = null;
 
     this.get_station_data(
-      this.id[i].selected_source_id, 
-      selected_state_id, 
-      this.id[i].selected_district_id, 
+      this.id[i].selected_source_id,
+      selected_state_id,
+      this.id[i].selected_district_id,
       this.id[i].selected_station_id,
       i, null)
 
@@ -181,9 +181,9 @@ export class DataService {
     this.id[i].selected_station_id = null;
 
     this.get_station_data(
-      this.id[i].selected_source_id, 
-      this.id[i].selected_state_id, 
-      selected_district_id, 
+      this.id[i].selected_source_id,
+      this.id[i].selected_state_id,
+      selected_district_id,
       this.id[i].selected_station_id,
       i, null)
 
@@ -192,11 +192,11 @@ export class DataService {
   new_station(event, i:number, hourly:boolean){
     this.errors = []
     const selected_station_id = hourly !== null ? this.id[i].selected_station_id : event.value
-    
+
     this.get_station_data(
-      this.id[i].selected_source_id, 
-      this.id[i].selected_state_id, 
-      this.id[i].selected_district_id, 
+      this.id[i].selected_source_id,
+      this.id[i].selected_state_id,
+      this.id[i].selected_district_id,
       selected_station_id,
       i, hourly);
   }
@@ -220,7 +220,7 @@ export class DataService {
       let unique_units = units.filter( (unit, index) => units.indexOf(unit) === index)
       if (unique_units.length > 2){
         throw new Error("Es ist nicht möglich mehr als zwei verschiedene Einheiten darzustellen")
-      } 
+      }
       this.data.datasets.forEach( (ds, index) => {
         ds.yAxisID = unique_units.indexOf(ds.unit).toString()
         ds.backgroundColor = this.chart_colors[ds.yAxisID]
@@ -229,7 +229,7 @@ export class DataService {
     }
     // reset colors
     this.data.datasets.forEach( (ds, index) => {
-      
+
       ds.backgroundColor = this.color_palette[index]
       if (ds.yAxisID === "0"){
         ds.label = ds.label_raw.replace(")", ", linke Achse)")
@@ -312,16 +312,26 @@ export class DataService {
 
     request_url = "https://yrxhzhs22a.execute-api.eu-central-1.amazonaws.com/Prod/get-stations"
     this.stations$ = this.http.get<IStation[]>(request_url, {})
-    
+
     req = this.stations$
     .pipe( finalize(() => this.req_list.splice(this.req_list.indexOf(req),1)))
     .subscribe( (data) => {
       console.log("stations", data)
     })
-    this.req_list.push(req)    
+    this.req_list.push(req)
 
     // dont display corona "scores"
-    let source_blacklist = ["corona_dead", /* "corona_infected", */ "corona_recovered"]
+    let source_blacklist = [
+      "corona_dead",
+      /* "corona_infected", */
+      "corona_recovered",
+      "score_fraunhofer_day_ahead_auction",
+      "score_fraunhofer_import_balance",
+      "score_fraunhofer_intraday_continuous_average_price",
+      "score_fraunhofer_intraday_continuous_id1_price",
+      "score_fraunhofer_intraday_continuous_id3_price",
+      "score_fraunhofer_load"
+      ]
     request_url = "https://yrxhzhs22a.execute-api.eu-central-1.amazonaws.com/Prod/get-sources"
     req = this.sources$ = this.http.get<ISource[]>(request_url, {})
     .pipe( finalize(() => this.req_list.splice(this.req_list.indexOf(req),1)))
@@ -343,8 +353,8 @@ export class DataService {
       } else {
         this.blink_status = true
       }
-    }, 300)  
-    
+    }, 300)
+
   }
 }
 
