@@ -3,10 +3,10 @@ import json
 import pandas as pd
 from datetime import datetime, timedelta
 import re
-import pymysql 
+import pymysql
 from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
-try:  
+try:
   __IPYTHON__
   os.chdir(os.path.dirname(__file__))
 except: pass
@@ -17,7 +17,7 @@ aws_engine = create_engine(
   ("mysql+pymysql://" +
   config["user"] + ":" +
   config["password"] + "@" +
-  config["host"] + ":" + 
+  config["host"] + ":" +
   str(config["port"]) + "/" +
   config["database"]),
   poolclass=NullPool, # dont maintain a pool of connections
@@ -40,9 +40,9 @@ def template(event, context):
     query = """"""
 
     df = pd.read_sql(query, aws_engine ) #,  params=(start_date, end_date))
-      
+
     assert event['httpMethod'] == 'GET', "Use GET for this request"
-    
+
     params = json.loads(event["body"])
 
     return {
@@ -53,7 +53,7 @@ def template(event, context):
         "Access-Control-Allow-Headers": 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'
       },
       "body": df.to_json( force_ascii=False, orient="records"),
-    }   
+    }
   except Exception as e:
     return on_error(e)
 
@@ -75,7 +75,7 @@ def post_test(event, context):
       "Access-Control-Allow-Headers": 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'
     },
     "body": json.dumps(result)
-  }   
+  }
 
 
 def get_station_data(event, context):
@@ -90,9 +90,9 @@ def get_station_data(event, context):
     state_id = params["state_id"] if "state_id" in params else None
     district_id = params["district_id"] if "district_id" in params else None
     station_id = params["station_id"] if "station_id" in params else None
-    start = params["start"] if "start" in params else None
-    end = datetime.fromisoformat(params["end"]) if "end" in params else datetime.now() - timedelta(hours=2)
-    end = min(end, datetime(datetime.now().year, datetime.now().month, datetime.now().day))
+    start = datetime.fromisoformat(params["start"]) if "start" in params else None
+    end = datetime.fromisoformat(params["end"]) if "end" in params else None #datetime.now() - timedelta(hours=2)
+    # end = min(end, datetime(datetime.now().year, datetime.now().month, datetime.now().day).date())
 
     params["country_id"] = "DE"
 
@@ -103,15 +103,15 @@ def get_station_data(event, context):
       agg_level = "state"
     if not state_id:
       agg_level = "country"
-    
+
     # load all information for the requested source
-    source = pd.read_sql("SELECT * FROM sources WHERE id = '%s'" % source_id, aws_engine ) 
+    source = pd.read_sql("SELECT * FROM sources WHERE id = '%s'" % source_id, aws_engine )
     assert len(source) == 1, "Please provide correct source_id."
 
     # used to aggregate hours to days
     sample_interval = params["sample_interval"] if "sample_interval" in params else "daily" # source["sample_interval"].iloc[0]
     assert sample_interval in ["daily", source["sample_interval"].iloc[0]], "Sample interval '%s' is not available for source '%s'" % (sample_interval, source.id.iloc[0])
-    
+
     def generate_query(source, sample_interval):
       # used to autogenerate mysql-query
       spatial_filters = [
@@ -142,12 +142,12 @@ def get_station_data(event, context):
           q_aggregation = " AVG(T1.score_value / T1.reference_value) AS score "
         if source.agg_mode.iloc[0] == "sum":
           q_aggregation = " SUM(T1.score_value) AS score "
-      
+
       q_temporal_filter_start = " AND dt >= '%s' " % start if start else ""
       q_temporal_filter_end = " AND dt <= '%s' " % end if end else ""
 
       query = """
-        SELECT 
+        SELECT
           %s, %s
         FROM scores AS T1
         JOIN locations AS T3 ON T1.district_id = T3.district_id
@@ -184,7 +184,7 @@ def get_station_data(event, context):
     df.rename(columns={"dt_new": "dt"}, inplace=True)
     if "prozent" in meta["ylabel"].lower():
       df.score = df.score * 100
-      
+
     # fill with nan
     earliest_date = start if start else df.dt.min()
     latest_date = end if end else df.dt.max()
@@ -214,15 +214,15 @@ def get_station_data(event, context):
         "Access-Control-Allow-Headers": 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'
       },
       "body": json.dumps(result)
-    }   
+    }
   except Exception as e:
     return on_error(e)
-    
+
 def get_locations(event, context):
   try:
     assert event['httpMethod'] == 'GET', "Use GET for this request"
     q = """
-      SELECT 
+      SELECT
         district_id,
         district,
         state_id,
@@ -230,7 +230,7 @@ def get_locations(event, context):
         country_id,
         country
       FROM locations
-    """ 
+    """
 
     locations = pd.read_sql(q, aws_engine)
 
@@ -254,7 +254,7 @@ def get_locations(event, context):
         "Access-Control-Allow-Headers": 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'
       },
       'body': json.dumps(result)
-    }   
+    }
   except Exception as e:
     return on_error(e)
 
@@ -264,16 +264,51 @@ def get_stations(event, context):
     assert event['httpMethod'] == 'GET', "Use GET for this request"
 
     query = """
-      SELECT T1.source_id, T1.id, T1.description, T2.district_id, T2.district, T2.district_type, T2.state_id, T2.state, T2.country_id, T2.country
-      FROM stations AS T1
-      JOIN locations AS T2 ON T1.district_id = T2.district_id
+      SELECT source_id, id, description, country_id, state_id, district_id
+      FROM stations
     """
 
+    # query = """
+    #   SELECT T1.source_id, T1.id, T1.description, T2.district_id, T2.district, T2.district_type, T2.state_id, T2.state, T2.country_id, T2.country
+    #   FROM stations AS T1
+    #   JOIN locations AS T2 ON T1.district_id = T2.district_id
+    # """
+
     df = pd.read_sql(query, aws_engine ) #,  params=(start_date, end_date))
-    
+
     return {
       "statusCode": 200,
       "body": df.to_json(force_ascii=False, orient="records"),
+      'headers': {
+        'access-control-allow-methods': 'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT',
+        'access-control-allow-origin': '*',
+        "Access-Control-Allow-Headers": 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'
+      }
+    }
+  except Exception as e:
+    return on_error(e)
+
+def get_measures(event, context):
+  try:
+    assert event['httpMethod'] == 'GET', "Use GET for this request"
+
+    query = """
+      SELECT 
+        country_id_announced, state_id_announced, district_id_announced,
+        country_id_action, state_id_action, district_id_action,
+        dt_announcement, dt_start_action, dt_end_action,
+        desc_short, desc_long
+      FROM measures
+    """
+
+    df = pd.read_sql(query, aws_engine ) #,  params=(start_date, end_date))
+    df.dt_announcement = df.dt_announcement.astype(str)
+    df.dt_start_action = df.dt_start_action.astype(str)
+    df.dt_end_action = df.dt_end_action.astype(str)
+
+    return {
+      "statusCode": 200,
+      "body": df.to_json(force_ascii=False,orient="records"),
       'headers': {
         'access-control-allow-methods': 'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT',
         'access-control-allow-origin': '*',
@@ -289,12 +324,12 @@ def get_sources(event, context):
     assert event['httpMethod'] == 'GET', "Use GET for this request"
 
     query = """
-      SELECT id, desc_short, desc_long 
+      SELECT id, desc_short, desc_long
       FROM sources
     """
 
     df = pd.read_sql(query, aws_engine ) #,  params=(start_date, end_date))
-    
+
     return {
       "statusCode": 200,
       "body": df.to_json(force_ascii=False,orient="records"),
@@ -306,7 +341,7 @@ def get_sources(event, context):
     }
   except Exception as e:
     return on_error(e)
-  
+
 
 def get_station_data_OLD(event, context):
   # def has_references(df):
@@ -349,7 +384,7 @@ def get_station_data_OLD(event, context):
   try:
     assert event['httpMethod'] == 'POST', "Use POST for this request"
     # source_id = event['pathParameters']['source_id']
-    
+
     params = json.loads(event["body"])
 
     assert "source_id" in params, "please provide a source_id"
@@ -366,7 +401,7 @@ def get_station_data_OLD(event, context):
       agg_level = "state"
     if not state_id:
       agg_level = "country"
-    
+
     # agg_to_words = {
     #   "station": "der Messstation",
     #   "district": "auf Ebene der Kreise",
@@ -375,7 +410,7 @@ def get_station_data_OLD(event, context):
     # }
 
     # load all information for the requested source
-    source = pd.read_sql("SELECT * FROM sources WHERE id = '%s'" % source_id, aws_engine ) 
+    source = pd.read_sql("SELECT * FROM sources WHERE id = '%s'" % source_id, aws_engine )
     assert len(source) == 1, "Please provide correct source_id."
 
     # if has_references(df):
@@ -413,8 +448,8 @@ def get_station_data_OLD(event, context):
     # q_group = "" # tbd
 
     query = """
-      SELECT 
-        T1.dt, 
+      SELECT
+        T1.dt,
         AVG(T1.reference_value / T1.score_value),
       FROM scores AS T1
       JOIN stations AS T2 ON T2.id = T1.station_id
@@ -442,6 +477,6 @@ def get_station_data_OLD(event, context):
         "Access-Control-Allow-Headers": 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'
       },
       "body": json.dumps(result)
-    }   
+    }
   except Exception as e:
     return on_error(e)
