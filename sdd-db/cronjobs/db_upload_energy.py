@@ -17,6 +17,7 @@ from pymysql.constants import CLIENT
 from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
 import requests
+from hashlib import md5
 
 # connect to aws database with sqlalchemy (used for pandas connections)
 config = json.load(open("../../credentials/credentials-aws-db.json", "r"))
@@ -123,13 +124,6 @@ def upload_week(week):
       "spatial_level": "country"
     }
 
-    station = {
-      "source_id": source_id,
-      "description": "country-level data",
-      "source_station_id": "country-level data",
-      "spatial_id": "DE"
-    }
-
     q = """
       REPLACE INTO sources (
         id, desc_short, desc_long, contributors, unit, unit_long, unit_agg_long,
@@ -140,25 +134,36 @@ def upload_week(week):
       cur.execute(q, list(source.values()))
     pymysql_con.commit()
 
+    country_id = "DE"
+    unique_index = source_id + country_id
+
+    station = {
+      "source_id": source_id,
+      "description": "country-level data",
+      "source_station_id": "country-level data",
+      "country_id": country_id,
+      "unique_index": md5(unique_index.encode("utf-8")).hexdigest()
+    }
+
     q = """
-      INSERT INTO stations ( source_id, description, source_station_id, spatial_id )
-      VALUES ( %s, %s, %s, %s )
+      INSERT INTO stations ( source_id, description, source_station_id, country_id, unique_index )
+      VALUES ( %s, %s, %s, %s, %s )
       ON DUPLICATE KEY UPDATE
       source_id = VALUES(source_id),
       description = VALUES(description),
       source_station_id = VALUES(source_station_id),
-      spatial_id = VALUES(spatial_id)
+      country_id = VALUES(country_id)
     """
     with pymysql_con.cursor() as cur:
       cur.execute(q, list(station.values()))
     pymysql_con.commit()
 
     q = """
-      SELECT id AS station_id, spatial_id FROM stations
+      SELECT id AS station_id FROM stations
       WHERE source_id = '%s'
     """ % source_id
 
-    scores_stations_foreign_keys = pd.read_sql(q, aws_engine)
+    scores_stations_foreign_key = pd.read_sql(q, aws_engine)["station_id"].iloc[0]
 
     # remove trailing zeros
     drop_index = len(chart["values"])
@@ -169,25 +174,19 @@ def upload_week(week):
     df_scores.dropna(inplace=True)
     df_scores.dt = df_scores.dt.apply(lambda x: datetime.fromtimestamp(x / 1000))
     df_scores['dt'] = df_scores['dt'].astype(str)
-    df_scores["spatial_id"] = "DE"
     df_scores["source_id"] = source_id
 
-    df_scores = df_scores.merge(
-      scores_stations_foreign_keys,
-      on="spatial_id",
-      how="left",
-      suffixes=(False, False)
-    )
+    df_scores["station_id"] = scores_stations_foreign_key
 
     q = """
-      INSERT INTO scores ( dt, score_value, source_id, spatial_id, station_id )
-      VALUES (%s, %s, %s, %s, %s)
+      INSERT INTO scores ( dt, score_value, source_id, station_id )
+      VALUES (%s, %s, %s, %s)
       ON DUPLICATE KEY UPDATE
       score_value = VALUES(score_value)
     """
 
     with pymysql_con.cursor() as cur:
-      cur.executemany(q, df_scores[["dt", "score_value", "source_id", "spatial_id", "station_id"]].values.tolist())
+      cur.executemany(q, df_scores[["dt", "score_value", "source_id", "station_id"]].values.tolist())
     pymysql_con.commit()
 
   print("uploaded week %s done" % week)
@@ -212,11 +211,11 @@ def upload_all():
     upload_week(str(week).zfill(2))
     week = week + 1
 
-# upload_all()
+upload_all()
 
 # upload for today
-current_week = datetime.now().isocalendar()[1]
-upload_week(str(week).zfill(2))
+#current_week = datetime.now().isocalendar()[1]
+#upload_week(str(week).zfill(2))
 
 
 pymysql_con.close()

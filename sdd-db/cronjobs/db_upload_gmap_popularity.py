@@ -12,12 +12,14 @@ import json
 from datetime import datetime, timedelta
 import pandas as pd
 import pymysql
+from pymysql.constants import CLIENT
 from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
 import dateutil.parser
 from shapely.geometry import Point, Polygon
 from shapely import wkt
 import traceback
+from hashlib import md5
 
 # ask for credentials
 config = json.load(open("../../credentials/credentials-aws-db.json", "r"))
@@ -38,25 +40,26 @@ pymysql_con = pymysql.connect(
   config["host"],
   config["user"],
   config["password"],
-  config["database"])
+  config["database"],
+  client_flag=CLIENT.MULTI_STATEMENTS)
 
 ## SOURCE_ID ANPASSEN!
 source_id = "score_google_places"
 s3_client = boto3.client('s3')
 
 # load locations (the geometry is saved in db and transforemd to WKT format for mapping of coords to district)
-q = """ SELECT district_id, ASWKT(geometry) AS geometry from locations """
+q = """ SELECT district_id, state_id, country_id, ASWKT(geometry) AS geometry from locations """
 locations = pd.read_sql(q, aws_engine)
 locations["geometry"] = locations["geometry"].apply(wkt.loads)
 
 def coords_to_district_id(lat, lon):
   """ transforms lat lon to district id without(!) geopandas """
   point = Point(float(lon), float(lat))
-  for i, district in locations.iterrows():
-    shape = district["geometry"]
+  for i, location in locations.iterrows():
+    shape = location["geometry"]
     if point.within(shape):
-      return district["district_id"]
-  return None
+      return location["district_id"], location["state_id"], location["country_id"]
+  return None, None, None
 
 
 def custom_index(x):
@@ -106,8 +109,7 @@ def upload_date(date):
 
       ## CHECKEN OB LON LAT SO HEISSEN
       coordinates.rename(columns={"lng": "lon"}, inplace=True)
-      district_id = coords_to_district_id(coordinates["lat"], coordinates["lon"])
-
+      district_id, state_id, country_id = coords_to_district_id(coordinates["lat"], coordinates["lon"])
 
       ## ANPASSEN, DASS FÜR JEDE STATION DIE ZUSATZINFOS ABGESPEICHERT WERDEN
       other = {
@@ -121,13 +123,18 @@ def upload_date(date):
         "station_rating_n": station["rating_n"]
       }
 
+      unique_index = source_id + district_id + station["id"]
+
       ## ANPASSEN
       stations.append({
         "district_id": district_id,
+        "state_id": state_id,
+        "country_id": country_id,
         "source_id": source_id,
         "other": json.dumps(other),
         "description": station["name"][0:128],
         "source_station_id": station["id"],
+        "unique_index": md5(unique_index.encode("utf-8")).hexdigest()
       })
 
       other = {
@@ -154,12 +161,15 @@ def upload_date(date):
       INSERT INTO stations
       (
         district_id,
+        state_id,
+        country_id,
         source_id,
         other,
         description,
-        source_station_id
+        source_station_id,
+        unique_index
       )
-      VALUES (%s, %s, %s, %s, %s )
+      VALUES (%s, %s, %s, %s, %s, %s, %s, %s )
       ON DUPLICATE KEY UPDATE
       other = VALUES(other),
       description = VALUES(description)
@@ -169,7 +179,7 @@ def upload_date(date):
     with pymysql_con.cursor() as cur:
       cur.executemany(
         ## DARAUF ACHTEN, DASS DIE SPALTEN IM DATAFRAME GENAU DER REIHENFOLGE DES INSERTS ENTSPRECHEN
-        q, df_stations[["district_id", "source_id", "other", "description", "source_station_id" ]].values.tolist())
+        q, df_stations[["district_id", "state_id", "country_id", "source_id", "other", "description", "source_station_id", "unique_index"]].values.tolist())
     pymysql_con.commit()
 
   # upload scores
@@ -229,17 +239,13 @@ def upload_all():
   d = first_date_available
 
   # delete all before uploading all
-  for table in ["scores", "stations"]:
-    q = """
-      DELETE FROM %s WHERE source_id = '%s';
-    """ % (table, source_id )
-    with pymysql_con.cursor() as cur:
-      cur.execute(q)
-    pymysql_con.commit()
-
-  # delete source
+  q = """
+    DELETE FROM sources WHERE id = '%s';
+    DELETE FROM stations WHERE source_id = '%s';
+    DELETE FROM scores WHERE source_id = '%s';
+  """ % (source_id,source_id,source_id )
   with pymysql_con.cursor() as cur:
-    cur.execute("DELETE FROM sources WHERE id = '%s'" % source_id)
+    cur.execute(q)
   pymysql_con.commit()
 
   ## DIE ERSTELLUNG DER QUELLE ANPASSEN!
@@ -259,7 +265,10 @@ def upload_all():
       1,
       "district"
     )
-  """ % source_id
+  """
+  with pymysql_con.cursor() as cur:
+    cur.execute(q)
+  pymysql_con.commit()
 
   print("all existing data dropped")
 
@@ -270,10 +279,10 @@ def upload_all():
 
 
 # use this for intial upload
-# upload_all()
+upload_all()
 
 # upload this for timed upload (e.g. cronjob)
-upload_date(datetime.now() - timedelta(days=1))
+# upload_date(datetime.now() - timedelta(days=1))
 
 # free connection
 pymysql_con.close()

@@ -38,6 +38,8 @@ pymysql_con = pymysql.connect(
   config["password"],
   config["database"])
 
+q = """ SELECT district_id, state_id, country_id  from locations """
+locations = pd.read_sql(q, aws_engine)
 
 # retrieve data from zeit interactive
 url_corona = "https://interactive.zeit.de/cronjobs/2020/corona/germany.json"
@@ -81,16 +83,23 @@ for district in data["kreise"]["items"]:
 
 ## upload stations (ignore duplicates)
 q = """
-    INSERT INTO stations (district_id, source_id, unique_index)
-    VALUES (%s, %s, %s)
+    INSERT INTO stations (district_id, state_id, country_id, source_id, unique_index)
+    VALUES (%s, %s, %s, %s, %s)
     ON DUPLICATE KEY UPDATE
     id = id
   """
 
 df_stations = pd.DataFrame(stations)
 
+df_stations = df_stations.merge(
+  locations,
+  on="district_id",
+  how="left",
+  suffixes=(False, False)
+)
+
 with pymysql_con.cursor() as cur:
-  cur.executemany(q, df_stations.values.tolist())
+  cur.executemany(q, df_stations[["district_id", "state_id", "country_id", "source_id", "unique_index"]].values.tolist())
 pymysql_con.commit()
 
 
