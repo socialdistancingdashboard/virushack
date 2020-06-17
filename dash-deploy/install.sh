@@ -10,7 +10,7 @@ sudo curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virusha
 sudo chmod 644 /etc/systemd/system/rundashboard.service
 sudo systemctl enable rundashboard.service
 cd /home/ec2-user
-git clone https://github.com/socialdistancingdashboard/frontend.git
+git clone https://github.com/socialdistancingdashboard/frontendv2.git
 curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virushack/master/dash-deploy/update.sh
 sudo chmod u+x update.sh
 sudo ./update.sh
