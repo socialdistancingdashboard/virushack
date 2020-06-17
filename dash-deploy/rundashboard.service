@@ -1,0 +1,9 @@
+[Unit]
+Description=Run Streamlit Dashboard.
+
+[Service]
+Type=simple
+ExecStart=/bin/bash /usr/bin/rundashboard.sh
+
+[Install]
+WantedBy=multi-user.target
