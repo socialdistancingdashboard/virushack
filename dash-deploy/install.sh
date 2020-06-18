@@ -2,6 +2,7 @@
 sudo yum -y -q update
 sudo yum install -y git
 sudo yum install -y python3
+sudo yum install -y python-devel
 sudo yum install -y gcc
 sudo pip3 install pandas dash geopandas geopy influxdb_client
 cd /usr/bin
