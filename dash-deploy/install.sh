@@ -2,7 +2,7 @@
 sudo yum -y -q update
 sudo yum install -y git
 sudo yum install -y python3
-pip install pandas dash geopandas geopy influxdb_client
+sudo pip3 install pandas dash geopandas geopy influxdb_client
 cd /usr/bin
 sudo curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virushack/master/dash-deploy/rundashboard.sh
 cd /etc/systemd/system
