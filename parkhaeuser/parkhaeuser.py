@@ -146,8 +146,8 @@ for city in cities:
             r = re.compile(r'{}\.html.*?(\d*)\s%'.format(city.lower()), re.DOTALL)
         s = r.search(response)
         occupation = 1 - (int(s.group(1)) / 100)
-        data = {'Landkreis': city}
-        data['Auslastung'] = occupation
+        data = {'Landkreis': city,
+                'Auslastung' = occupation}
         results.append(data)
     except Exception as err:
         print(err)
