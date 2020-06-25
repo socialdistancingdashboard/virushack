@@ -1,5 +1,7 @@
 #!/bin/bash
 sudo yum -y -q update
+sudo curl https://yum.secrethub.io/secrethub.repo --output /etc/yum/repos.d/secrethub.repo --create-dirs
+sudo yum install -y secrethub-cli
 sudo yum install -y git
 sudo yum install -y python3
 sudo yum install -y python3-devel
