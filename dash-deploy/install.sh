@@ -1,7 +1,7 @@
 #!/bin/bash
-sudo apt-get update -y
 sudo touch /etc/apt/sources.list.d/secrethub.list
 echo 'deb [trusted=yes] https://apt.secrethub.io stable main' | sudo tee -a /etc/apt/sources.list.d/secrethub.list
+sudo apt-get update -y
 sudo apt install -y secrethub-cli
 sudo apt install -y secrethub-cli
 sudo apt install -y git
