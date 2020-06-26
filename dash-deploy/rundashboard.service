@@ -1,5 +1,5 @@
 [Unit]
-Description=Run Streamlit Dashboard.
+Description=Run Dash Dashboard.
 
 [Service]
 Type=simple
