@@ -3,7 +3,15 @@ Description=Run Dash Dashboard.
 
 [Service]
 Type=simple
-ExecStart=/bin/bash /usr/bin/rundashboard.sh
+User=ubuntu
+Group=user
+WorkingDirectory=/home/ubuntu/frontendv2/
+ExecStart=/home/ubuntu/frontendv2/dash_frontend.py
+SyslogIdentifier=dash
+StandardOutput=syslog
+StandardError=syslog
+Restart=always
+RestartSec=3
 
 [Install]
 WantedBy=multi-user.target
