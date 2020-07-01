@@ -21,7 +21,7 @@ curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virushack/ma
 sudo chmod u+x update.sh
 sudo ./update.sh
 sudo chown -R ubuntu:ubuntu /home/ubuntu
-secrethub inject -i credentials.txt.tpl -o credentials.txt.test --identity-provider=aws
+secrethub inject -i config.json.tpl -o config.json --identity-provider=aws
 sudo systemctl start rundashboard.service
 sudo su
 crontab -u ubuntu -l
