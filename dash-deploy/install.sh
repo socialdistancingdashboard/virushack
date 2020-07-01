@@ -11,8 +11,6 @@ sudo apt install -y gcc
 sudo apt install -y python3-pip
 sudo apt install -y libspatialindex-dev
 sudo pip3 install pandas dash geopandas geopy influxdb_client Flask-Caching rtree
-cd /usr/bin
-sudo curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virushack/master/dash-deploy/rundashboard.sh
 cd /etc/systemd/system
 sudo curl -O https://raw.githubusercontent.com/socialdistancingdashboard/virushack/master/dash-deploy/rundashboard.service
 sudo chmod 644 /etc/systemd/system/rundashboard.service
