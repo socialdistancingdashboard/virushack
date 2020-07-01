@@ -4,9 +4,9 @@ Description=Run Dash Dashboard.
 [Service]
 Type=simple
 User=ubuntu
-Group=user
+Group=ubuntu
 WorkingDirectory=/home/ubuntu/frontendv2/
-ExecStart=/home/ubuntu/frontendv2/dash_frontend.py
+ExecStart=python /home/ubuntu/frontendv2/dash_frontend.py
 SyslogIdentifier=dash
 StandardOutput=syslog
 StandardError=syslog
