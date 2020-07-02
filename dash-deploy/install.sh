@@ -23,6 +23,7 @@ sudo ./update.sh
 sudo chown -R ubuntu:ubuntu /home/ubuntu
 cd /home/ubuntu/frontendv2/
 secrethub inject -i config.json.tpl -o config.json --identity-provider=aws
+sudo chown -R ubuntu:ubuntu /home/ubuntu
 sudo systemctl start rundashboard.service
 sudo su
 crontab -u ubuntu -l
