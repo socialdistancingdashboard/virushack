@@ -14,8 +14,6 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 from selenium import webdriver
 
-date = datetime.now()
-s3_client = boto3.client('s3')
 results = []
 
 """Funktionen zum Scrapen des Quelltextes einer Website. Für Düsseldorf gibt es eine eigene Funktion, da die 
@@ -157,5 +155,11 @@ for city in cities:
 #    s = json.dumps(results, indent = 4)
 #    f.write(s)
 
-s3_client.put_object(Body=json.dumps(results),  Bucket='sdd-s3-basebucket',
+if len(results) > 0:
+    date = datetime.now()
+    s3_client = boto3.client('s3')
+    response = s3_client.put_object(Body=json.dumps(results),  Bucket='sdd-s3-basebucket',
                      Key='parkhaeuser/{}/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2), str(date.day).zfill(2), str(date.hour).zfill(2)))
+    print(f'Response: {response}')
+   
+
