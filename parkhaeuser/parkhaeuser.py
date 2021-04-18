@@ -145,7 +145,7 @@ for city in cities:
         s = r.search(response)
         occupation = 1 - (int(s.group(1)) / 100)
         data = {'Landkreis': city,
-                'Auslastung' = occupation}
+                'Auslastung': occupation}
         results.append(data)
     except Exception as err:
         print(err)
