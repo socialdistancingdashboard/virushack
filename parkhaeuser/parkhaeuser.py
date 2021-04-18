@@ -158,8 +158,11 @@ for city in cities:
 if len(results) > 0:
     date = datetime.now()
     s3_client = boto3.client('s3')
-    response = s3_client.put_object(Body=json.dumps(results),  Bucket='sdd-s3-basebucket',
-                     Key='parkhaeuser/{}/{}/{}/{}'.format(str(date.year).zfill(4), str(date.month).zfill(2), str(date.day).zfill(2), str(date.hour).zfill(2)))
+    response = s3_client.put_object(
+        Body=json.dumps(results),
+        Bucket='sdd-s3-basebucket',
+        Key=f'parkhaeuser/{str(date.year).zfill(4)}/{str(date.month).zfill(2)}'\
+             '/{str(date.day).zfill(2)}/{str(date.hour).zfill(2)}')
     print(f'Response: {response}')
    
 
