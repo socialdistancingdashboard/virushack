@@ -73,21 +73,23 @@ for location, empty, total in liste_co:
         occupation = (total - empty) / total
         total_co += total
         empty_co += empty
-        data = {'Location': location,
-                'Gesamt': total,
-                'Frei': empty,
-                'Auslastung': occupation}
+        data = {
+            'Location': location,
+            'Gesamt': total,
+            'Frei': empty,
+            'Auslastung': occupation}
         details.append(data)
     except Exception as err:
         print(err)
         print(f'Daten für Köln: {location} nicht gefunden')
 if total_co:
     occupation_co = (total_co - empty_co) / total_co
-    data = {'Landkreis': 'Köln',
-            'Gesamt': total_co,
-            'Frei': empty_co,
-            'Auslastung': occupation_co,
-            'Details': details}
+    data = {
+        'Landkreis': 'Köln',
+        'Gesamt': total_co,
+        'Frei': empty_co,
+        'Auslastung': occupation_co,
+        'Details': details}
     results.append((data))
 else:
     print('Auslastung für Köln kann nicht berechnet werden')
@@ -124,11 +126,12 @@ for location1, location2 in list(zip(locations_du[0::], locations_du[1::]))+[(lo
 
 if total_du:
     occupation_du = (total_du - empty_du) / total_du
-    data = {'Landkreis': 'Düsseldorf',
-            'Gesamt': total_du,
-            'Frei': empty_du,
-            'Auslastung': occupation_du,
-            'Details': details}
+    data = {
+        'Landkreis': 'Düsseldorf',
+        'Gesamt': total_du,
+        'Frei': empty_du,
+        'Auslastung': occupation_du,
+        'Details': details}
     results.append((data))
 else:
     print('Auslastung für Düsseldorf kann nicht berechnet werden, da keine Daten verfügbar')
@@ -144,8 +147,9 @@ for city in cities:
             r = re.compile(r'{}\.html.*?(\d*)\s%'.format(city.lower()), re.DOTALL)
         s = r.search(response)
         occupation = 1 - (int(s.group(1)) / 100)
-        data = {'Landkreis': city,
-                'Auslastung': occupation}
+        data = {
+            'Landkreis': city,
+            'Auslastung': occupation}
         results.append(data)
     except Exception as err:
         print(err)
