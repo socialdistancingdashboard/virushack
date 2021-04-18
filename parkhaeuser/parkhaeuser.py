@@ -5,12 +5,12 @@ Created on Sat Mar 21 15:58:56 2020
 @author: Peter
 """
 
-import requests
 import re
 import json
 import time
-import boto3
 from datetime import datetime
+import requests
+import boto3
 from bs4 import BeautifulSoup
 from selenium import webdriver
 
@@ -27,7 +27,7 @@ Performancegründen requests verwendet.
 def scrape(city, url):
     try:
         response = requests.get(url)
-        response.raise_for_status
+        response.raise_for_status()
         response = response.text
     except Exception as err:
         response = None
@@ -40,7 +40,7 @@ def scrape_du():
     try:
         driver = webdriver.Firefox()
         driver.get(url)
-        #Sleep, damit alle dynamischen Elemente geladen werden und 
+        #Sleep, damit alle dynamischen Elemente geladen werden und
         #der komplette Quelltext gescraped wird.
         #Zeit muss eventuell angepasst werden, je nach System.
         time.sleep(10)
@@ -67,7 +67,7 @@ def calc_co():
     empty_co = 0
     for location, empty, total in liste_co:
         try:
-            #Sonderfall: für Theather Parkhaus wird total nicht durch 
+            #Sonderfall: für Theather Parkhaus wird total nicht durch
             #die regex abgegriffen
             if location == 'Theater-Parkhaus':
                 total = 470
@@ -103,9 +103,8 @@ def calc_co():
             'Details': details
         }
         return data
-    else:
-        print('Auslastung für Köln kann nicht berechnet werden')
-        return None
+    print('Auslastung für Köln kann nicht berechnet werden')
+    return None
 
 def calc_du():
     """Berechnet die Belegung von Düsseldorf.
@@ -115,7 +114,7 @@ def calc_du():
     Zudem werden die Belegungszahlen für alle Viertel zusammen berechnet
     und in die JSON Datei geschrieben.
     """
-        locations_du= [
+    locations_du= [
             'Altstadt',
             'Friedrichstadt',
             'Hauptbahnhof',
@@ -123,19 +122,18 @@ def calc_du():
             'Nordstraße',
             'Schadowstraße'
         ]
-        response = scrape_du()
-        total_du = 0
-        empty_du = 0
-        details = []
-    #Die regex scannt immer für location[...]Belegung[...]nächste location, 
+    response = scrape_du()
+    total_du = 0
+    empty_du = 0
+    details = []
+    #Die regex scannt immer für location[...]Belegung[...]nächste location,
     #um zu verhindern, dass die Zahlen falsch zugeordnet werden, sollten
     #die Zahlen für eine location nicht verfügbar sein.
-        for location1, location2 in list(zip(locations_du[0::], locations_du[1::]))
-                                    + [(locations_du[-1], '')]:
+    for location1, location2 in list(zip(locations_du[0::], locations_du[1::]))\
+                                    +[(locations_du[-1], '')]:
         r = re.compile(
-            r'{}.*?(\d*) von (\d*) frei.*?{}'.format(location1, location2),
-            re.DOTALL
-        )
+                r'{}.*?(\d*) von (\d*) frei.*?{}'.format(location1, location2),
+                re.DOTALL)
         try:
             s = r.search(response)
             total, empty = int(s.group(2)), int(s.group(1))
@@ -162,10 +160,9 @@ def calc_du():
             'Auslastung': occupation_du,
             'Details': details}
         return data
-    else:
-        print('Auslastung für Düsseldorf kann nicht berechnet werden,'\
-              'da keine Daten verfügbar')
-        return None
+    print('Auslastung für Düsseldorf kann nicht berechnet werden'\
+          'da keine Daten verfügbar')
+    return None
 
 def calc():
     """Berechnet Belegung von mehreren Städten."""
@@ -177,19 +174,24 @@ def calc():
         'Bad Homburg'
     ]
     results = []
-    response = scrape('Frankfurt', 'https://www.planetradio.de/service/parkhaeuser/')
+    response = scrape(
+        'Frankfurt',
+        'https://www.planetradio.de/service/parkhaeuser/')
     for city in cities:
         try:
             if city == 'Bad Homburg':
                 r = re.compile(r'bad-homburg\.html.*?(\d*)\s%', re.DOTALL)
             else:
-                r = re.compile(r'{}\.html.*?(\d*)\s%'.format(city.lower()), re.DOTALL)
+                r = re.compile(
+                    r'{}\.html.*?(\d*)\s%'.format(city.lower()),
+                    re.DOTALL)
             s = r.search(response)
             occupation = 1 - (int(s.group(1)) / 100)
             data = {
                 'Landkreis': city,
                 'Auslastung': occupation
             }
+            results.append(data)
         except Exception as err:
             print(err)
             print(f'Daten für {city} nicht gefunden')
@@ -203,11 +205,11 @@ if __name__ == '__main__':
     if len(results) > 0:
         date = datetime.now()
         s3_client = boto3.client('s3')
-        response = s3_client.put_object(
+        s3_response = s3_client.put_object(
             Body=json.dumps(results),
             Bucket='sdd-s3-basebucket',
             Key=f'parkhaeuser/{str(date.year).zfill(4)}/'\
             '{str(date.month).zfill(2)}/{str(date.day).zfill(2)}/'\
             '{str(date.hour).zfill(2)}'
         )
-        print(f'Response: {response}')
+        print(f'Response: {s3_response}')
