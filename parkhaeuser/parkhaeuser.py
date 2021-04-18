@@ -53,7 +53,7 @@ def scrape_du():
     return response
 
 def calc_co():
-"""Berechnet die Belegung von Köln."""
+    """Berechnet die Belegung von Köln."""
     url = 'https://www.stadt-koeln.de/leben-in-koeln/verkehr/parken/parkhaeuser/'
     response = scrape('Köln', url)
     r = re.compile(
