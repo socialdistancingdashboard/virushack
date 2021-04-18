@@ -16,10 +16,14 @@ from selenium import webdriver
 
 results = []
 
-"""Funktionen zum Scrapen des Quelltextes einer Website. Für Düsseldorf gibt es eine eigene Funktion, da die 
-Website viele dynamische Elemente besitzt und mit requests.get der relevante Quelltext für die Belegung der
-Parkhäuser nicht erfasst wird. Daher wird der Quelltext mit webdriver und BeautifulSoup gescrapet. Für die anderen
-Seiten wird aus Performancegründen requests verwendet. 
+"""Funktionen zum Scrapen des Quelltextes einer Website.
+
+Für Düsseldorf gibt es eine eigene Funktion, da die Website
+viele dynamische Elemente besitzt und mit requests.get der
+relevante Quelltext für die Belegung der Parkhäuser nicht
+erfasst wird. Daher wird der Quelltext mit webdriver und
+BeautifulSoup gescrapet. Für die anderen Seiten wird aus
+Performancegründen requests verwendet.
 """
 def scrape(city, url):
     try:
@@ -55,7 +59,7 @@ r = re.compile(r'Freie Plätze">(.*?)<strong><br\s/>(\d*).*?Stellplätze:\s(\d*)
 liste_co = r.findall(response)
 
 details = []
-total_co = 0 
+total_co = 0
 empty_co = 0
 for location, empty, total in liste_co: 
     try:
